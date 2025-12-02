@@ -40,7 +40,7 @@ jobs:
 
     # 6️⃣ Upload build to EC2
     - name: Deploy to EC2
-      uses: appleboy/scp-action
+      uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SERVER_IP }}        # EC2 public IP
         username: ubuntu                 # EC2 username
