@@ -12,6 +12,12 @@ import { useAuth } from "@/lib/auth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { apiRequest } from "@/lib/queryClient";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TradeData {
   CreatedAt: string;
@@ -36,7 +42,6 @@ export default function History() {
   const [prevPage, setPrevPage] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Updated backend logic
   const fetchClientTrades = async () => {
     if (!user?.email) return [];
 
@@ -112,7 +117,7 @@ export default function History() {
                 <span className="text-md text-gray-600 dark:text-gray-200">Start Date</span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted">
+                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted hover:text-foreground">
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {startDate ? format(startDate, "MMM d, yyyy") : "Pick a date"}
                     </Button>
@@ -132,7 +137,7 @@ export default function History() {
                 <span className="text-md text-gray-600 dark:text-gray-200">End Date</span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted">
+                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted hover:text-foreground">
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {endDate ? format(endDate, "MMM d, yyyy") : "Pick a date"}
                     </Button>
@@ -196,7 +201,22 @@ export default function History() {
                       <div className="flex items-center">
                         Lot Size
                         <span className="relative group ml-[16px] mb-1 inline-block align-middle">
-                          <Info className="w-4 h-4 mt-1 cursor-pointer" />
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="w-4 h-4 mt-1 cursor-pointer" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  1 Lot Size
+                                  <br />
+                                  0.01 ETH
+                                  <br />
+                                  0.001 BTC
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </span>
                       </div>
                     </th>
@@ -228,18 +248,16 @@ export default function History() {
                         <td className="py-3 px-4">
                           <div className="flex items-center">
                             <div
-                              className={`w-1 h-8 rounded-full mr-3 ${
-                                trade.Side === "buy" ? "bg-green-500" : "bg-red-500"
-                              }`}
+                              className={`w-1 h-8 rounded-full mr-3 ${trade.Side === "buy" ? "bg-green-500" : "bg-red-500"
+                                }`}
                             ></div>
                             <div>
                               <div className="font-medium text-gray-800 dark:text-foreground">
                                 {trade.Symbol}
                               </div>
                               <div
-                                className={`text-[14px] ${
-                                  trade.Side === "buy" ? "text-green-600" : "text-red-600"
-                                }`}
+                                className={`text-[14px] ${trade.Side === "buy" ? "text-green-600" : "text-red-600"
+                                  }`}
                               >
                                 {trade.Side.charAt(0).toUpperCase() + trade.Side.slice(1)}
                               </div>
@@ -257,11 +275,10 @@ export default function History() {
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`${
-                              trade.State === "filled"
-                                ? "bg-[#DAF0E1] border-[#B5E1C3] text-[#006038] dark:bg-green-900/50 dark:border-green-800 dark:text-green-400"
-                                : "bg-[#FCDAE2] border-[#F9B5C6] text-[#801D18] dark:bg-red-900/50 dark:border-red-800 dark:text-red-400"
-                            } w-12 px-2 py-1 rounded-full text-[14px] border`}
+                            className={`${trade.State === "filled"
+                              ? "bg-[#DAF0E1] border-[#B5E1C3] text-[#006038] dark:bg-green-900/50 dark:border-green-800 dark:text-green-400"
+                              : "bg-[#FCDAE2] border-[#F9B5C6] text-[#801D18] dark:bg-red-900/50 dark:border-red-800 dark:text-red-400"
+                              } w-12 px-2 py-1 rounded-full text-[14px] border`}
                           >
                             {trade.State}
                           </span>

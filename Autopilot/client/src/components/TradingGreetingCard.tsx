@@ -178,7 +178,7 @@ const TradingGreetingCard = ({ userName, brokerName }: TradingGreetingCardProps)
   }, [balanceData]);
 
   return (
-    <div className="bg-background w-full rounded-2xl drop-shadow-lg">
+    <div className="bg-background w-full rounded-2xl drop-shadow-lg relative z-0">
       {/* Greeting */}
       <div className="flex justify-between items-start py-5 px-6">
         <div>
@@ -200,8 +200,9 @@ const TradingGreetingCard = ({ userName, brokerName }: TradingGreetingCardProps)
               Add your <span className="font-bold">broker</span> account to activate strategy deployment and start trading smarter.
             </p>
             <div className="flex gap-4 flex-wrap">
+
               {/* Connect Delta Dropdown */}
-              <div className="relative" ref={connectDeltaRef}>
+              {/* <div className="relative" ref={connectDeltaRef}>
                 <button
                   onClick={() => handleToggle('delta')}
                   className="bg-white border border-white text-black px-2 py-2.5 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-gray-200 transition-all duration-300 w-45"
@@ -235,7 +236,7 @@ const TradingGreetingCard = ({ userName, brokerName }: TradingGreetingCardProps)
                     ))}
                   </div>
                 )}
-              </div>
+              </div> */}
 
               {/* Connect CoinDCX Dropdown */}
               <div className="relative" ref={connectCoinDcxRef}>

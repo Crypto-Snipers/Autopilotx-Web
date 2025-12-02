@@ -1,55 +1,55 @@
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
-  // Load env file based on `mode` in the current working directory
-  const env = loadEnv(mode, process.cwd(), '');
-  
-  // Log environment variables for debugging (remove in production)
-  console.log('VITE_SUPABASE_URL:', env.VITE_SUPABASE_URL ? '***' : 'Not set');
-  console.log('VITE_SUPABASE_ANON_KEY:', env.VITE_SUPABASE_ANON_KEY ? '***' : 'Not set');
-
-  return {
+export default defineConfig({
     base: '/',
     plugins: [react()],
-    root: '.',
-    build: {
-      outDir: '../client-dist',
-      emptyOutDir: true,
-      rollupOptions: {
-        // Remove external since we want to bundle everything
+    css: {
+      postcss: {
+        plugins: [
+          tailwindcss,
+          autoprefixer,
+        ],
       },
-      sourcemap: true,
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src'),
-        '@components': path.resolve(__dirname, 'src/components'),
-        '@lib': path.resolve(__dirname, 'src/lib'),
-        '@hooks': path.resolve(__dirname, 'src/hooks'),
-        '@pages': path.resolve(__dirname, 'src/pages'),
-        '@assets': path.resolve(__dirname, 'src/assets'),
-        '@types': path.resolve(__dirname, 'src/types'),
+        "@": path.resolve(__dirname, "src"),
+        "@components": path.resolve(__dirname, "src", "components"),
+        "@hooks": path.resolve(__dirname, "src", "hooks"),
+        "@lib": path.resolve(__dirname, "src", "lib"),
+        "@pages": path.resolve(__dirname, "src", "pages"),
+        "@assets": path.resolve(__dirname, "src", "assets"),
+        "@types": path.resolve(__dirname, "src", "types"),
+        "@shared": path.resolve(__dirname, "..", "shared"),
       },
     },
     server: {
-      port: 3000,
-      strictPort: true,
-      
+      host: "0.0.0.0",
+      port: 7000,
+      allowedHosts: [
+        "autopilotx.in",
+        "www.autopilotx.in",
+        "localhost",
+        "127.0.0.1",
+      ],
     },
-    css: {
-      postcss: './postcss.config.cjs',
-      modules: {
-        localsConvention: 'camelCaseOnly',
+    build: {
+      outDir: path.resolve(__dirname, "..", "client-dist"),
+      emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom'],
+          },
+        },
       },
+      sourcemap: true,
     },
-    optimizeDeps: {
-      include: ['@supabase/supabase-js'],
-    },
-  };
 });

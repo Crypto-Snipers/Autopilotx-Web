@@ -5,6 +5,7 @@ import { getSessionItem } from "@/lib/sessionStorageUtils";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useTheme } from "@/context/ThemeContext";
+import { format } from "date-fns";
 
 
 type NotificationType = 'success' | 'warning' | 'info' | 'error';
@@ -94,34 +95,76 @@ export default function Header() {
 
   // Toggle notifications and mark unread as read
   const toggleNotifications = async () => {
-    setShowNotifications(!showNotifications);
+    const nextState = !showNotifications;
+    setShowNotifications(nextState);
 
-    if (!showNotifications) {
+    if (nextState) {
       // Mark all unread notifications as read
       const unread = notifications.filter(n => !n.read);
 
       await Promise.all(
         unread.map(async (n) => {
           try {
-            const res = await fetch(`/api/notifications/${n.id}/read?user_email=${encodeURIComponent(user?.email || '')}`, {
-              method: "POST",
-            });
-            if (!res.ok) {
-              console.error(`Failed to mark notification ${n.id} as read`);
-            }
+            const url = `/api/notifications/${n.id}/read?user_email=${encodeURIComponent(user?.email || '')}`;
+            await apiRequest("POST", url);
           } catch (err) {
-            console.error("Error marking as read:", err);
+            console.error(`Error marking notification ${n.id} as read:`, err);
           }
         })
       );
 
       // Update frontend state
-      setNotifications(notifications.map(n => ({ ...n, read: true })));
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     }
   };
 
+  // const toggleNotifications = async () => {
+  //   setShowNotifications(!showNotifications);
+
+  //   if (!showNotifications) {
+  //     // Mark all unread notifications as read
+  //     const unread = notifications.filter(n => !n.read);
+
+  //     await Promise.all(
+  //       unread.map(async (n) => {
+  //         try {
+  //           const res = await fetch(`/api/notifications/${n.id}/read?user_email=${encodeURIComponent(user?.email || '')}`, {
+  //             method: "POST",
+  //           });
+  //           if (!res.ok) {
+  //             console.error(`Failed to mark notification ${n.id} as read`);
+  //           }
+  //         } catch (err) {
+  //           console.error("Error marking as read:", err);
+  //         }
+  //       })
+  //     );
+
+  //     // Update frontend state
+  //     setNotifications(notifications.map(n => ({ ...n, read: true })));
+  //   }
+  // };
+
+
+  // Format time to Indian Standard Time (IST) - returns only time
+  const formatToIST = (timeString: string) => {
+    if (!timeString) return '';
+    try {
+      const date = new Date(timeString);
+      // Add 5 hours and 30 minutes (19800000 milliseconds) for IST offset
+      const istDate = new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
+      return istDate.toLocaleString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (error) {
+      return timeString;
+    }
+  };
 
   // Get the appropriate icon based on notification type
+
   const getNotificationIcon = (type: NotificationType) => {
     const baseClass = "w-6 h-6 mt-1 rounded-full flex items-center justify-center";
     switch (type) {
@@ -165,22 +208,14 @@ export default function Header() {
     if (!user?.email) return;
 
     try {
-      const res = await fetch(
-        `/api/notifications/${id}/dismiss?user_email=${encodeURIComponent(user.email)}`,
-        {
-          method: "POST",
-        }
-      );
-
-      if (!res.ok) {
-        console.error(`Failed to dismiss notification ${id}`);
-      } else {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }
+      const url = `/api/notifications/${id}/dismiss?user_email=${encodeURIComponent(user.email)}`;
+      await apiRequest("POST", url);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
       console.error("Dismiss error:", err);
     }
   };
+
 
   // --- CHANGE: Removed incorrect local theme state ---
 
@@ -229,7 +264,6 @@ export default function Header() {
               </button>
             </div>
             {showNotifications && (
-              // --- CHANGE: Applied theme-aware styles to notification panel ---
               <div className="bg-card fixed top-0 right-0 h-full w-80 shadow-lg z-50">
                 <div className="flex justify-between items-center p-4 border-b border-border">
                   <h3 className="text-lg font-medium text-foreground">Notifications</h3>
@@ -265,7 +299,11 @@ export default function Header() {
                               <h4 className={`font-medium ${!notification.read ? "font-bold" : "font-normal"}`}>
                                 {notification.title}</h4>
                               <p className="text-sm text-muted-foreground">{notification.message}</p>
-                              <span className="text-xs text-muted-foreground">{notification.time}</span>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+                                <span>{format(new Date(), "PPP")}</span>
+                                <span>•</span>
+                                <span>{formatToIST(notification.time)}</span>
+                              </div>
                             </div>
                           </div>
                           <button

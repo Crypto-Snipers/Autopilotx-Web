@@ -119,7 +119,7 @@ export default function SignIn() {
         await signin(values.email, values.password);
 
         // If login is successful, redirect to home page
-        navigate("/");
+        navigate("/home");
       } else {
         throw new Error("Failed to retrieve user data");
       }
@@ -313,10 +313,6 @@ export default function SignIn() {
               </FormItem>
             )}
           />
-
-          {/* <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Continue"}
-          </Button> */}
 
           <button
           type="submit" className="w-full bg-[#06a57f] hover:bg-[#05b289] font-medium text-white px-4 py-2 rounded-md transition-colors" disabled={isLoading}>

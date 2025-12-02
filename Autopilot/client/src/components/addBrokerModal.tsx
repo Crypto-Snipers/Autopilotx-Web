@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { X, Loader2, BadgeInfo, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
@@ -6,6 +6,24 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
 import { setSessionItem } from '@/lib/sessionStorageUtils';
 import DeltaExchangeLogo from '../assets/DeltaExchangeLogo.png';
+import { Portal } from './ui/Portal';
+
+// Prevent body scroll when modal is open
+const usePreventBodyScroll = (isOpen: boolean) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isOpen]);
+};
 
 interface AddBrokerModalProps {
   isOpen: boolean;
@@ -28,9 +46,11 @@ const AddBrokerModal: React.FC<AddBrokerModalProps> = ({ isOpen, onClose, onSucc
   const [brokerIdError, setBrokerIdError] = useState('');
 
 
+  usePreventBodyScroll(isOpen);
+
   if (!isOpen) return null;
 
-  // Condistion on user ID, that is should only accepts digits
+  // Condition on user ID, that is should only accepts digits
   const isValidateBrokerId = (id: string) => /^\d+$/.test(id);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -132,9 +152,17 @@ const AddBrokerModal: React.FC<AddBrokerModalProps> = ({ isOpen, onClose, onSucc
 
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      {/* The classes for the glow and green theme have been applied here */}
-      <div className="bg-background rounded-2xl shadow-lg w-[800px] max-h-[90vh] overflow-y-auto transition-shadow duration-300 dark:border dark:border-green-500/20 dark:shadow-2xl dark:shadow-green-400/20">
+    <Portal>
+      <div 
+        className="fixed inset-0 bg-black/50 flex justify-center items-start pt-16 pb-8 overflow-y-auto"
+        onClick={(e) => {
+          // Close modal when clicking on the overlay
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        <div className="bg-background rounded-2xl shadow-2xl w-[800px] max-h-[80vh] overflow-y-auto transition-all duration-300 dark:border dark:border-green-500/20 dark:shadow-2xl dark:shadow-green-400/20 transform scale-100">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-zinc-700">
           <h2 className="text-base font-medium text-gray-800 dark:text-white">Add Broker</h2>
@@ -143,7 +171,7 @@ const AddBrokerModal: React.FC<AddBrokerModalProps> = ({ isOpen, onClose, onSucc
               href="https://docs.delta.exchange"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-600 text-sm hover:underline"
+              className="text-[#06a57f] text-sm hover:underline"
             >
               View Docs
             </a>
@@ -195,12 +223,12 @@ const AddBrokerModal: React.FC<AddBrokerModalProps> = ({ isOpen, onClose, onSucc
               <div>
                 <span className='text-md'>Go to : </span>
                 <a
-                  href="https://www.delta.exchange/app/account/manageapikeys"
-                  className="text-green-600 hover:underline break-all"
+                  href="https://www.delta.exchange/"
+                  className="text-[#06a57f] hover:underline break-all"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  https://www.delta.exchange/app/account/manageapikeys
+                 https://www.delta.exchange/
                 </a>
               </div>
             </div>
@@ -217,7 +245,7 @@ const AddBrokerModal: React.FC<AddBrokerModalProps> = ({ isOpen, onClose, onSucc
                 <div className="flex items-center gap-2 mt-1">
                   <input
                     type="text"
-                    value="13.232.102.237"
+                    value="13.201.215.73"
                     readOnly
                     className="w-full p-2 border dark:border-gray-400 dark:bg-background dark:text-gray-400 rounded-lg bg-gray-100 text-gray-700 text-sm"
                   />
@@ -225,7 +253,7 @@ const AddBrokerModal: React.FC<AddBrokerModalProps> = ({ isOpen, onClose, onSucc
                     type="button"
                     className="px-3 py-2 text-xs rounded-lg font-medium bg-[#02b589] hover:bg-[#00a67d] text-white transition"
                     onClick={() => {
-                      navigator.clipboard.writeText("13.232.102.237")
+                      navigator.clipboard.writeText("13.201.215.73")
                       toast({
                         title: "Successful",
                         description: "Text copied!",
@@ -337,8 +365,9 @@ const AddBrokerModal: React.FC<AddBrokerModalProps> = ({ isOpen, onClose, onSucc
             </div>
           </form>
         </div>
+        </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 

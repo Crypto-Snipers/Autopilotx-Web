@@ -394,7 +394,7 @@ export default function AdminDashboard() {
                                                                 roleUpdateMutation.isPending &&
                                                                 roleUpdateMutation.variables?.email === user.email
                                                             }
-                                                            className="bg-blue-600 hover:bg-blue-700"
+                                                            className="bg-[#1a785f] hover:bg-[#1a785f]"
                                                         >
                                                             {roleUpdateMutation.isPending &&
                                                                 roleUpdateMutation.variables?.email === user.email ? (

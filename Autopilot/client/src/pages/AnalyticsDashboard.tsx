@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { TrendingUp, Users, Wallet, BarChart3, Activity, ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { TrendingUp, Users, Wallet, BarChart3, Activity, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button";
 import { Line, LineChart, ResponsiveContainer } from "recharts"
 import Sidebar from "@/components/Sidebar"
 import Header from "@/components/Header"
@@ -10,6 +11,9 @@ import { apiRequest } from "@/lib/queryClient"
 import { useToast } from "@/hooks/use-toast"
 import { useLocation } from "wouter"
 import CryptoMarketOverview from "@/components/CryptoMarketOverview"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 // Spinner for loading states
 const spinner = (
@@ -89,14 +93,14 @@ const fetchTotalFundsDeployed = async (): Promise<number> => {
 // Fetch total value of funds(futures wallets) 
 const fetchtotalFunds = async (): Promise<number> => {
     try {
-        const res = await apiRequest<{ success: boolean; total_futures_wallets_usd: number }>(
+        const res = await apiRequest<{ success: boolean; total_futures_wallets_inr: number }>(
             "GET",
             "/api/total-funds"
         );
 
         if (!res.success) throw new Error("Failed to fetch total funds deployed");
 
-        const total = res.total_futures_wallets_usd;
+        const total = res.total_futures_wallets_inr;
         return total;
     } catch (error) {
         console.error("Error fetching total funds:", error);
@@ -189,6 +193,9 @@ export default function AnalyticsDashboard() {
     const [totalActiveStrategies, setTotalActiveStrategies] = useState<number | null>(null);
     const [totalActiveStrategiesLoading, setTotalActiveStrategiesLoading] = useState(true);
     const [totalActiveStrategiesError, setTotalActiveStrategiesError] = useState<string | null>(null);
+
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
 
 
     // Check admin access if a user tried to access this page directly
@@ -375,8 +382,8 @@ export default function AnalyticsDashboard() {
                 : totalFundsError
                     ? totalFundsError
                     : typeof totalFunds === "number"
-                        ? `$${totalFunds.toLocaleString()}`
-                        : "$0",
+                        ? `₹${totalFunds.toLocaleString()}`
+                        : "₹0",
             change: "+3.8%",
             changeType: "positive" as const,
             icon: Wallet,
@@ -391,8 +398,8 @@ export default function AnalyticsDashboard() {
                 : totalFundsDeployedError
                     ? totalFundsDeployedError
                     : typeof totalFundsDeployed === "number"
-                        ? `$${totalFundsDeployed.toLocaleString()}`
-                        : "0",
+                        ? `₹${totalFundsDeployed.toLocaleString()}`
+                        : "₹0",
             change: "+5.7%",
             changeType: "positive" as const,
             icon: TrendingUp,
@@ -407,7 +414,7 @@ export default function AnalyticsDashboard() {
                 : totalVolumesError
                     ? totalVolumesError
                     : typeof totalVolumes === "number"
-                        ? `$${totalVolumes.toLocaleString()}`
+                        ? `${totalVolumes.toLocaleString()}`
                         : "0",
             change: "+2.4%",
             changeType: "positive" as const,
@@ -431,6 +438,68 @@ export default function AnalyticsDashboard() {
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Analytics Dashboard</h2>
                             <p className="text-gray-600 dark:text-gray-400">Monitor your platform's key performance metrics and trading strategies.</p>
+                        </div>
+
+                        {/* Date Filter */}
+                        <div className="flex items-center justify-end gap-2 mb-6">
+                            {/* start date */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-md text-gray-600 dark:text-gray-200">From</span>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            <span className="truncate">
+                                                {startDate ? format(startDate, "MMM d, yyyy") : "Pick a date"}
+                                            </span>
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={startDate || undefined}
+                                            onSelect={(date) => setStartDate(date ?? null)}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+
+                            {/* end date */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-md text-gray-600 dark:text-gray-200">To</span>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+
+                                        <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            <span className="truncate">
+                                                {endDate ? format(endDate, "MMM d, yyyy") : "Pick a date"}
+                                            </span>
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={endDate || undefined}
+                                            onSelect={(date) => setEndDate(date ?? null)}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+
+                            {/* clear filters */}
+                            <Button
+                                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground text-md font-semibold"
+                            >
+                                Apply
+                            </Button>
+                            <Button
+                                className="bg-red-600/80 hover:bg-red-600/100 text-primary-foreground text-md font-semibold"
+                            >
+                                Reset
+                            </Button>
                         </div>
 
                         {/* Main Metrics Grid */}

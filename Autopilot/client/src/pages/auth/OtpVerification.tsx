@@ -224,7 +224,7 @@ export default function OtpVerification() {
       if (userData.phone) setSessionItem("signupPhone", userData.phone);
 
       // Redirect to home page
-      navigate("/");
+      navigate("/home");
     } catch (error: any) {
       console.error("OTP verification error:", error);
       setIsInvalid(true);
@@ -288,7 +288,7 @@ export default function OtpVerification() {
             </p>
           )}
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <button type="submit" className="w-full p-3 rounded-lg bg-[#06a57f] text-white hover:bg-[#06a57f]/80" disabled={isLoading}>
             {isLoading ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -297,7 +297,7 @@ export default function OtpVerification() {
             ) : (
               "Verify Email"
             )}
-          </Button>
+          </button>
 
           <div className="text-center text-sm">
             <p className="text-muted-foreground">
@@ -306,7 +306,7 @@ export default function OtpVerification() {
                 type="button"
                 onClick={handleResendOtp}
                 disabled={timeLeft > 0 || isResending}
-                className="font-medium text-primary hover:underline"
+                className="font-medium text-[#06a57f] hover:underline"
               >
                 {isResending ? (
                   <span className="inline-flex items-center">

@@ -633,7 +633,6 @@ async function registerRoutes(app2) {
 // server/vite.ts
 import express from "express";
 import fs from "fs";
-import path2 from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 
 // vite.config.ts
@@ -641,37 +640,81 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
-var vite_config_default = defineConfig({
-  plugins: [
+import tsconfigPaths from "vite-tsconfig-paths";
+var vite_config_default = defineConfig(async () => {
+  const plugins = [
     react(),
-    runtimeErrorOverlay(),
-    ...process.env.NODE_ENV !== "production" && process.env.REPL_ID !== void 0 ? [
-      await import("@replit/vite-plugin-cartographer").then(
-        (m) => m.cartographer()
-      )
-    ] : []
-  ],
-  resolve: {
-    alias: {
-      // "@": path.resolve(import.meta.dirname, "client", "src"),
-      // "@shared": path.resolve(import.meta.dirname, "shared"),
-      // "@assets": path.resolve(import.meta.dirname, "attached_assets"),
-      "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
-      "@hooks": path.resolve(import.meta.dirname, "client", "src/hooks"),
-      "@lib": path.resolve(import.meta.dirname, "client", "src/lib")
-    }
-  },
-  root: path.resolve(import.meta.dirname, "client"),
-  build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
-    emptyOutDir: true
+    tsconfigPaths({
+      root: path.resolve(__dirname),
+      projects: [path.resolve(__dirname, "tsconfig.json")]
+    }),
+    runtimeErrorOverlay()
+  ];
+  if (process.env.NODE_ENV !== "production" && process.env.REPL_ID !== void 0) {
+    const { cartographer } = await import("@replit/vite-plugin-cartographer");
+    plugins.push(cartographer());
   }
+  return {
+    base: "/",
+    plugins,
+    css: {
+      postcss: {
+        plugins: [
+          (await import("tailwindcss")).default,
+          (await import("autoprefixer")).default
+        ]
+      }
+    },
+    root: path.resolve(__dirname, "client"),
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "client", "src"),
+        "@components": path.resolve(__dirname, "client", "src", "components"),
+        "@hooks": path.resolve(__dirname, "client", "src", "hooks"),
+        "@lib": path.resolve(__dirname, "client", "src", "lib"),
+        "@pages": path.resolve(__dirname, "client", "src", "pages"),
+        "@assets": path.resolve(__dirname, "client", "src", "assets"),
+        "@types": path.resolve(__dirname, "client", "src", "types"),
+        "@shared": path.resolve(__dirname, "shared")
+      }
+    },
+    server: {
+      host: "0.0.0.0",
+      port: 7e3,
+      allowedHosts: [
+        "autopilotx.in",
+        "www.autopilotx.in",
+        "localhost",
+        "127.0.0.1"
+      ]
+    },
+    optimizeDeps: {
+      exclude: [
+        "@replit/vite-plugin-cartographer",
+        "@replit/vite-plugin-runtime-error-modal"
+      ]
+    },
+    build: {
+      outDir: path.resolve(__dirname, "client-dist"),
+      emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ["react", "react-dom"]
+          }
+        }
+      },
+      sourcemap: true
+    }
+  };
 });
 
 // server/vite.ts
 import { nanoid } from "nanoid";
+import { fileURLToPath } from "url";
+import path2 from "path";
+var __filename = fileURLToPath(import.meta.url);
+var __dirname2 = path2.dirname(__filename);
 var viteLogger = createLogger();
 function log(message, source = "express") {
   const formattedTime = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-US", {
@@ -686,11 +729,13 @@ async function setupVite(app2, server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true
+    allowedHosts: [
+      "autopilotx.in",
+      "www.autopilotx.in"
+    ]
   };
   const vite = await createViteServer({
     ...vite_config_default,
-    configFile: false,
     customLogger: {
       ...viteLogger,
       error: (msg, options) => {
@@ -705,12 +750,7 @@ async function setupVite(app2, server) {
   app2.use("*", async (req, res, next) => {
     const url = req.originalUrl;
     try {
-      const clientTemplate = path2.resolve(
-        import.meta.dirname,
-        "..",
-        "client",
-        "index.html"
-      );
+      const clientTemplate = path2.resolve(__dirname2, "..", "client", "index.html");
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
@@ -725,7 +765,7 @@ async function setupVite(app2, server) {
   });
 }
 function serveStatic(app2) {
-  const distPath = path2.resolve(import.meta.dirname, "../client-dist");
+  const distPath = path2.resolve(__dirname2, "public");
   if (!fs.existsSync(distPath)) {
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`

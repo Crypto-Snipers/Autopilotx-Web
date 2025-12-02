@@ -29,13 +29,13 @@ logger.info("Logging initialized")
 
 load_dotenv()
 
-your_email_address = "support@thecryptosnipers.com"
-your_email_password = "Manisha@ANG#13"
+your_email_address = "support@autopilotx.in"
+your_email_password = "Support@007!"
 recipient_email_address = "vipinpal7080@gmail.com"
 your_smtp_server = "smtpout.secureserver.net"
 your_smtp_port = 465
-your_company_name = "Crypto Snipers"
-logo_path = os.path.join(os.path.dirname(__file__), "assets", "CS2.png")
+your_company_name = "Autopilotx"
+logo_path = os.path.join(os.path.dirname(__file__), "assets", "autopilotx-black.png")
 
 
 def send_welcome_email(sender_email: str=your_email_address, sender_password: str=your_email_password, recipient_email: str=recipient_email_address,
@@ -59,17 +59,17 @@ def send_welcome_email(sender_email: str=your_email_address, sender_password: st
         logger.info(f"Preparing welcome email for {recipient_email}")
         # Create the email message
         message = MIMEMultipart("alternative")
-        message["Subject"] = f"Welcome to {company_name} - Your Trading Journey Begins!"
+        message["Subject"] = f"Welcome to Autopilotx - Your Trading Journey Begins!"
         message["From"] = formataddr((company_name, sender_email))
         message["To"] = recipient_email
 
         # Create the plain-text version of your message
         text = f"""\
-        Welcome to {company_name}!
+        Welcome to Autopilotx!
 
-        You've just taken your first step into the future of crypto trading with {company_name} – India's first-of-its-kind algorithmic trading platform for cryptocurrencies!
+        You've just taken your first step into the future of crypto trading with Autopilotx – India's first-of-its-kind algorithmic trading platform for cryptocurrencies!
 
-        Getting Started with {company_name}:
+        Getting Started with Autopilotx:
 
         1. New here and haven't signed up via referral?
         👉 Fill out this quick form to register: 
@@ -87,15 +87,12 @@ def send_welcome_email(sender_email: str=your_email_address, sender_password: st
         5. Minimum Capital Requirement
         💰 Each strategy needs a minimum of $500 or ₹50,000 to begin.
 
-        Let the Sniper Take Over:
-        🎯 Sit back and relax while the Snipers execute trades for you, 24/7!
-
         Need Help?
         Our expert support team is here to assist you:
-        ✉️ Email: support@thecryptosnipers.com
+        ✉️ Email: support@autpilotx.in
 
         Happy Trading,
-        The {company_name} Team
+        The Autopilotx Team
         """
 
         # Create the HTML version of your message with inline styles and image reference
@@ -105,16 +102,16 @@ def send_welcome_email(sender_email: str=your_email_address, sender_password: st
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Welcome to {company_name}</title>
+            <title>Welcome to Autopilotx</title>
         </head>
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f8fafc; color: #1e293b; line-height: 1.6;">
             <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
                 <div style="background: #000000; padding: 40px 30px; text-align: center; position: relative; overflow: hidden;">
                     <div style="margin-bottom: 15px;">
-                        <img src="cid:logo" alt="{company_name} Logo" style="max-width: 200px; height: auto;">
+                        <img src="cid:logo" alt="Autopilotx Logo" style="max-width: 200px; height: auto;">
                     </div>
                     <div style="font-size: 18px; color: rgba(255, 255, 255, 0.9); position: relative; z-index: 2; font-weight: 400; letter-spacing: 0.5px;">
-                        The Crypto Snipers - Real Future of Trading begins here!
+                        Real Future of Trading begins here!
                     </div>
                 </div>
                 
@@ -123,15 +120,15 @@ def send_welcome_email(sender_email: str=your_email_address, sender_password: st
                         Welcome to the Future of Trading
                     </div>
                     <div style="font-size: 16px; font-weight: 500; text-align: center; color: #000000; margin-bottom: 40px;">
-                        You've just taken your first step into the future of crypto trading with {company_name} – India's first-of-its-kind algorithmic trading platform for cryptocurrencies!
+                        You've just taken your first step into the future of crypto trading with Autopilotx – India's first-of-its-kind algorithmic trading platform for cryptocurrencies!
                     </div>
                     
                     <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px; padding: 30px; margin: 40px 0; border-left: 4px solid #3b82f6; border: 1px solid #bfdbfe;">
                         <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #2563ea; display: flex; align-items: center; justify-content: center; gap: 12px;">
-                            Getting Started with {company_name}
+                            Getting Started with Autopilotx
                         </div>
                         <div style="font-size: 14px; color: #000000; font-weight: 500; margin-bottom: 25px; line-height: 1.5; text-align: center;">
-                            Follow the provided simple steps to activate the Snipers for your account.
+                            Follow the provided simple steps to activate Autopilotx for your account.
                         </div>
                         <ul style="list-style: none; padding: 0; margin: 0;">
                             <li style="padding: 16px 0 16px 40px; border-bottom: 1px solid rgba(59, 130, 246, 0.1); font-size: 16px; color: #374151; font-weight: 500; position: relative;">
@@ -162,10 +159,10 @@ def send_welcome_email(sender_email: str=your_email_address, sender_password: st
                     <div style="margin: 50px 0 40px 0;">
                         <div style="background: #2563ea; border-radius: 12px; padding: 35px 30px; text-align: center; color: #ffffff;">
                             <div style="font-size: 20px; margin-bottom: 12px; font-weight: 600; line-height: 1.4;">
-                                Let the Sniper Take Over
+                                Let We Take Over
                             </div>
                             <div style="font-size: 16px; font-weight: 500; opacity: 0.95; line-height: 1.6;">
-                                🎯 Sit back and relax while the Snipers execute trades for you, 24/7!
+                                🎯 Sit back and relax while We execute trades for you, 24/7!
                             </div>
                         </div>
                     </div>
@@ -183,7 +180,7 @@ def send_welcome_email(sender_email: str=your_email_address, sender_password: st
                             <div style="text-align: center; margin: 0 20px 20px 20px; padding: 20px; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); min-width: 180px;">
                                 <div style="font-size: 28px; margin-bottom: 12px;">✉️</div>
                                 <div style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: #1e40af;">Email Support</div>
-                                <div style="font-size: 14px; color: #4b5563; line-height: 1.5;">info@thecryptosnipers.com</div>
+                                <div style="font-size: 14px; color: #4b5563; line-height: 1.5;">support@autopilotx.in</div>
                             </div>
                         </div>
                     </div>
@@ -201,10 +198,10 @@ def send_welcome_email(sender_email: str=your_email_address, sender_password: st
                     </div>
                     <div style="font-style: italic; color: #64748b; font-size: 14px; margin-top: 25px;">
                         Happy Trading,<br>
-                        <span style="font-weight: 600;">The {company_name} Team</span>
+                        <span style="font-weight: 600;">The Autopilotx Team</span>
                     </div>
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
-                        <p>© {company_name} {time.strftime('%Y')}. All rights reserved.</p>
+                        <p>© Autopilotx {time.strftime('%Y')}. All rights reserved.</p>
                         <p style="margin-top: 5px;">This is an automated message, please do not reply directly to this email.</p>
                     </div>
                 </div>
@@ -293,30 +290,29 @@ def send_approval_email(sender_email: str=your_email_address, sender_password: s
         text = f"""
         Your Account is Now Approved!
 
-        We’re pleased to inform you that your account on {company_name} has been successfully approved.
+        We’re pleased to inform you that your account on Autopilotx has been successfully approved.
 
         What’s Next?
         To help you get started, please find the onboarding video and guidelines linked below:
         🔗 Guide Link.
 
         - How to access and use the platform?
-        - How to link your broker to the Crypto Snipers?
+        - How to link your broker to Autopilotx?
         - How to deploy your strategy?
         - How to deactivate your strategy?
         - How to check your trade history?
 
-        Let the Sniper Take Over
         We’re excited to have you onboard, and we can’t wait to see your trading journey take off with us.
 
         Expert Support Available
         If you have any questions or face issues during onboarding, feel free to reply to this email or reach out to our support team on Telegram.
 
-        Email Support: info@thecryptosnipers.com
-        Telegram Support: @infocryptosnipers
+        Email Support: support@autopilotx.in
+        
 
-        Happy Snipping,
-        Team {company_name}
-        © {company_name} {time.strftime('%Y')}. All rights reserved.
+        Happy Trading,
+        Team Autopilotx
+        © Autopilotx {time.strftime('%Y')}. All rights reserved.
         """
 
         # HTML version with inlined CSS
@@ -326,12 +322,12 @@ def send_approval_email(sender_email: str=your_email_address, sender_password: s
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Welcome to {company_name}</title>
+            <title>Welcome to Autopilotx</title>
         </head>
         <body style="margin: 0; padding: 20px; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #1e293b; line-height: 1.6;">
             <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid #e2e8f0;">
                 <div style="background: rgb(0, 0, 0); padding: 40px 30px; text-align: center; position: relative; overflow: hidden;">
-                    <div style="margin-bottom: 15px;"><img style="height: 8rem; width: 20rem;" src="cid:logo" alt="cryptoSniperLogo"></div>
+                    <div style="margin-bottom: 15px;"><img style="height: 8rem; width: 20rem;" src="cid:logo" alt="autopilotxLogo"></div>
                     <div style="font-size: 18px; color: rgba(255, 255, 255, 0.9); position: relative; z-index: 2; font-weight: 400; letter-spacing: 0.5px;">The Crypto Snipers - Real Future of Trading begins here!</div>
                 </div>
                 
@@ -340,7 +336,7 @@ def send_approval_email(sender_email: str=your_email_address, sender_password: s
                         Your Account is Now Approved!
                     </div>
                     <div style="font-size: 16px; font-weight: 500; text-align: center; color: #000000; margin-bottom: 40px;">
-                        We’re pleased to inform you that your account on The Crypto Snipers has been successfully approved. 
+                        We’re pleased to inform you that your account on Autopilotx has been successfully approved. 
                     </div>
                     
                     <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px; padding: 30px; margin: 40px 0; border-left: 4px solid #3b82f6; border: 1px solid #bfdbfe;">
@@ -358,7 +354,7 @@ def send_approval_email(sender_email: str=your_email_address, sender_password: s
                             </li>
                             <li style="padding: 16px 0 16px 40px; border-bottom: 1px solid rgba(59, 130, 246, 0.1); font-size: 16px; color: #374151; font-weight: 500; position: relative; display: flex; align-items: center;">
                                 <span style="color: #3b82f6; font-size: 16px; font-weight: bold; margin-right: 8px;">✓</span>
-                                How to link your broker to the Crypto Snipers?
+                                How to link your broker to Autopilotx?
                             </li>
                             <li style="padding: 16px 0 16px 40px; border-bottom: 1px solid rgba(59, 130, 246, 0.1); font-size: 16px; color: #374151; font-weight: 500; position: relative; display: flex; align-items: center;">
                                 <span style="color: #3b82f6; font-size: 16px; font-weight: bold; margin-right: 8px;">✓</span>
@@ -376,9 +372,9 @@ def send_approval_email(sender_email: str=your_email_address, sender_password: s
                     </div>
                     
                     <div style="background: #2563ea; border-radius: 12px; padding: 30px; text-align: center; margin: 40px 0; color: #ffffff;">
-                        <div style="font-size: 18px; margin-bottom: 8px; font-weight: 600;">
-                            Let the Sniper Take Over
-                        </div>
+                        # <div style="font-size: 18px; margin-bottom: 8px; font-weight: 600;">
+                        #     Let the Sniper Take Over
+                        # </div>
                         <div style="font-size: 14px; font-weight: 500; opacity: 0.9;">
                            We’re excited to have you onboard, and we can’t wait to see your trading journey take off with us.
                         </div>
@@ -395,16 +391,16 @@ def send_approval_email(sender_email: str=your_email_address, sender_password: s
                                 <div style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: #1e40af;">Email Support</div>
                                 <div style="font-size: 14px; color: #4b5563; line-height: 1.5;">
                                     <a style="color: #2563eb; text-decoration: none;"
-                                    href="mailto:info@thecryptosnipers.com">info@thecryptosnipers.com</a>
+                                    href="mailto:support@autopilotx.in">support@autopilotx.in</a>
                                 </div>
                             </div>
                             <div style="padding: 20px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); margin: 10px; min-width: 200px;">
                                 <div style="font-size: 28px; margin-bottom: 12px;">💬</div>
                                 <div style="font-weight: 700; margin-bottom: 8px; font-size: 16px; color: #1e40af;">Telegram Support</div>
-                                <div style="font-size: 14px; color: #4b5563; line-height: 1.5;">
-                                    <a style="color: #2563eb; text-decoration: none;"
-                                    href="https://t.me/infocryptosnipers">@infocryptosnipers</a>
-                                </div>
+                                # <div style="font-size: 14px; color: #4b5563; line-height: 1.5;">
+                                #     <a style="color: #2563eb; text-decoration: none;"
+                                #     href="https://t.me/infocryptosnipers">@infocryptosnipers</a>
+                                # </div>
                             </div>
                         </div>
                     </div>
@@ -422,10 +418,10 @@ def send_approval_email(sender_email: str=your_email_address, sender_password: s
                     </div>
                     <div style="font-style: italic; color: #64748b; font-size: 14px; margin-top: 25px;">
                         Happy Snipping,<br>
-                        <span style="font-weight: 600;">Team {company_name}</span>
+                        <span style="font-weight: 600;">Team Autopilotx</span>
                     </div>
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8;">
-                        <p>© {company_name} {time.strftime('%Y')}. All rights reserved.</p>
+                        <p>© Autopilotx {time.strftime('%Y')}. All rights reserved.</p>
                         <p style="margin-top: 5px;">This is an automated message, please do not reply directly to this email.</p>
                     </div>
                 </div>

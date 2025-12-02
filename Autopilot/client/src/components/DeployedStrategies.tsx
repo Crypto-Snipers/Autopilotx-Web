@@ -69,14 +69,14 @@ const DeployedStrategies = () => {
                 </div>
 
 
-                <div className="mt-4 space-y-2 text-blue-500 font-medium">
+                <div className="mt-4 space-y-2 text-[#06a57f] font-medium">
                   <div className="flex justify-between">
                     <span>Margin in use:</span>
                     <span>${Number(strategy.margin || 0) * Number(strategy.multiplier || 1)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Quantity in use:</span>
-                    <span>{(Number(strategy.Qty || 0) * Number(strategy.multiplier || 1)).toFixed(2)}</span>
+                    <span>{(Number(strategy.Qty || 0) * Number(strategy.multiplier || 1)).toFixed(3)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Multiplier selected:</span>
@@ -89,8 +89,8 @@ const DeployedStrategies = () => {
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={NoStrategyDeployment} className='w-42 h-36 pb-4'></img>
 
-                <p className="text-gray-500 dark:text-gray-200   mb-2">No Strategy Deployed</p>
-                <button className="flex items-center text-green-600 text-sm font-medium" onClick={() => window.location.href = "/strategies"}>
+                <p className="text-gray-500 dark:text-gray-200 mb-2">No Strategy Deployed</p>
+                <button className="flex items-center text-[#06a57f] text-sm font-medium" onClick={() => window.location.href = "/strategies"}>
                   View All
                   <ArrowRight size={16} className="ml-1" />
                 </button>

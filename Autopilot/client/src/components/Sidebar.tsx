@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from "@/lib/auth";
 import { Lock, Settings, Home, BarChart, LineChart, History, Youtube, Instagram, MessageCircle, LogOut, ChartNoAxesCombined, UserRoundCog, Shield, Layers, ChartColumnDecreasing } from "lucide-react";
 import { clearLocalStorage, clearSessionStorage } from "@/lib/sessionStorageUtils";
@@ -6,15 +6,77 @@ import { apiRequest } from "@/lib/queryClient";
 import AutoPilotLogoWhite from "@/assets/8-02.png";
 import AutoPilotLogoBlack from "@/assets/autopilotx-black.png";
 
+// Create a custom hook for theme detection
+const useThemeDetector = () => {
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
 
+  useEffect(() => {
+    // Function to get current theme
+    const getCurrentTheme = (): 'dark' | 'light' => {
+      if (typeof window === 'undefined') return 'light';
+      
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        return savedTheme as 'dark' | 'light';
+      }
+      
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light';
+    };
+
+    // Set initial theme
+    setTheme(getCurrentTheme());
+
+    // Function to handle theme changes
+    const handleThemeChange = () => {
+      setTheme(getCurrentTheme());
+    };
+
+    // Set up event listeners
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Listen for system theme changes
+    mediaQuery.addEventListener('change', handleThemeChange);
+    
+    // Listen for storage events (theme changes in other tabs/windows)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'theme') {
+        handleThemeChange();
+      }
+    });
+    
+    // Listen for theme changes in the current tab
+    const observer = new MutationObserver(() => {
+      if (document.documentElement.classList.contains('dark') !== (theme === 'dark')) {
+        handleThemeChange();
+      }
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    // Clean up
+    return () => {
+      mediaQuery.removeEventListener('change', handleThemeChange);
+      window.removeEventListener('storage', handleThemeChange);
+      observer.disconnect();
+    };
+  }, [theme]); // Add theme as a dependency
+
+  return theme;
+};
 
 export default function Sidebar() {
   const { user, signout } = useAuth();
   const [role, setRole] = useState<string>("user");
   const location = window.location.pathname;
-  const currentTheme = localStorage.getItem('theme') || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  const logo = currentTheme === "dark" ? AutoPilotLogoWhite : AutoPilotLogoBlack;
-
+  const currentTheme = useThemeDetector();
+  
+  // Memoize the logo to prevent unnecessary re-renders
+  const logo = useMemo(() => {
+    return currentTheme === 'dark' ? AutoPilotLogoWhite : AutoPilotLogoBlack;
+  }, [currentTheme]);
 
   // Check User role
   useEffect(() => {
@@ -59,7 +121,7 @@ export default function Sidebar() {
 
 
   const navItems = [
-    { name: "Home", path: "/", icon: <Home className="w-5 h-5 mr-2" /> },
+    { name: "Home", path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
     { name: "Strategies", path: "/strategies", icon: <ChartColumnDecreasing className="w-5 h-5 mr-2" /> },
     { name: "Positions", path: "/positions", icon: <Layers className="w-5 h-5 mr-2" /> },
     { name: "History", path: "/history", icon: <History className="w-5 h-5 mr-2" /> },
@@ -72,13 +134,14 @@ export default function Sidebar() {
   ];
 
   const socialLinks = [
-    { name: "YouTube Channel", icon: <Youtube className="w-5 h-5 mr-2 text-red-500" />, url: "https://m.youtube.com/@TheCryptoSnipers" },
-    { name: "Join Telegram", icon: <MessageCircle className="w-5 h-5 mr-2 text-blue-500" />, url: "https://t.me/infocryptosnipers" },
-    { name: "Follow on Instagram", icon: <Instagram className="w-5 h-5 mr-2 text-pink-500" />, url: "https://www.instagram.com/thecryptosnipers?igsh=dmg1Z3Vlb2xjbjNx" },
+    { name: "YouTube Channel", icon: <Youtube className="w-5 h-5 mr-2 text-[#06a57f]" />, url: "https://m.youtube.com/@TheCryptoSnipers" },
+    { name: "Join Telegram", icon: <MessageCircle className="w-5 h-5 mr-2 text-[#06a57f]" />, url: "https://t.me/infocryptosnipers" },
+    { name: "Follow on Instagram", icon: <Instagram className="w-5 h-5 mr-2 text-[#06a57f]" />, url: "https://www.instagram.com/thecryptosnipers?igsh=dmg1Z3Vlb2xjbjNx" },
   ];
 
   const footerLinks = [
     { name: "Terms & Conditions", icon: <Lock className="w-5 h-5 mr-2" />, path: "/terms" },
+    // { name: "Privacy Policy", icon: <Lock className="w-5 h-5 mr-2" />, path: "/privacy" },
     { name: "LogOut", icon: <LogOut className="w-5 h-5 mr-2" /> },
   ];
 
@@ -87,8 +150,8 @@ export default function Sidebar() {
       <div className="p-4">
         <img src={logo} className="h-20 ml-2" alt="AutoPilotX Logo" />
       </div>
-      <div className="mt-6 px-4 text-sm text-foreground font-bold">Overview</div>
-      <nav className="mt-2 space-y-1 px-2 text-foreground font-medium">
+      <div className="mt-6 px-4 text-medium text-foreground font-bold">Overview</div>
+      <nav className="mt-2 space-y-1 px-2 text-foreground text-sm">
         {navItems.map((item) => (
           <a
             key={item.path}
@@ -116,7 +179,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-auto">
-        <div className="px-4 text-sm text-foreground font-bold mb-2">Join Us</div>
+        <div className="px-4 text-medium text-foreground font-bold mb-2">Join Us</div>
         <div className="bg-muted rounded-lg mx-2 p-4 space-y-3">
           {socialLinks.map((link) => (
             <a
@@ -124,7 +187,7 @@ export default function Sidebar() {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center text-sm text-foreground font-medium hover:text-[#02b589]"
+              className="flex items-center text-sm text-foreground hover:text-gray-400"
             >
               {link.icon}
               {link.name}
@@ -141,7 +204,7 @@ export default function Sidebar() {
                 e.preventDefault();
                 handleLogout();
               } : undefined}
-              className="flex items-center text-sm text-foreground font-medium hover:text-[#02b589]"
+              className="flex items-center text-sm text-foreground hover:text-gray-400"
             >
               {link.icon}
               {link.name}
