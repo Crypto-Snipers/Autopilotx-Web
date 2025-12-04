@@ -20,13 +20,29 @@ import {
 } from "@/components/ui/tooltip";
 
 interface TradeData {
-  CreatedAt: string;
-  Side: string;
-  Size: number;
-  State: string;
-  AverageFillPrice: string;
-  PaidCommission: string;
-  Symbol: string;
+  entry_time: string;
+  position: string;
+  qty: number;
+  entry_price: number;
+  exit_price: number;
+  pnl: number;
+  symbol: string;
+  trade_id?: string;
+  exit_time?: string;
+  currency: string;
+}
+
+interface ApiResponse {
+  status: string;
+  page: number;
+  page_size: number;
+  total_trades: number;
+  total_pages: number;
+  has_next: boolean;
+  has_previous: boolean;
+  next_page: number | null;
+  previous_page: number | null;
+  data: TradeData[];
 }
 
 export default function History() {
@@ -47,27 +63,26 @@ export default function History() {
 
     setLoading(true);
     try {
-      const res = await apiRequest<{
-        status: string;
-        count: number;
-        data: TradeData[];
-        page: number;
-        next_page: number | null;
-        previous_page: number | null;
-        page_size: number;
-      }>(
+      const res = await apiRequest<ApiResponse>(
         "GET",
-        `/api/user/client-history?email=${encodeURIComponent(user.email)}&page=${page}&page_size=${pageSize}`
+        `/api/user/client-history?user_email=${encodeURIComponent(user.email)}&page=${page}&page_size=${pageSize}`
       );
 
-      if (res.status !== "success") throw new Error("Failed to fetch trades");
+      if (res.status !== "success") {
+        throw new Error(res.status || "Failed to fetch trades");
+      }
 
       setNextPage(res.next_page);
       setPrevPage(res.previous_page);
       setPage(res.page);
-      return res.data;
+      return res.data || [];
     } catch (error) {
       console.error("Error fetching trade history:", error);
+      // Show error to user
+      if (error instanceof Error) {
+        // You might want to use a toast or alert here
+        console.error(error.message);
+      }
       setNextPage(null);
       setPrevPage(null);
       return [];
@@ -81,13 +96,18 @@ export default function History() {
   }, [page, user?.email, pageSize]);
 
   const filteredTrades = trades.filter((trade) => {
-    const tradeDate = new Date(trade.CreatedAt);
-    return (
-      (symbol === "all" || trade.Symbol.toLowerCase() === symbol) &&
-      (side === "all" || trade.Side.toLowerCase() === side) &&
-      (!startDate || tradeDate >= startDate) &&
-      (!endDate || tradeDate <= endDate)
-    );
+    try {
+      const tradeDate = new Date(trade.entry_time);
+      const matchesSymbol = symbol === "all" || (trade.symbol && trade.symbol.toLowerCase() === symbol.toLowerCase());
+      const matchesSide = side === "all" || (trade.position && trade.position.toLowerCase() === side.toLowerCase());
+      const afterStartDate = !startDate || tradeDate >= new Date(startDate.setHours(0, 0, 0, 0));
+      const beforeEndDate = !endDate || tradeDate <= new Date(endDate.setHours(23, 59, 59, 999));
+      
+      return matchesSymbol && matchesSide && afterStartDate && beforeEndDate;
+    } catch (error) {
+      console.error("Error filtering trade:", trade, error);
+      return false;
+    }
   });
 
   const clearFilters = () => {
@@ -199,7 +219,7 @@ export default function History() {
                     <th className="py-3 px-4">Position</th>
                     <th className="py-3 px-4">
                       <div className="flex items-center">
-                        Lot Size
+                        Quantity
                         <span className="relative group ml-[16px] mb-1 inline-block align-middle">
                           <TooltipProvider>
                             <Tooltip>
@@ -208,7 +228,7 @@ export default function History() {
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>
-                                  1 Lot Size
+                                  1 Quantity
                                   <br />
                                   0.01 ETH
                                   <br />
@@ -220,9 +240,9 @@ export default function History() {
                         </span>
                       </div>
                     </th>
-                    <th className="py-3 px-4">Executed Price</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Fee</th>
+                    <th className="py-3 px-4">Entry Price</th>
+                    <th className="py-3 px-4">Exit Price</th>
+                    <th className="py-3 px-4 text-right">Pnl</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -239,53 +259,42 @@ export default function History() {
                         className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-muted"
                       >
                         <td className="py-3 px-4 text-gray-700 dark:text-foreground font-medium">
-                          {format(new Date(trade.CreatedAt), "yyyy-MM-dd")}
+                          {format(new Date(trade.entry_time), "yyyy-MM-dd")}
                           <br />
                           <span className="text-gray-500 dark:text-muted-foreground text-[14px]">
-                            {format(new Date(trade.CreatedAt), "HH:mm:ss")}
+                            {format(new Date(trade.entry_time), "HH:mm:ss")}
                           </span>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center">
                             <div
-                              className={`w-1 h-8 rounded-full mr-3 ${trade.Side === "buy" ? "bg-green-500" : "bg-red-500"
+                              className={`w-1 h-8 rounded-full mr-3 ${trade.position === "long" ? "bg-green-500" : "bg-red-500"
                                 }`}
                             ></div>
                             <div>
                               <div className="font-medium text-gray-800 dark:text-foreground">
-                                {trade.Symbol}
+                                {trade.symbol}
                               </div>
                               <div
-                                className={`text-[14px] ${trade.Side === "buy" ? "text-green-600" : "text-red-600"
+                                className={`text-[14px] ${trade.position === "long" ? "text-green-600" : "text-red-600"
                                   }`}
                               >
-                                {trade.Side.charAt(0).toUpperCase() + trade.Side.slice(1)}
+                                {trade.position.toUpperCase()}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="py-3 px-4 font-medium text-gray-800 dark:text-foreground">
-                          {trade.Size.toFixed(2)}{" "}
-                          <span className="text-gray-500 dark:text-muted-foreground">
-                            {trade.Symbol.replace("USD", "")}
-                          </span>
+                          {trade.qty.toFixed(3)} {trade.symbol}
                         </td>
                         <td className="py-3 px-4 font-medium text-gray-800 dark:text-foreground">
-                          {parseFloat(trade.AverageFillPrice).toLocaleString()}
+                        {trade.entry_price}
                         </td>
                         <td className="py-3 px-4">
-                          <span
-                            className={`${trade.State === "filled"
-                              ? "bg-[#DAF0E1] border-[#B5E1C3] text-[#006038] dark:bg-green-900/50 dark:border-green-800 dark:text-green-400"
-                              : "bg-[#FCDAE2] border-[#F9B5C6] text-[#801D18] dark:bg-red-900/50 dark:border-red-800 dark:text-red-400"
-                              } w-12 px-2 py-1 rounded-full text-[14px] border`}
-                          >
-                            {trade.State}
-                          </span>
+                          {trade.exit_price}
                         </td>
                         <td className="py-3 px-4 font-medium text-gray-800 dark:text-foreground text-right">
-                          {parseFloat(trade.PaidCommission).toFixed(2)}{" "}
-                          <span className="text-gray-500 dark:text-muted-foreground">USDT</span>
+                          {trade.currency === "INR" ? '₹' : '$'} {trade.pnl}
                         </td>
                       </tr>
                     ))

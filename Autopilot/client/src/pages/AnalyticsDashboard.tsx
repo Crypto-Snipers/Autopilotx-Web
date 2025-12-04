@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
-import { TrendingUp, Users, Wallet, BarChart3, Activity, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon } from "lucide-react"
+import { TrendingUp, Users, Wallet, BarChart3, Activity, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, Search } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Line, LineChart, ResponsiveContainer } from "recharts"
 import Sidebar from "@/components/Sidebar"
 import Header from "@/components/Header"
@@ -14,6 +15,7 @@ import CryptoMarketOverview from "@/components/CryptoMarketOverview"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import emptyStateImage from "@/assets/empty_state_search.svg";
 
 // Spinner for loading states
 const spinner = (
@@ -37,18 +39,24 @@ interface User {
 }
 
 // Fetch all users and return count and user list
-const fetchAllUsers = async (): Promise<User[]> => {
+const fetchAllUsers = async (startDate?: string, endDate?: string): Promise<{ users: User[], count: number }> => {
     try {
-        const res = await apiRequest<{ success: boolean, count: number; users: User[] }>(
+        const params = new URLSearchParams();
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        
+        const url = `/api/all-users${params.toString() ? `?${params.toString()}` : ''}`;
+        
+        const res = await apiRequest<{ success: boolean, count: number, users: User[] }>(
             "GET",
-            "/api/all-users"
+            url
         );
 
-        if (!res.users || !Array.isArray(res.users)) {
+        if (!res.success || !Array.isArray(res.users)) {
             throw new Error("Invalid response format");
         }
 
-        return res.users;
+        return { users: res.users, count: res.count };
     } catch (error) {
         console.error("Error fetching all users:", error);
         throw new Error("Failed to fetch all users");
@@ -57,16 +65,22 @@ const fetchAllUsers = async (): Promise<User[]> => {
 
 
 // Fetch all the active users
-const fetchActiveUsers = async (): Promise<number> => {
+const fetchActiveUsers = async (startDate?: string, endDate?: string): Promise<{ count: number, users: any[] }> => {
     try {
-        const res = await apiRequest<{ success: boolean; count: number; users: [] }>(
+        const params = new URLSearchParams();
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        
+        const url = `/api/active-users${params.toString() ? `?${params.toString()}` : ''}`;
+        
+        const res = await apiRequest<{ success: boolean; count: number; users: any[] }>(
             "GET",
-            "/api/active-users"
+            url
         );
 
         if (!res.success) throw new Error("Failed to fetch active users");
 
-        return res.count;
+        return { count: res.count, users: res.users };
     } catch (error) {
         console.error("Error fetching active users:", error);
         throw new Error("Failed to fetch active users");
@@ -74,11 +88,17 @@ const fetchActiveUsers = async (): Promise<number> => {
 };
 
 // Fetch total funds deployed
-const fetchTotalFundsDeployed = async (): Promise<number> => {
+const fetchTotalFundsDeployed = async (startDate?: string, endDate?: string): Promise<number> => {
     try {
+        const params = new URLSearchParams();
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        
+        const url = `/api/total-funds-deployed${params.toString() ? `?${params.toString()}` : ''}`;
+        
         const res = await apiRequest<{ success: boolean; total_used_margin: number }>(
             "GET",
-            "/api/total-funds-deployed"
+            url
         );
 
         if (!res.success) throw new Error("Failed to fetch total funds deployed");
@@ -91,39 +111,50 @@ const fetchTotalFundsDeployed = async (): Promise<number> => {
 };
 
 // Fetch total value of funds(futures wallets) 
-const fetchtotalFunds = async (): Promise<number> => {
+const fetchtotalFunds = async (startDate?: string, endDate?: string): Promise<number> => {
     try {
+        const params = new URLSearchParams();
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        
+        const url = `/api/total-funds${params.toString() ? `?${params.toString()}` : ''}`;
+        
         const res = await apiRequest<{ success: boolean; total_futures_wallets_inr: number }>(
             "GET",
-            "/api/total-funds"
+            url
         );
 
-        if (!res.success) throw new Error("Failed to fetch total funds deployed");
+        if (!res.success) throw new Error("Failed to fetch total funds");
 
-        const total = res.total_futures_wallets_inr;
-        return total;
+        return res.total_futures_wallets_inr;
     } catch (error) {
         console.error("Error fetching total funds:", error);
-        throw new Error("Failed to fetch total funds deployed");
-    };
-}
+        throw new Error("Failed to fetch total funds");
+    }
+};
 
 // Fetch total volumes generated
-const fetchTotalVolumesGenerated = async (): Promise<number> => {
+const fetchTotalVolumesGenerated = async (startDate?: string, endDate?: string): Promise<number> => {
     try {
+        const params = new URLSearchParams();
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        
+        const url = `/api/total-volumes-generated${params.toString() ? `?${params.toString()}` : ''}`;
+        
         const res = await apiRequest<{ success: boolean; total_volumes: number }>(
             "GET",
-            "/api/total-volumes-generated"
+            url
         );
 
         if (!res.success) throw new Error("Failed to fetch total volumes generated");
-        const total = res.total_volumes;
-        return total;
+
+        return res.total_volumes;
     } catch (error) {
         console.error("Error fetching total volumes generated:", error);
         throw new Error("Failed to fetch total volumes generated");
     }
-}
+};
 
 // Fetch all strategies
 const fetchAllStrategies = async (): Promise<number> => {
@@ -196,6 +227,64 @@ export default function AnalyticsDashboard() {
 
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
+    const [dateRangeKey, setDateRangeKey] = useState(0); // Used to force re-render when dates change
+
+        // Search state
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
+    interface UserVolumeData {
+        name: string;
+        email: string;
+        total_funds: number;
+        total_volumes: number;
+    }
+
+    const [searchResult, setSearchResult] = useState<UserVolumeData | null>(null);
+
+    const handleSearch = async () => {
+        if (!searchQuery) return;
+
+        setIsSearching(true);
+        setSearchResult(null);
+
+        try {
+            const res = await apiRequest<{
+                success: boolean;
+                name: string;
+                email: string;
+                total_funds: number;
+                total_volumes: number;
+            }>(
+                "GET",
+                `/api/user/total-volumes-generated?email=${encodeURIComponent(searchQuery)}`
+            );
+
+            if (res.success) {
+                setSearchResult({
+                    name: res.name,
+                    email: res.email,
+                    total_funds: res.total_funds,
+                    total_volumes: res.total_volumes
+                });
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to fetch user volume data",
+                    variant: "destructive",
+                });
+            }
+        } catch (error: any) {
+            console.error("Error fetching user volume:", error);
+            const errorMessage = error.response?.data?.detail || error.message || "Failed to fetch user volume";
+            toast({
+                title: "Error",
+                description: errorMessage,
+                variant: "destructive",
+            });
+        } finally {
+            setIsSearching(false);
+        }
+    };
 
 
     // Check admin access if a user tried to access this page directly
@@ -250,23 +339,43 @@ export default function AnalyticsDashboard() {
         return baseData
     }
 
+    // Helper function to format date as YYYY-MM-DD (ISO format) for API
+    const formatDateForApi = (date: Date | null): string | undefined => {
+        if (!date) return undefined;
+        return date.toISOString().split('T')[0];
+    };
+
+    // Helper function to format date for UI display
+    const formatDateForDisplay = (date: Date | null, formatStr: string = 'PPP'): string => {
+        if (!date) return 'Select date';
+        return format(date, formatStr);
+    };
+
     // Fetch all users
     useEffect(() => {
-        fetchAllUsers()
-            .then(users => {
-                setTotalUsers(users.length);
+        setTotalUsersLoading(true);
+        const start = formatDateForApi(startDate);
+        const end = formatDateForApi(endDate);
+        
+        fetchAllUsers(start, end)
+            .then(({ users, count }) => {
+                setTotalUsers(count);
                 setTotalUsersLoading(false);
             })
             .catch(err => {
                 setTotalUsersError(`Failed to fetch users: ${err}`);
                 setTotalUsersLoading(false);
             });
-    }, []);
+    }, [dateRangeKey]);
 
     // Fetch active users
     useEffect(() => {
-        fetchActiveUsers()
-            .then(count => {
+        setTotalActiveUsersLoading(true);
+        const start = formatDateForApi(startDate);
+        const end = formatDateForApi(endDate);
+        
+        fetchActiveUsers(start, end)
+            .then(({ count }) => {
                 setTotalActiveUsers(count);
                 setTotalActiveUsersLoading(false);
             })
@@ -274,11 +383,15 @@ export default function AnalyticsDashboard() {
                 setTotalActiveUsersError(`Failed to fetch active users: ${err}`);
                 setTotalActiveUsersLoading(false);
             });
-    }, []);
+    }, [dateRangeKey]);
 
     // Fetch total funds deployed
     useEffect(() => {
-        fetchTotalFundsDeployed()
+        setTotalFundsDeployedLoading(true);
+        const start = formatDateForApi(startDate);
+        const end = formatDateForApi(endDate);
+        
+        fetchTotalFundsDeployed(start, end)
             .then(total => {
                 setTotalFundsDeployed(total);
                 setTotalFundsDeployedLoading(false);
@@ -287,11 +400,15 @@ export default function AnalyticsDashboard() {
                 setTotalFundsDeployedError(`Failed to fetch total funds deployed: ${err}`);
                 setTotalFundsDeployedLoading(false);
             });
-    }, []);
+    }, [dateRangeKey]);
 
     // Fetch total value of funds
     useEffect(() => {
-        fetchtotalFunds()
+        setTotalFundsLoading(true);
+        const start = formatDateForApi(startDate);
+        const end = formatDateForApi(endDate);
+        
+        fetchtotalFunds(start, end)
             .then(total => {
                 setTotalFunds(total);
                 setTotalFundsLoading(false);
@@ -300,24 +417,45 @@ export default function AnalyticsDashboard() {
                 setTotalFundsError(`Failed to fetch total funds: ${err}`);
                 setTotalFundsLoading(false);
             });
-    }, []);
+    }, [dateRangeKey]);
 
     // Fetch total volumes generated
     useEffect(() => {
-        fetchTotalVolumesGenerated()
+        setTotalVolumesLoading(true);
+        const start = formatDateForApi(startDate);
+        const end = formatDateForApi(endDate);
+        
+        fetchTotalVolumesGenerated(start, end)
             .then(total => {
                 setTotalVolumes(total);
-                console.log("Total Volumes:", total);
                 setTotalVolumesLoading(false);
             })
             .catch(err => {
                 setTotalVolumesError(`Failed to fetch total volumes generated: ${err}`);
                 setTotalVolumesLoading(false);
             });
-    }, []);
+    }, [dateRangeKey]);
 
-    // Fetch all strategies
+    // Handle date range apply
+    const handleApplyDateRange = () => {
+        // If endDate is not set, use current date
+        const endDateToUse = endDate || new Date();
+        // Increment the key to force re-render of all effects
+        setDateRangeKey(prev => prev + 1);
+    };
+
+    // Reset date range
+    const handleResetDateRange = () => {
+        setStartDate(null);
+        setEndDate(null);
+        // Don't reset the key here, the state change will trigger the reset
+        setDateRangeKey(prev => prev + 1);
+    };
+
+    // Fetch all strategies (no date filter as per original implementation)
     useEffect(() => {
+        setTotalStrategiesLoading(true);
+        
         fetchAllStrategies()
             .then(total => {
                 setTotalStrategies(total);
@@ -440,7 +578,7 @@ export default function AnalyticsDashboard() {
                             <p className="text-gray-600 dark:text-gray-400">Monitor your platform's key performance metrics and trading strategies.</p>
                         </div>
 
-                        {/* Date Filter */}
+                        {/* Date Range Picker */}
                         <div className="flex items-center justify-end gap-2 mb-6">
                             {/* start date */}
                             <div className="flex items-center gap-2">
@@ -450,7 +588,7 @@ export default function AnalyticsDashboard() {
                                         <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
                                             <CalendarIcon className="mr-2 h-4 w-4" />
                                             <span className="truncate">
-                                                {startDate ? format(startDate, "MMM d, yyyy") : "Pick a date"}
+                                                {formatDateForDisplay(startDate, 'MMM d, yyyy')}
                                             </span>
                                         </Button>
                                     </PopoverTrigger>
@@ -458,8 +596,15 @@ export default function AnalyticsDashboard() {
                                         <Calendar
                                             mode="single"
                                             selected={startDate || undefined}
-                                            onSelect={(date) => setStartDate(date ?? null)}
+                                            onSelect={(date) => {
+                                                setStartDate(date || null);
+                                                // If end date is before new start date, clear it
+                                                if (date && endDate && date > endDate) {
+                                                    setEndDate(null);
+                                                }
+                                            }}
                                             initialFocus
+                                            disabled={(date) => date > new Date()}
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -470,20 +615,33 @@ export default function AnalyticsDashboard() {
                                 <span className="text-md text-gray-600 dark:text-gray-200">To</span>
                                 <Popover>
                                     <PopoverTrigger asChild>
-
-                                        <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
+                                        <Button 
+                                            variant="outline" 
+                                            className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground"
+                                        >
                                             <CalendarIcon className="mr-2 h-4 w-4" />
                                             <span className="truncate">
-                                                {endDate ? format(endDate, "MMM d, yyyy") : "Pick a date"}
+                                                {formatDateForDisplay(endDate, 'MMM d, yyyy')}
                                             </span>
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="p-0">
                                         <Calendar
                                             mode="single"
-                                            selected={endDate || undefined}
-                                            onSelect={(date) => setEndDate(date ?? null)}
+                                            selected={endDate || new Date()}
+                                            onSelect={(date) => {
+                                                if (startDate && date && date < startDate) {
+                                                    toast({
+                                                        title: "Invalid Date Range",
+                                                        description: "End date must be after start date",
+                                                        variant: "destructive",
+                                                    });
+                                                    return;
+                                                }
+                                                setEndDate(date || new Date());
+                                            }}
                                             initialFocus
+                                            disabled={(date) => (startDate ? date < startDate : false) || date > new Date()}
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -491,17 +649,32 @@ export default function AnalyticsDashboard() {
 
                             {/* clear filters */}
                             <Button
-                                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground text-md font-semibold"
+                                onClick={() => {
+                                    const endDateToUse = endDate || new Date();
+                                    if (startDate && endDateToUse < startDate) {
+                                        toast({
+                                            title: "Invalid Date Range",
+                                            description: "End date must be after start date",
+                                            variant: "destructive",
+                                        });
+                                        return;
+                                    }
+                                    handleApplyDateRange();
+                                }}
+                                disabled={!startDate}
+                                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground text-sm font-medium px-4 py-2"
                             >
                                 Apply
                             </Button>
                             <Button
-                                className="bg-red-600/80 hover:bg-red-600/100 text-primary-foreground text-md font-semibold"
+                                    onClick={handleResetDateRange}
+                                    disabled={!startDate && !endDate}
+                                    className="text-sm font-medium px-4 py-2 bg-black/80 hover:bg-red-600 text-primary-foreground"
                             >
-                                Reset
+                                    Clear
                             </Button>
                         </div>
-
+                        
                         {/* Main Metrics Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
                             {metrics.map((metric, index) => {
@@ -548,9 +721,65 @@ export default function AnalyticsDashboard() {
                             })}
                         </div>
 
-                        {/* Performance Overview */}
-                        <div className="py-8 w-full h-full mx-auto m-2 p-2 flex flex-wrap">
-                            <CryptoMarketOverview />
+
+                        {/* Filter Total Volumes Generated By User */}
+                        <div className="mb-8">
+                           <div className="bg-white dark:bg-[#17181d] p-6 rounded-lg">
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Filter Total Volumes Generated By User</h3>
+                                <div className="flex flex-col gap-6">
+                                    <div className="flex w-full items-center space-x-2">
+                                        <Input
+                                            type="email"
+                                            placeholder="Enter user email..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="bg-white dark:bg-[#1e222d] w-full"
+                                        />
+                                        <Button onClick={handleSearch} disabled={isSearching} className="bg-[#1a785f] hover:bg-[#1e896d]">
+                                            {isSearching ? (
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                            ) : (
+                                                <Search className="h-4 w-4" />
+                                            )}
+                                        </Button>
+                                        
+                                    </div>
+
+                                    {searchResult ? (
+                                        <div className="w-full overflow-x-auto">
+                                            <div className="min-w-[800px] bg-gray-100 dark:bg-[#1e222d] rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                                <div className="grid grid-cols-4 gap-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</span>
+                                                        <span className="font-medium text-gray-900 dark:text-white">{searchResult.name}</span>
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</span>
+                                                        <span className="font-medium text-gray-900 dark:text-white">{searchResult.email}</span>
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Funds</span>
+                                                        <span className="font-medium text-gray-900 dark:text-white">${searchResult.total_funds.toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Vol Generated</span>
+                                                        <span className="font-medium text-gray-900 dark:text-white">${searchResult.total_volumes.toLocaleString()}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-8 bg-gray-100 dark:bg-[#1e222d] rounded-lg border border-gray-200 dark:border-gray-700 border-dashed">
+                                            <img
+                                                src={emptyStateImage}
+                                                alt="No results"
+                                                className="w-36 h-36 object-contain mb-4 opacity-60"
+                                            />
+                                            <p className="text-gray-500 dark:text-gray-400 text-md ml-8">It's been quiet here</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -558,4 +787,3 @@ export default function AnalyticsDashboard() {
         </div>
     )
 }
-

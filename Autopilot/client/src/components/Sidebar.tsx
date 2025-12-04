@@ -156,17 +156,17 @@ export default function Sidebar() {
           <a
             key={item.path}
             href={item.path}
-            onClick={(e) => {
-              if (item.name === "History") {
-                e.preventDefault();
-                const brokerName = sessionStorage.getItem("broker_name");
-                if (brokerName === "coindcx") {
-                  window.open("https://coindcx.com/stats/futures/positions", "_blank");
-                  return;
-                }
-              }
-              window.location.href = item.path;
-            }}
+            // onClick={(e) => {
+            //   if (item.name === "History") {
+            //     e.preventDefault();
+            //     const brokerName = sessionStorage.getItem("broker_name");
+            //     if (brokerName === "coindcx") {
+            //       window.open("https://coindcx.com/stats/futures/positions", "_blank");
+            //       return;
+            //     }
+            //   }
+            //   window.location.href = item.path;
+            // }}
             className={`flex items-center px-3 py-2 rounded-full ${location === item.path
               ? "bg-[#06a57f] text-primary-foreground"
               : "text-foreground hover:bg-muted"
