@@ -574,7 +574,7 @@ export default function AnalyticsDashboard() {
                     <div>
                         {/* Welcome Section */}
                         <div className="mb-8">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Analytics Dashboard</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Analytics Dashboard test</h2>
                             <p className="text-gray-600 dark:text-gray-400">Monitor your platform's key performance metrics and trading strategies.</p>
                         </div>
 
