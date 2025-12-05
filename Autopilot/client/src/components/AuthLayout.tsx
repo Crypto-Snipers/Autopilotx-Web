@@ -6,20 +6,24 @@ interface AuthLayoutProps {
   children: ReactNode;
   title: string;
   subtitle: string;
+  titleClass?: string;
+  subtitleClass?: string;
 }
 
 export default function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
     <div className="flex min-h-screen">
-      {/* Left sidebar with branding and illustration */}
-      <div className="w-full md:w-2/5 bg-[#2d313a] flex flex-col items-center justify-center p-8">
+
+      {/* Left sidebar with branding and illustration - hidden on small screens */}
+      <div className="hidden md:flex md:w-2/5 bg-[#2d313a] flex-col items-center justify-center p-8">
         <div className="w-full max-w-sm">
+          {/* Logo */}
           <div className="fixed top-0 left-0 p-4 z-50 w-36 h-auto">
-            <img src={WhiteLogo} alt="" />
+            <img src={WhiteLogo} alt="Logo" />
           </div>
 
           {/* Illustration */}
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center mt-20">
             <img src={TradingIllustration} alt="Trading Illustration" />
           </div>
         </div>

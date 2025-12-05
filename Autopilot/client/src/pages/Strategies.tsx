@@ -11,6 +11,7 @@ import PerformanceCard, { PerformanceData } from "@/components/PerformanceCard";
 import Lowheader from "@/components/Lowheader";
 import { getSessionItem } from "@/lib/sessionStorageUtils";
 import { apiRequest } from "@/lib/queryClient";
+import NoPositionFound from "@/assets/undraw_no_open_positions_found.svg"
 
 type StrategyViewType = "all" | "deployed";
 
@@ -545,12 +546,11 @@ export default function Strategies() {
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-      <Sidebar />
-
-      <div className="flex-1 md:ml-[14rem]">
-        <Header />
-        <Lowheader />
+      <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+            <Sidebar />
+            <div className="flex-1 md:ml-[14rem] flex flex-col">
+              <Header />
+              <Lowheader />
 
         <main className="px-4 py-2 md:p-6">
           <div className="flex justify-between items-center">
@@ -672,28 +672,28 @@ export default function Strategies() {
                     <CardContent className="p-0">
                       {/* Header */}
                       <div className="flex justify-between items-start mb-2">
-                        <div className="text-lg font-bold text-gray-900">
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">
                           {strategy.name}
                         </div>
-                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full">
+                        <span className="text-xs font-semibold text-green-700 bg-green-100 mb-2 py-1 rounded-full">
                           +{strategy.Returns ?? "0"}%
                         </span>
                       </div>
 
 
                       {/* Description */}
-                      <p className="text-sm text-gray-700 mb-3">
+                      <p className="text-sm text-gray-800 dark:text-white mb-3">
                         {strategy.description}
                       </p>
 
                       {/* Win Rate */}
-                      <div className="text-sm font-semibold text-gray-800 mb-1 flex justify-between">
+                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1 flex justify-between">
                         <span>Win Rate</span>
                         <span>{strategy.WinRate ?? "0"}%</span>
                       </div>
                       <div className="w-full h-2 bg-gray-200 rounded-full mb-4">
                         <div
-                          className="h-2 bg-green-500 rounded-full"
+                          className="h-2 bg-green-600 rounded-full"
                           style={{ width: `${strategy.WinRate ?? 0}%` }}
                         />
                       </div>
@@ -757,7 +757,7 @@ export default function Strategies() {
                   <p className="text-neutral-500">
                     {viewType === "deployed" ? (
                       <div className="p-6 flex flex-col items-center justify-center h-64 space-y-4">
-                        <svg
+                        {/* <svg
                           width="184"
                           height="183"
                           viewBox="0 0 184 183"
@@ -1130,12 +1130,14 @@ export default function Strategies() {
                             d="M56.6933 70.6074C55.7539 70.6989 54.9487 71.2357 54.2472 71.8274C54.0886 71.9494 53.9605 72.1019 53.869 72.2788C53.7775 72.4557 53.7226 72.6448 53.7104 72.8461C53.6921 73.206 53.808 73.5659 54.0398 73.8404C54.6498 74.5785 55.7234 74.2918 56.5408 74.1576C56.9678 74.0905 57.468 74.06 57.8096 73.7611C58.1512 73.4622 58.2183 72.9742 58.1329 72.5411C58.0719 72.2849 57.9926 72.0287 57.8889 71.7847C57.7974 71.5285 57.7181 71.2601 57.6022 71.0161C57.3704 70.5281 56.8397 70.5403 56.3883 70.6623C56.3212 70.6867 56.2663 70.7355 56.2358 70.7965C56.2053 70.8575 56.1992 70.9307 56.2175 70.9978C56.2358 71.0649 56.2785 71.1259 56.3395 71.1625C56.4005 71.1991 56.4737 71.2113 56.5408 71.1991C56.6689 71.1564 56.797 71.132 56.9312 71.1381C57.0776 71.1564 57.1081 71.2601 57.1508 71.3943C57.285 71.7603 57.4375 72.1202 57.5412 72.4984C57.6205 72.7729 57.6693 73.1572 57.407 73.3585C57.1447 73.5598 56.7482 73.5476 56.4554 73.6025C56.0894 73.6757 55.7234 73.7245 55.3574 73.755C55.2049 73.7733 55.0524 73.7672 54.906 73.7245C54.7596 73.6818 54.6254 73.6147 54.5034 73.5171C54.418 73.4317 54.3509 73.328 54.3082 73.2121C54.2655 73.0962 54.2472 72.9742 54.2594 72.8522C54.2716 72.7302 54.3082 72.6143 54.3692 72.5045C54.4302 72.3947 54.5095 72.3032 54.6132 72.2361C55.1927 71.742 55.9125 71.2357 56.6872 71.1625C56.7604 71.1625 56.8336 71.132 56.8824 71.0771C56.9373 71.0222 56.9678 70.9551 56.9678 70.8819C56.9678 70.8087 56.9373 70.7355 56.8885 70.6806C56.8397 70.6379 56.7665 70.6074 56.6933 70.6074Z"
                             fill="#010E30"
                           />
-                        </svg>
+                        </svg> */}
+                        <img src={NoPositionFound} className="h-40 w-auto" alt="No open positions found image" />
                         <p className="text-gray-500">No Strategy Deployed</p>
                       </div>
                     ) : (
                       <div className="p-6 flex flex-col items-center justify-center h-64 space-y-4">
-                        <svg
+                        <img src={NoPositionFound} className="h-40 w-auto" alt="No open positions found image" />
+                        {/* <svg
                           width="184"
                           height="183"
                           viewBox="0 0 184 183"
@@ -1508,7 +1510,7 @@ export default function Strategies() {
                             d="M56.6933 70.6074C55.7539 70.6989 54.9487 71.2357 54.2472 71.8274C54.0886 71.9494 53.9605 72.1019 53.869 72.2788C53.7775 72.4557 53.7226 72.6448 53.7104 72.8461C53.6921 73.206 53.808 73.5659 54.0398 73.8404C54.6498 74.5785 55.7234 74.2918 56.5408 74.1576C56.9678 74.0905 57.468 74.06 57.8096 73.7611C58.1512 73.4622 58.2183 72.9742 58.1329 72.5411C58.0719 72.2849 57.9926 72.0287 57.8889 71.7847C57.7974 71.5285 57.7181 71.2601 57.6022 71.0161C57.3704 70.5281 56.8397 70.5403 56.3883 70.6623C56.3212 70.6867 56.2663 70.7355 56.2358 70.7965C56.2053 70.8575 56.1992 70.9307 56.2175 70.9978C56.2358 71.0649 56.2785 71.1259 56.3395 71.1625C56.4005 71.1991 56.4737 71.2113 56.5408 71.1991C56.6689 71.1564 56.797 71.132 56.9312 71.1381C57.0776 71.1564 57.1081 71.2601 57.1508 71.3943C57.285 71.7603 57.4375 72.1202 57.5412 72.4984C57.6205 72.7729 57.6693 73.1572 57.407 73.3585C57.1447 73.5598 56.7482 73.5476 56.4554 73.6025C56.0894 73.6757 55.7234 73.7245 55.3574 73.755C55.2049 73.7733 55.0524 73.7672 54.906 73.7245C54.7596 73.6818 54.6254 73.6147 54.5034 73.5171C54.418 73.4317 54.3509 73.328 54.3082 73.2121C54.2655 73.0962 54.2472 72.9742 54.2594 72.8522C54.2716 72.7302 54.3082 72.6143 54.3692 72.5045C54.4302 72.3947 54.5095 72.3032 54.6132 72.2361C55.1927 71.742 55.9125 71.2357 56.6872 71.1625C56.7604 71.1625 56.8336 71.132 56.8824 71.0771C56.9373 71.0222 56.9678 70.9551 56.9678 70.8819C56.9678 70.8087 56.9373 70.7355 56.8885 70.6806C56.8397 70.6379 56.7665 70.6074 56.6933 70.6074Z"
                             fill="#010E30"
                           />
-                        </svg>
+                        </svg> */}
                         <p className="text-gray-500">No strategies available</p>
                       </div>
                     )}

@@ -19,6 +19,7 @@ import icon from '../assets/8-02.png';
 import "../types/herosection.css"; 
 import dashboard from '../assets/dashboard.png'
 import MidBanner from '../assets/crs_dashboard_img.jpg'
+import { Menu, X } from "lucide-react";
 
 interface AnimatedSectionProps {
   children: ReactNode;
@@ -65,36 +66,46 @@ const AnimatedSection = ({ children, className = '' }: AnimatedSectionProps) => 
 
 
 // Header component
-const Header = () => (
-  <header className="w-full fixed top-0 left-0 z-50 bg-[#0F2027]/80 backdrop-blur-md border-b border-slate-900">
-    <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 py-2">
-      {/* Logo */}
-      <div className="flex items-center">
-        <img
-          src={icon}
-          alt="AutopilotX Logo"
-          className="h-16 md:h-20 w-auto object-contain"
-        />
-      </div>
+const Header = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
 
-      {/* Buttons */}
-      <div className="flex items-center gap-1 sm:gap-2">
-        <button
-          onClick={() => window.location.href = "/signin"}
-          className="hidden sm:inline-block text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-md text-sm"
-        >
-          Log in
-        </button>
-        <button
-          onClick={() => window.location.href = "/signup"}
-          className="bg-[#06a57f] hover:bg-[#05b289] text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2 text-sm"
-        >
-          Sign up
-        </button>
-      </div>
-    </nav>
-  </header>
-);
+  return (
+    <header className="w-full fixed top-0 left-0 z-50 bg-[#0F2027]/80 backdrop-blur-md border-b border-slate-900">
+      <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 py-2">
+        {/* Logo */}
+        <div className="flex items-center">
+          <img src={icon} alt="AutopilotX Logo" className="h-12 sm:h-16 md:h-20 w-auto object-contain" />
+        </div>
+
+        {/* Desktop Buttons */}
+        <div className="hidden sm:flex items-center gap-2">
+          <button onClick={() => window.location.href="/signin"} className="text-slate-300 hover:text-white px-3 py-1.5 rounded-md text-sm">
+            Log in
+          </button>
+          <button onClick={() => window.location.href="/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-4 py-2 rounded-md text-sm">
+            Sign up
+          </button>
+        </div>
+
+        {/* Mobile Hamburger */}
+        <div className="sm:hidden">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="text-slate-300">
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="sm:hidden bg-[#0F2027]/90 border-t border-slate-900 flex flex-col items-center py-4 gap-2">
+          <button onClick={() => window.location.href="/signin"} className="text-white px-6 py-2 w-full rounded-md text-center">Log in</button>
+          <button onClick={() => window.location.href="/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-6 py-2 w-full rounded-md text-center">Sign up</button>
+        </div>
+      )}
+    </header>
+  );
+};
+
 
 // Ripple Grid for Hero Section
 const RippleGrid = () => {

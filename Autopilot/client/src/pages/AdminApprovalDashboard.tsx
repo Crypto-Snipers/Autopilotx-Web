@@ -496,12 +496,11 @@ export default function AdminDashboard() {
         //         </div>
         //     </div>
         // </div>
-
-        <div className="flex min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-            <Sidebar />
-            <div className="flex-1 md:ml-[14rem]">
-                <Header />
-                <Lowheader />
+            <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+                    <Sidebar />
+                    <div className="flex-1 md:ml-[14rem] flex flex-col">
+                      <Header />
+                      <Lowheader />
                 <div className="container mx-auto p-6 space-y-6">
                     {/* Header */}
                     <div className="flex items-center justify-between">

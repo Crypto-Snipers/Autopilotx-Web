@@ -2,16 +2,37 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar as CalendarIcon, Info, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Calendar as CalendarIcon,
+  Info,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import Lowheader from "@/components/Lowheader";
 import { format } from "date-fns";
 import { useAuth } from "@/lib/auth";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { apiRequest } from "@/lib/queryClient";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TradeData {
   CreatedAt: string;
@@ -36,7 +57,6 @@ export default function History() {
   const [prevPage, setPrevPage] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Updated backend logic
   const fetchClientTrades = async () => {
     if (!user?.email) return [];
 
@@ -52,7 +72,9 @@ export default function History() {
         page_size: number;
       }>(
         "GET",
-        `/api/user/client-history?email=${encodeURIComponent(user.email)}&page=${page}&page_size=${pageSize}`
+        `/api/user/client-history?email=${encodeURIComponent(
+          user.email
+        )}&page=${page}&page_size=${pageSize}`
       );
 
       if (res.status !== "success") throw new Error("Failed to fetch trades");
@@ -92,29 +114,45 @@ export default function History() {
     setSide("all");
   };
 
-  return (
-    <div className="flex min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-      <Sidebar />
-      <div className="flex-1 md:ml-[14rem]">
-        <Header />
-        <Lowheader />
+return (
+  <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+    <Sidebar />
 
-        <div className="min-h-screen bg-gray-50 dark:bg-[#2d3139] p-6">
+    {/* MAIN CONTENT */}
+    <div className="flex-1 flex flex-col ml-0 md:ml-[14rem]">
+      {/* ml-0 = no gap on mobile */}
+      {/* md:ml-[14rem] = desktop sidebar space */}
+
+      <Header />
+
+      <div className="mt-0 md:mt-2">
+        {/* Remove top gap on mobile */}
+        <Lowheader /></div>
+
+        <div className="min-h-screen bg-gray-50 dark:bg-[#2d3139] p-4 sm:p-6 flex-1">
           <div className="max-w-8xl mx-auto">
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-foreground mb-6">
               History
             </h1>
 
-            {/* Filters */}
-            <div className="flex flex-wrap justify-between rounded-lg gap-4 items-center mb-6">
+            {/* ---------- FILTERS GRID (RESPONSIVE) ---------- */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+
               {/* Start Date */}
-              <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">Start Date</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600 dark:text-gray-200">
+                  Start Date
+                </span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center bg-card text-foreground"
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "MMM d, yyyy") : "Pick a date"}
+                      {startDate
+                        ? format(startDate, "MMM d, yyyy")
+                        : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="p-0">
@@ -128,11 +166,16 @@ export default function History() {
               </div>
 
               {/* End Date */}
-              <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">End Date</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600 dark:text-gray-200">
+                  End Date
+                </span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center bg-card text-foreground"
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {endDate ? format(endDate, "MMM d, yyyy") : "Pick a date"}
                     </Button>
@@ -148,10 +191,12 @@ export default function History() {
               </div>
 
               {/* Symbol */}
-              <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">Symbol</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600 dark:text-gray-200">
+                  Symbol
+                </span>
                 <Select value={symbol} onValueChange={setSymbol}>
-                  <SelectTrigger className="w-24">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -163,10 +208,12 @@ export default function History() {
               </div>
 
               {/* Side */}
-              <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">Side</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm text-gray-600 dark:text-gray-200">
+                  Side
+                </span>
                 <Select value={side} onValueChange={setSide}>
-                  <SelectTrigger className="w-24">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -177,38 +224,52 @@ export default function History() {
                 </Select>
               </div>
 
-              <Button
-                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground text-md font-semibold"
-                onClick={clearFilters}
-              >
-                Clear Filters
-              </Button>
+              {/* Clear Filters Button */}
+              <div className="flex flex-col justify-end">
+                <Button
+                  className="bg-[#1a785f] hover:bg-[#1e896d] text-white font-semibold w-full"
+                  onClick={clearFilters}
+                >
+                  Clear Filters
+                </Button>
+              </div>
             </div>
 
-            {/* Table */}
+            {/* ---------- TABLE (MOBILE SCROLLABLE) ---------- */}
             <div className="overflow-x-auto rounded-2xl border border-[#06a57f]">
-              <table className="w-full text-md text-left">
-                <thead className="bg-[#06a57f] text-primary-foreground font-semibold">
-                  <tr>
-                    <th className="py-3 px-4">Order Time</th>
-                    <th className="py-3 px-4">Position</th>
-                    <th className="py-3 px-4">
-                      <div className="flex items-center">
+              <table className="w-full text-xs sm:text-sm md:text-md table-auto">
+                <thead className="bg-[#00B894] text-white">
+                  <tr className="text-xs">
+
+                    <th className="px-2 py-2 font-semibold border-r border-white/20">Order Time</th>
+
+                    <th className="px-2 py-2 font-semibold border-r border-white/20">Position</th>
+
+                    <th className="px-2 py-2 font-semibold border-r border-white/20">
+                      <div className="flex items-center gap-1">
                         Lot Size
-                        <span className="relative group ml-[16px] mb-1 inline-block align-middle">
-                          <Info className="w-4 h-4 mt-1 cursor-pointer" />
-                        </span>
+                        <Info className="h-3 w-3" />
                       </div>
                     </th>
-                    <th className="py-3 px-4">Executed Price</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Fee</th>
+
+                    <th className="px-2 py-2 font-semibold border-r border-white/20">Executed Price</th>
+
+                    <th className="px-2 py-2 font-semibold border-r border-white/20">Status</th>
+
+                    <th className="px-2 py-2 font-semibold">Fee</th>
+
                   </tr>
                 </thead>
+
+
+
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={6} className="p-6 text-center text-gray-500 dark:text-muted-foreground">
+                      <td
+                        colSpan={6}
+                        className="p-4 text-center text-gray-500 dark:text-gray-300"
+                      >
                         Loading...
                       </td>
                     </tr>
@@ -218,57 +279,66 @@ export default function History() {
                         key={index}
                         className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-muted"
                       >
-                        <td className="py-3 px-4 text-gray-700 dark:text-foreground font-medium">
+                        <td className="py-2 px-2 font-medium">
                           {format(new Date(trade.CreatedAt), "yyyy-MM-dd")}
                           <br />
-                          <span className="text-gray-500 dark:text-muted-foreground text-[14px]">
+                          <span className="text-gray-500 text-[12px]">
                             {format(new Date(trade.CreatedAt), "HH:mm:ss")}
                           </span>
                         </td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center">
+
+                        <td className="py-2 px-2">
+                          <div className="flex items-center gap-2">
                             <div
-                              className={`w-1 h-8 rounded-full mr-3 ${
-                                trade.Side === "buy" ? "bg-green-500" : "bg-red-500"
+                              className={`w-1 h-6 rounded-full ${
+                                trade.Side === "buy"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                               }`}
                             ></div>
                             <div>
-                              <div className="font-medium text-gray-800 dark:text-foreground">
+                              <div className="font-medium truncate max-w-[90px]">
                                 {trade.Symbol}
                               </div>
                               <div
-                                className={`text-[14px] ${
-                                  trade.Side === "buy" ? "text-green-600" : "text-red-600"
+                                className={`text-[12px] ${
+                                  trade.Side === "buy"
+                                    ? "text-green-600"
+                                    : "text-red-600"
                                 }`}
                               >
-                                {trade.Side.charAt(0).toUpperCase() + trade.Side.slice(1)}
+                                {trade.Side}
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-4 font-medium text-gray-800 dark:text-foreground">
+
+                        <td className="py-2 px-2 font-medium">
                           {trade.Size.toFixed(2)}{" "}
-                          <span className="text-gray-500 dark:text-muted-foreground">
+                          <span className="text-gray-500">
                             {trade.Symbol.replace("USD", "")}
                           </span>
                         </td>
-                        <td className="py-3 px-4 font-medium text-gray-800 dark:text-foreground">
+
+                        <td className="py-2 px-2 font-medium">
                           {parseFloat(trade.AverageFillPrice).toLocaleString()}
                         </td>
-                        <td className="py-3 px-4">
+
+                        <td className="py-2 px-2">
                           <span
-                            className={`${
+                            className={`px-2 py-1 text-[12px] rounded-full border ${
                               trade.State === "filled"
-                                ? "bg-[#DAF0E1] border-[#B5E1C3] text-[#006038] dark:bg-green-900/50 dark:border-green-800 dark:text-green-400"
-                                : "bg-[#FCDAE2] border-[#F9B5C6] text-[#801D18] dark:bg-red-900/50 dark:border-red-800 dark:text-red-400"
-                            } w-12 px-2 py-1 rounded-full text-[14px] border`}
+                                ? "bg-green-100 border-green-300 text-green-700"
+                                : "bg-red-100 border-red-300 text-red-700"
+                            }`}
                           >
                             {trade.State}
                           </span>
                         </td>
-                        <td className="py-3 px-4 font-medium text-gray-800 dark:text-foreground text-right">
+
+                        <td className="py-2 px-2 font-medium text-right">
                           {parseFloat(trade.PaidCommission).toFixed(2)}{" "}
-                          <span className="text-gray-500 dark:text-muted-foreground">USDT</span>
+                          <span className="text-gray-500">USDT</span>
                         </td>
                       </tr>
                     ))
@@ -276,7 +346,7 @@ export default function History() {
                     <tr>
                       <td
                         colSpan={6}
-                        className="p-4 text-center text-gray-500 dark:text-muted-foreground"
+                        className="p-4 text-center text-gray-500 dark:text-gray-300"
                       >
                         No trades found
                       </td>
@@ -286,18 +356,18 @@ export default function History() {
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-end pt-4">
+            {/* ---------- PAGINATION ---------- */}
+            <div className="flex items-center justify-end pt-4 gap-2">
               <Button
                 size="sm"
                 disabled={!prevPage}
                 onClick={() => prevPage && setPage(prevPage)}
-                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground"
+                className="bg-[#1a785f] hover:bg-[#1e896d] text-white"
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
 
-              <span className="mx-4 text-sm font-medium text-gray-700 dark:text-muted-foreground">
+              <span className="mx-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Page {page}
               </span>
 
@@ -305,7 +375,7 @@ export default function History() {
                 size="sm"
                 disabled={!nextPage}
                 onClick={() => nextPage && setPage(nextPage)}
-                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground"
+                className="bg-[#1a785f] hover:bg-[#1e896d] text-white"
               >
                 <ChevronRight className="h-6 w-6" />
               </Button>

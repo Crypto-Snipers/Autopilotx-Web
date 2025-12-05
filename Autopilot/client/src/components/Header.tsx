@@ -190,7 +190,7 @@ export default function Header() {
       <div className="flex items-center justify-between px-4 md:px-6 py-3">
         <div className="flex items-center">
           <button
-            className="text-muted-foreground hover:text-foreground md:hidden mr-2"
+            className="text-muted-foreground hover:text-foreground hidden mr-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <Menu className="w-6 h-6" />
@@ -198,7 +198,8 @@ export default function Header() {
         </div>
 
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 mx-auto md:mx-0 md:ml-auto">
+
           <div className="bg-muted hover:bg-[#1a785f] w-7 h-7 rounded-full flex items-center justify-center">
             <button
               onClick={toggleTheme}
