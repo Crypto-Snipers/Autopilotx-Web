@@ -253,6 +253,12 @@ export default function AnalyticsDashboard() {
         setHasSearched(true);
         setSearchResult(null);
 
+        const start = formatDateForApi(startDate);
+        const end = formatDateForApi(endDate);
+        const params = new URLSearchParams({ email: searchQuery });
+        if (start) params.append("startDate", start);
+        if (end) params.append("endDate", end);
+
         try {
             const res = await apiRequest<{
                 success: boolean;
@@ -263,7 +269,7 @@ export default function AnalyticsDashboard() {
                 users_emails: string[];
             }>(
                 "GET",
-                `/api/user/total-volumes-generated?email=${encodeURIComponent(searchQuery)}`
+                `/api/user/total-volumes-generated?${params.toString()}`
             );
 
             if (res.success) {
