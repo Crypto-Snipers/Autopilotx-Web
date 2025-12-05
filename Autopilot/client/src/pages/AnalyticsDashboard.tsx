@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { TrendingUp, Users, Wallet, BarChart3, Activity, ArrowUpRight, ArrowDownRight, Calendar as CalendarIcon, Search } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { TrendingUp, Users, Wallet, BarChart3, Activity, Calendar as CalendarIcon, Search, Loader2 } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import emptyStateImage from "@/assets/empty_state_search.svg";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 // Spinner for loading states
 const spinner = (
@@ -237,14 +238,19 @@ export default function AnalyticsDashboard() {
         email: string;
         total_funds: number;
         total_volumes: number;
+        users_emails: string[];
     }
 
     const [searchResult, setSearchResult] = useState<UserVolumeData | null>(null);
+    const [hasSearched, setHasSearched] = useState(false);
+    const [userEmails, setUserEmails] = useState<string[]>([]);
+    const [emailSuggestions, setEmailSuggestions] = useState<string[]>([]);
 
     const handleSearch = async () => {
         if (!searchQuery) return;
 
         setIsSearching(true);
+        setHasSearched(true);
         setSearchResult(null);
 
         try {
@@ -254,6 +260,7 @@ export default function AnalyticsDashboard() {
                 email: string;
                 total_funds: number;
                 total_volumes: number;
+                users_emails: string[];
             }>(
                 "GET",
                 `/api/user/total-volumes-generated?email=${encodeURIComponent(searchQuery)}`
@@ -264,8 +271,13 @@ export default function AnalyticsDashboard() {
                     name: res.name,
                     email: res.email,
                     total_funds: res.total_funds,
-                    total_volumes: res.total_volumes
+                    total_volumes: res.total_volumes,
+                    users_emails: res.users_emails
                 });
+                if (Array.isArray(res.users_emails) && res.users_emails.length > 0) {
+                    setUserEmails(prev => Array.from(new Set([...prev, ...res.users_emails])));
+                }
+                setEmailSuggestions([]);
             } else {
                 toast({
                     title: "Error",
@@ -284,6 +296,38 @@ export default function AnalyticsDashboard() {
         } finally {
             setIsSearching(false);
         }
+    };
+
+    const handleSearchInputChange = (value: string) => {
+        setSearchQuery(value);
+
+        if (!value.trim()) {
+            setEmailSuggestions([]);
+            setSearchResult(null);
+            setHasSearched(false);
+            return;
+        }
+
+        const normalizedValue = value.toLowerCase();
+        const sourceEmails = userEmails.length > 0
+            ? userEmails
+            : (searchResult?.users_emails ?? []);
+
+        if (!sourceEmails.length) {
+            setEmailSuggestions([]);
+            return;
+        }
+
+        const matches = sourceEmails
+            .filter(email => email.toLowerCase().includes(normalizedValue))
+            .slice(0, 8);
+
+        setEmailSuggestions(matches);
+    };
+
+    const handleSuggestionSelect = (email: string) => {
+        setSearchQuery(email);
+        setEmailSuggestions([]);
     };
 
 
@@ -360,6 +404,12 @@ export default function AnalyticsDashboard() {
         fetchAllUsers(start, end)
             .then(({ users, count }) => {
                 setTotalUsers(count);
+                if (Array.isArray(users) && users.length > 0) {
+                    const emailsFromUsers = users
+                        .map(user => user.email)
+                        .filter((email): email is string => Boolean(email));
+                    setUserEmails(Array.from(new Set(emailsFromUsers)));
+                }
                 setTotalUsersLoading(false);
             })
             .catch(err => {
@@ -368,7 +418,7 @@ export default function AnalyticsDashboard() {
             });
     }, [dateRangeKey]);
 
-    // Fetch active users
+    // Fetch approved users
     useEffect(() => {
         setTotalActiveUsersLoading(true);
         const start = formatDateForApi(startDate);
@@ -498,7 +548,7 @@ export default function AnalyticsDashboard() {
             sparklineColor: "#00ed64", // Green
         },
         {
-            title: "Total Active Users",
+            title: "Total Approved Users",
             value: totalActiveUsersLoading
                 ? spinner
                 : totalActiveUsersError
@@ -721,20 +771,36 @@ export default function AnalyticsDashboard() {
                             })}
                         </div>
 
-
                         {/* Filter Total Volumes Generated By User */}
                         <div className="mb-8">
-                           <div className="bg-white dark:bg-[#17181d] p-6 rounded-lg">
+                           <div className="bg-white dark:bg-[#17181d] p-6 rounded-lg shadow-md">
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Filter Total Volumes Generated By User</h3>
                                 <div className="flex flex-col gap-6">
                                     <div className="flex w-full items-center space-x-2">
-                                        <Input
-                                            type="email"
-                                            placeholder="Enter user email..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="bg-white dark:bg-[#1e222d] w-full"
-                                        />
+                                        <div className="relative flex-1">
+                                            <Input
+                                                type="email"
+                                                placeholder="Enter user email..."
+                                                value={searchQuery}
+                                                onChange={(e) => handleSearchInputChange(e.target.value)}
+                                                className="bg-white dark:bg-[#1e222d] w-full"
+                                                autoComplete="off"
+                                            />
+                                            {emailSuggestions.length > 0 && (
+                                                <div className="absolute left-0 right-0 z-10 mt-2 max-h-56 overflow-y-auto rounded-md border border-border bg-white dark:bg-[#1e222d] shadow-lg">
+                                                    {emailSuggestions.map((email) => (
+                                                        <button
+                                                            type="button"
+                                                            key={email}
+                                                            onClick={() => handleSuggestionSelect(email)}
+                                                            className="block w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted"
+                                                        >
+                                                            {email}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                         <Button onClick={handleSearch} disabled={isSearching} className="bg-[#1a785f] hover:bg-[#1e896d]">
                                             {isSearching ? (
                                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -746,27 +812,31 @@ export default function AnalyticsDashboard() {
                                     </div>
 
                                     {searchResult ? (
-                                        <div className="w-full overflow-x-auto">
-                                            <div className="min-w-[800px] bg-gray-100 dark:bg-[#1e222d] rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                                                <div className="grid grid-cols-4 gap-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Name</span>
-                                                        <span className="font-medium text-gray-900 dark:text-white">{searchResult.name}</span>
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</span>
-                                                        <span className="font-medium text-gray-900 dark:text-white">{searchResult.email}</span>
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Funds</span>
-                                                        <span className="font-medium text-gray-900 dark:text-white">${searchResult.total_funds.toLocaleString()}</span>
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Vol Generated</span>
-                                                        <span className="font-medium text-gray-900 dark:text-white">${searchResult.total_volumes.toLocaleString()}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div className="border rounded-lg bg-neutral-50 dark:bg-card dark:border-border">
+                                            <Table className="text-center">
+                                                <TableHeader className="bg-muted">
+                                                    <TableRow>
+                                                        <TableHead className="text-center">User Name</TableHead>
+                                                        <TableHead className="text-center">User Email</TableHead>
+                                                        <TableHead className="text-center">Total Funds</TableHead>
+                                                        <TableHead className="text-center">Total Volumes Generated</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    <TableRow key={searchResult.email}>
+                                                        <TableCell className="font-medium">{searchResult.name || "—"}</TableCell>
+                                                        <TableCell>{searchResult.email || "—"}</TableCell>
+                                                        <TableCell>₹{searchResult.total_funds.toLocaleString()}</TableCell>
+                                                        <TableCell>{searchResult.total_volumes.toLocaleString()}</TableCell>
+                                                    </TableRow>
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    ) : hasSearched ? (
+                                        <div className="flex flex-col items-center justify-center py-8 bg-gray-100 dark:bg-[#1e222d] rounded-lg border border-gray-200 dark:border-gray-700 border-dashed">
+                                            <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                                            <h3 className="text-lg font-medium text-foreground mb-2">No user found</h3>
+                                            <p className="text-muted-foreground">Double-check the email address and try again.</p>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center py-8 bg-gray-100 dark:bg-[#1e222d] rounded-lg border border-gray-200 dark:border-gray-700 border-dashed">
