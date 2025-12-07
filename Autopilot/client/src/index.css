@@ -24,7 +24,7 @@
   --border: 220 13% 91%;
   --input: 220 13% 91%;
 
-  --primary: 217 90% 50%;
+  --primary: 165 93% 33%;
   --primary-foreground: 210 40% 98%;
 
   --secondary: 220 20% 23%;
@@ -36,7 +36,7 @@
   --destructive: 0 85% 60%;
   --destructive-foreground: 210 40% 98%;
 
-  --ring: 217 90% 50%;
+  --ring: 165 93% 33%;
 
   --sidebar-background: 220 20% 23%;
   --sidebar-foreground: 0 0% 100%;
@@ -72,8 +72,7 @@
   --border: 217 19% 18%;
   --input: 217 19% 18%;
 
-  --primary: 217 90% 50%;
-  --primary-foreground: 210 40% 98%;
+  --primary: 165 93% 33%;
 
   --secondary: 220 20% 23%;
   --secondary-foreground: 210 40% 98%;
@@ -84,7 +83,7 @@
   --destructive: 0 70% 45%;
   --destructive-foreground: 210 40% 98%;
 
-  --ring: 217 90% 50%;
+  --ring: 165 93% 33%;
 }
 
 @layer base {

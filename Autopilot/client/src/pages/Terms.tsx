@@ -10,7 +10,7 @@ export default function Terms() {
       <Header />
         <Sidebar />
         <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#2d3139] p-4 md:p-8">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-3xl md:max-w-4xl mx-auto">
             <div className="bg-white dark:bg-background text-foreground shadow-md rounded-xl p-6 md:p-8">
               <div className="flex items-center mb-6">
                 <Shield className="h-8 w-8 text-green-600 mr-3" />

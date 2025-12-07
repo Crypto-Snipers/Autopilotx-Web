@@ -70,9 +70,10 @@ const CryptoCard = ({
       try {
         if (Array.isArray(data) && data.length > 0) {
           const normalized = data.map((candle) => ({
-            t: new Date(candle.time).toISOString(),
-            c: candle.close,
+            t: new Date(candle[0]).toISOString(), // timestamp
+            c: Number(candle[4]),                 // close price
           }));
+
 
           setCandles(normalized);
           setErr(null);
@@ -255,6 +256,15 @@ const CryptoCard = ({
 // CryptoMarketOverview Component
 
 export default function CryptoMarketOverview() {
+  // Calculate timestamps for the last 24 hours
+  const now = Date.now();
+  const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
+
+  // Format API URLs with 1-minute interval and time range
+  const getApiUrl = (pair) => {
+    return `  `; // 1440 minutes = 24 hours
+  };
+
   return (
     <div className="w-full font-sans p-4 bg-white dark:bg-background rounded-2xl border border-slate-200 dark:border-border shadow-lg">
       <div className="mb-6">
@@ -262,28 +272,31 @@ export default function CryptoMarketOverview() {
           Crypto Market Overview
         </h2>
         <p className="text-sm text-slate-500 dark:text-muted-foreground">
-          Live price performance over 48 hours
+          Live price performance (1-minute candles, last 24 hours)
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6">
         <CryptoCard
-          name="Bitcoin"
-          symbol="BTC"
-          apiEndpoint="https://public.coindcx.com/market_data/candles?pair=B-BTC_USDT&interval=1m"
-          accent="#05b289"
-        />
-        <CryptoCard
-          name="Ethereum"
-          symbol="ETH"
-          apiEndpoint="https://public.coindcx.com/market_data/candles?pair=B-ETH_USDT&interval=1m"
-          accent="#208b3a"
-        />
-        <CryptoCard
-          name="Solana"
-          symbol="SOL"
-          apiEndpoint="https://public.coindcx.com/market_data/candles?pair=B-SOL_USDT&interval=1m"
-          accent="#34a0a4"
-        />
+    name="Bitcoin"
+    symbol="BTC"
+    apiEndpoint="https://api.autopilotx.in/ohlcv/BTC-USDT?interval=1m&limit=100"
+    accent="#05b289"
+  />
+
+  <CryptoCard
+    name="Ethereum"
+    symbol="ETH"
+    apiEndpoint="https://api.autopilotx.in/ohlcv/ETH-USDT?interval=1m&limit=100"
+    accent="#208b3a"
+  />
+
+  <CryptoCard
+    name="Solana"
+    symbol="SOL"
+    apiEndpoint="https://api.autopilotx.in/ohlcv/SOL-USDT?interval=1m&limit=100"
+    accent="#34a0a4"
+  />
+
       </div>
     </div>
   );

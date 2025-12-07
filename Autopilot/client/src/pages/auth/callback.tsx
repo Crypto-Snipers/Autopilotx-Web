@@ -61,7 +61,7 @@ export default function AuthCallback() {
         
         // Wait a bit before redirecting to show the toast
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/home';
         }, 1000);
         
       } catch (err) {

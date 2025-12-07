@@ -3,7 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <link rel="icon" type="image/png" href="/src/assets/fav_icon.jpg" />
+    <link rel="icon" type="image/png" href="/src/assets/fav_icon.png" />
+    <script>
+      // Theme initialization script - prevents flash of incorrect theme
+      (function() {
+        try {
+          // 1. Get stored theme or fallback to system preference
+          const storedTheme = localStorage.getItem('theme');
+          const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const initialTheme = storedTheme || (systemPrefersDark ? 'dark' : 'light');
+          
+          // 2. Apply theme class immediately to prevent flash
+          const root = document.documentElement;
+          root.classList.remove('light', 'dark');
+          root.classList.add(initialTheme);
+          
+          // 3. Set data-theme attribute for CSS variables if needed
+          root.setAttribute('data-theme', initialTheme);
+          
+          // 4. Set color-scheme meta tag for better browser support
+          const meta = document.createElement('meta');
+          meta.name = 'color-scheme';
+          meta.content = initialTheme;
+          document.head.appendChild(meta);
+        } catch (e) {
+          console.warn('Error initializing theme:', e);
+          // Fallback to dark theme if there's an error
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -18,7 +18,6 @@ import NotFound from "@/pages/not-found";
 import { useAuth } from "./lib/auth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import Visitor from "@/pages/Visitor";
 import AuthCallback from "@/pages/auth/callback";
 import AdminNotificationForm from "@/pages/AdminNotificationForm";
 import AdminApprovalDashboard from "@/pages/AdminApprovalDashboard";
@@ -81,7 +80,7 @@ function Router() {
       <Route path="/auth/update-password" component={UpdatePassword} />
       <Route path="/auth/test-reset" component={TestReset} />
       <Route path="/home" component={() => <ProtectedRoute component={Home} />} />
-      <Route path="/" component={() => <ProtectedRoute component={Home} />} />
+      <Route path="/" component={() => <ProtectedRoute component={WelcomeVisitor} />} />
       {/* <Route path="/strategies" component={() => <ProtectedRoute component={Strategies} />} /> */}
       <Route path="/strategies" component={() => <Strategies />} />
       {/* <Route path="/positions" component={() => <ProtectedRoute component={Positions} />} /> */}

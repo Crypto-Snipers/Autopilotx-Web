@@ -66,7 +66,7 @@ export default function CompleteProfile() {
       setSessionItem("signupName", values.username || "");
       setSessionItem("signupPhone", values.phone || "");
 
-      navigate("/", { state: { values } });
+      navigate("/home", { state: { values } });
     }
     catch (error) {
     console.error("Profile completion error:", error);
