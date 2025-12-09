@@ -255,7 +255,6 @@ export default function AdminDashboard() {
             <div className="flex-1 md:ml-[14rem]">
                 <Header />
                 <Lowheader />
-
                 <div className="container mx-auto p-6 space-y-6">
                     {/* Page Title */}
                     <div className="flex items-center justify-between">
@@ -394,7 +393,7 @@ export default function AdminDashboard() {
                                                                 roleUpdateMutation.isPending &&
                                                                 roleUpdateMutation.variables?.email === user.email
                                                             }
-                                                            className="bg-[#1a785f] hover:bg-[#1a785f]"
+                                                            className="bg-blue-600 hover:bg-blue-700"
                                                         >
                                                             {roleUpdateMutation.isPending &&
                                                                 roleUpdateMutation.variables?.email === user.email ? (

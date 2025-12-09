@@ -121,13 +121,11 @@ export default function Positions() {
   }, [positions, user?.email, queryClient]);
 
   return (
-    <div
-      className={`flex min-h-screen transition-colors duration-300 dark:bg-[#2d3139] bg-neutral-50`}
-    >
-      <Sidebar />
-      <div className="flex-1 md:ml-[14rem] flex flex-col">
-        <Header />
-        <Lowheader />
+    <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+          <Sidebar />
+          <div className="flex-1 md:ml-[14rem] flex flex-col">
+            <Header />
+            <Lowheader />
 
         <main className="flex-1 overflow-y-auto p-4">
           <div className="mb-6">

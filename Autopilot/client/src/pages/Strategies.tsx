@@ -546,12 +546,11 @@ export default function Strategies() {
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-      <Sidebar />
-
-      <div className="flex-1 md:ml-[14rem]">
-        <Header />
-        <Lowheader />
+      <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+            <Sidebar />
+            <div className="flex-1 md:ml-[14rem] flex flex-col">
+              <Header />
+              <Lowheader />
 
         <main className="px-4 py-2 md:p-6">
           <div className="flex justify-between items-center">

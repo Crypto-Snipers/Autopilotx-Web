@@ -619,12 +619,12 @@ export default function AnalyticsDashboard() {
         },
     ];
 
-    return (
-        <div className="flex min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-            <Sidebar />
-            <div className="flex-1 md:ml-[14rem]">
-                <Header />
-                <Lowheader />
+      return (
+          <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+                <Sidebar />
+                <div className="flex-1 md:ml-[14rem] flex flex-col">
+                  <Header />
+                  <Lowheader />
                 {/* Main Content */}
                 <main className="container mx-auto p-6 space-y-6">
                     <div>
