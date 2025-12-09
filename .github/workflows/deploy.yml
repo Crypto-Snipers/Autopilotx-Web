@@ -18,6 +18,7 @@ jobs:
             cd /home/ubuntu/main/Autopilot
             git pull
             npm install
+            rm -rf client-dist
             npm run build
             sudo systemctl reload nginx
 
