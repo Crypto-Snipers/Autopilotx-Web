@@ -9,6 +9,7 @@ import Header from "@/components/Header";
 import Lowheader from "@/components/Lowheader";
 import { format } from "date-fns";
 import { useAuth } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { apiRequest } from "@/lib/queryClient";
@@ -49,14 +50,19 @@ export default function History() {
   const [trades, setTrades] = useState<TradeData[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [tempStartDate, setTempStartDate] = useState<Date | null>(null);
+  const [tempEndDate, setTempEndDate] = useState<Date | null>(null);
   const [symbol, setSymbol] = useState("all");
   const [side, setSide] = useState("all");
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
   const { user } = useAuth();
+  const { toast } = useToast();
   const [nextPage, setNextPage] = useState<number | null>(null);
   const [prevPage, setPrevPage] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isStartOpen, setIsStartOpen] = useState(false);
+  const [isEndOpen, setIsEndOpen] = useState(false);
 
   const fetchClientTrades = async () => {
     if (!user?.email) return [];
@@ -102,7 +108,7 @@ export default function History() {
       const matchesSide = side === "all" || (trade.position && trade.position.toLowerCase() === side.toLowerCase());
       const afterStartDate = !startDate || tradeDate >= new Date(startDate.setHours(0, 0, 0, 0));
       const beforeEndDate = !endDate || tradeDate <= new Date(endDate.setHours(23, 59, 59, 999));
-      
+
       return matchesSymbol && matchesSide && afterStartDate && beforeEndDate;
     } catch (error) {
       console.error("Error filtering trade:", trade, error);
@@ -110,9 +116,22 @@ export default function History() {
     }
   });
 
+
+  const formatDateForDisplay = (date: Date | null, formatStr: string = 'MMM d, yyyy'): string => {
+    if (!date) return 'Pick a date';
+    return format(date, formatStr);
+  };
+
+  const applyFilters = () => {
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+  };
+
   const clearFilters = () => {
     setStartDate(null);
     setEndDate(null);
+    setTempStartDate(null);
+    setTempEndDate(null);
     setSymbol("all");
     setSide("all");
   };
@@ -134,19 +153,30 @@ export default function History() {
             <div className="flex flex-wrap justify-between rounded-lg gap-4 items-center mb-6">
               {/* Start Date */}
               <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">Start Date</span>
-                <Popover>
+                <span className="text-md text-gray-600 dark:text-gray-200">From</span>
+                <Popover open={isStartOpen} onOpenChange={setIsStartOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted hover:text-foreground">
+                    <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "MMM d, yyyy") : "Pick a date"}
+                      <span className="truncate">
+                        {formatDateForDisplay(tempStartDate)}
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="p-0">
                     <Calendar
                       mode="single"
-                      selected={startDate || undefined}
-                      onSelect={(date) => setStartDate(date ?? null)}
+                      selected={tempStartDate || undefined}
+                      onSelect={(date) => {
+                        setTempStartDate(date ?? null);
+                        // If end date is before new start date, clear it
+                        if (date && tempEndDate && date > tempEndDate) {
+                          setTempEndDate(null);
+                        }
+                        setIsStartOpen(false);
+                      }}
+                      initialFocus
+                      disabled={(date) => date > new Date()}
                     />
                   </PopoverContent>
                 </Popover>
@@ -154,19 +184,34 @@ export default function History() {
 
               {/* End Date */}
               <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">End Date</span>
-                <Popover>
+                <span className="text-md text-gray-600 dark:text-gray-200">To</span>
+                <Popover open={isEndOpen} onOpenChange={setIsEndOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-60 justify-center bg-card text-foreground hover:bg-muted hover:text-foreground">
+                    <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "MMM d, yyyy") : "Pick a date"}
+                      <span className="truncate">
+                        {formatDateForDisplay(tempEndDate)}
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="p-0">
                     <Calendar
                       mode="single"
-                      selected={endDate || undefined}
-                      onSelect={(date) => setEndDate(date ?? null)}
+                      selected={tempEndDate || undefined}
+                      onSelect={(date) => {
+                        if (tempStartDate && date && date < tempStartDate) {
+                          toast({
+                            title: "Invalid Date Range",
+                            description: "End date must be after start date",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setTempEndDate(date ?? null);
+                        setIsEndOpen(false);
+                      }}
+                      initialFocus
+                      disabled={(date) => (tempStartDate ? date < tempStartDate : false) || date > new Date()}
                     />
                   </PopoverContent>
                 </Popover>
@@ -181,14 +226,14 @@ export default function History() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="ethusd">ETHUSD</SelectItem>
-                    <SelectItem value="btcusd">BTCUSD</SelectItem>
+                    <SelectItem value="ethusd">ETH</SelectItem>
+                    <SelectItem value="btcusd">BTC</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Side */}
-              <div className="flex items-center gap-2">
+              {/* Side not needed */}
+              {/* <div className="flex items-center gap-2">
                 <span className="text-md text-gray-600 dark:text-gray-200">Side</span>
                 <Select value={side} onValueChange={setSide}>
                   <SelectTrigger className="w-24">
@@ -200,10 +245,17 @@ export default function History() {
                     <SelectItem value="sell">Sell</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
 
               <Button
                 className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground text-md font-semibold"
+                onClick={applyFilters}
+              >
+                Apply Filters
+              </Button>
+
+              <Button
+                className="bg-black/40 hover:bg-red-600 text-primary-foreground text-md font-semibold"
                 onClick={clearFilters}
               >
                 Clear Filters
@@ -288,7 +340,7 @@ export default function History() {
                           {trade.qty.toFixed(3)} {trade.symbol}
                         </td>
                         <td className="py-3 px-4 font-medium text-gray-800 dark:text-foreground">
-                        {trade.entry_price}
+                          {trade.entry_price}
                         </td>
                         <td className="py-3 px-4">
                           {trade.exit_price}
