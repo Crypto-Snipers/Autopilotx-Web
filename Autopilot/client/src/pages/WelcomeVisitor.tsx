@@ -414,7 +414,7 @@ const Footer = () => {
         <div>
           <h4 className="font-bold text-[#06a57f] mb-4">Follow Us</h4>
           <div className="flex items-start justify-center gap-8 text-slate-200">
-            <a href="https://www.youtube.com/@SatishKVideos" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a href="https://www.youtube.com/@SatishKVideos" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
               <YoutubeIcon />
               <span className="text-xs">YouTube</span>
             </a>
@@ -422,7 +422,7 @@ const Footer = () => {
               <InstagramIcon />
               <span className="text-xs">Instagram</span>
             </a>
-            <a href="https://web.telegram.org/k/#@autopilotx_in" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a href="https://web.telegram.org/k/#@autopilotx_in" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
               <Send />
               <span className="text-xs">Telegram</span>
             </a>
