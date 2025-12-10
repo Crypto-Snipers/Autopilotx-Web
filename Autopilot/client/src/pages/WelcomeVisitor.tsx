@@ -78,10 +78,10 @@ const Header = () => {
 
         {/* Desktop Buttons */}
         <div className="hidden sm:flex items-center gap-2">
-          <button onClick={() => window.location.href="/signin"} className="text-slate-300 hover:text-white px-3 py-1.5 rounded-md text-sm">
+          <button onClick={() => window.location.href = "/signin"} className="text-slate-300 hover:text-white px-3 py-1.5 rounded-md text-sm">
             Log in
           </button>
-          <button onClick={() => window.location.href="/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-4 py-2 rounded-md text-sm">
+          <button onClick={() => window.location.href = "/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-4 py-2 rounded-md text-sm">
             Sign up
           </button>
         </div>
@@ -97,8 +97,8 @@ const Header = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="sm:hidden bg-[#0F2027]/90 border-t border-slate-900 flex flex-col items-center py-4 gap-2">
-          <button onClick={() => window.location.href="/signin"} className="text-white px-6 py-2 w-full rounded-md text-center">Log in</button>
-          <button onClick={() => window.location.href="/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-6 py-2 w-full rounded-md text-center">Sign up</button>
+          <button onClick={() => window.location.href = "/signin"} className="text-white px-6 py-2 w-full rounded-md text-center">Log in</button>
+          <button onClick={() => window.location.href = "/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-6 py-2 w-full rounded-md text-center">Sign up</button>
         </div>
       )}
     </header>
@@ -414,7 +414,7 @@ const Footer = () => {
         <div>
           <h4 className="font-bold text-[#06a57f] mb-4">Follow Us</h4>
           <div className="flex items-start justify-center gap-8 text-slate-200">
-            <a href="#" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a href="https://www.youtube.com/@SatishKVideos" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
               <YoutubeIcon />
               <span className="text-xs">YouTube</span>
             </a>
@@ -422,7 +422,7 @@ const Footer = () => {
               <InstagramIcon />
               <span className="text-xs">Instagram</span>
             </a>
-            <a href="#" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a href="https://web.telegram.org/k/#@autopilotx_in" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
               <Send />
               <span className="text-xs">Telegram</span>
             </a>

@@ -19,6 +19,7 @@ jobs:
             git pull
             npm install
             rm -rf client-dist
+            rm -rf dist
             npm run build
             sudo systemctl reload nginx
 
