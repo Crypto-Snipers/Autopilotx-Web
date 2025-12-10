@@ -98,7 +98,7 @@ export default function SignIn() {
         }
 
         await signin(values.email, values.password);
-        navigate("/");
+        navigate("/home");
       } else {
         throw new Error("Failed to retrieve user data");
       }
