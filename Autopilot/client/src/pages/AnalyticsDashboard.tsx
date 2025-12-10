@@ -232,107 +232,80 @@ export default function AnalyticsDashboard() {
 
     // Search state
     const [searchQuery, setSearchQuery] = useState("");
-    const [isSearching, setIsSearching] = useState(false);
     interface UserVolumeData {
         name: string;
         email: string;
         total_funds: number;
         total_volumes: number;
-        users_emails: string[];
     }
 
-    const [searchResult, setSearchResult] = useState<UserVolumeData | null>(null);
-    const [hasSearched, setHasSearched] = useState(false);
-    const [userEmails, setUserEmails] = useState<string[]>([]);
+    const [allUserVolumes, setAllUserVolumes] = useState<UserVolumeData[]>([]);
+    const [isLoadingVolumes, setIsLoadingVolumes] = useState(false);
     const [emailSuggestions, setEmailSuggestions] = useState<string[]>([]);
 
-    const handleSearch = async () => {
-        if (!searchQuery) return;
+    // Derived state for filtering
+    const filteredUsers = allUserVolumes.filter(user =>
+        (user.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+        (user.name?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+    );
 
-        setIsSearching(true);
-        setHasSearched(true);
-        setSearchResult(null);
+    // Fetch all user volumes on date change or mount
+    useEffect(() => {
+        const fetchVolumes = async () => {
+            setIsLoadingVolumes(true);
+            const start = formatDateForApi(startDate);
+            const end = formatDateForApi(endDate);
+            const params = new URLSearchParams();
+            if (start) params.append("startDate", start);
+            if (end) params.append("endDate", end);
 
-        const start = formatDateForApi(startDate);
-        const end = formatDateForApi(endDate);
-        const params = new URLSearchParams();
-        if (start) params.append("startDate", start);
-        if (end) params.append("endDate", end);
+            try {
+                const res = await apiRequest<UserVolumeData[]>(
+                    "GET",
+                    `/api/user/total-volumes-generated?${params.toString()}`
+                );
 
-        try {
-            const res = await apiRequest<{
-                name: string;
-                email: string;
-                total_funds: number;
-                total_volumes: number;
-            }[]>(
-                "GET",
-                `/api/user/total-volumes-generated?${params.toString()}`
-            );
-
-            if (Array.isArray(res)) {
-                // Extract all emails from the response to update suggestions
-                const allEmails = res.map(u => u.email).filter(Boolean);
-                if (allEmails.length > 0) {
-                    setUserEmails(prev => Array.from(new Set([...prev, ...allEmails])));
-                }
-
-                // Find the specific user matching the search query
-                const foundUser = res.find(u => u.email.toLowerCase() === searchQuery.toLowerCase());
-
-                if (foundUser) {
-                    setSearchResult({
-                        name: foundUser.name,
-                        email: foundUser.email,
-                        total_funds: foundUser.total_funds,
-                        total_volumes: foundUser.total_volumes,
-                        users_emails: allEmails
-                    });
-                    setEmailSuggestions([]);
+                if (Array.isArray(res)) {
+                    setAllUserVolumes(res);
                 } else {
-                    toast({
-                        title: "Not Found",
-                        description: "No data found for this user",
-                        variant: "destructive",
-                    });
+                    console.error("Invalid response format for total volumes");
+                    setAllUserVolumes([]);
                 }
-            } else {
-                throw new Error("Invalid response format");
+            } catch (error: any) {
+                console.error("Error fetching user volumes:", error);
+                const errorMessage = error.response?.data?.detail || error.message || "Failed to fetch user volumes";
+                toast({
+                    title: "Error",
+                    description: errorMessage,
+                    variant: "destructive",
+                });
+                setAllUserVolumes([]);
+            } finally {
+                setIsLoadingVolumes(false);
             }
-        } catch (error: any) {
-            console.error("Error fetching user volume:", error);
-            const errorMessage = error.response?.data?.detail || error.message || "Failed to fetch user volume";
-            toast({
-                title: "Error",
-                description: errorMessage,
-                variant: "destructive",
-            });
-        } finally {
-            setIsSearching(false);
-        }
-    };
+        };
+
+        fetchVolumes();
+    }, [dateRangeKey, startDate, endDate]);
 
     const handleSearchInputChange = (value: string) => {
         setSearchQuery(value);
 
         if (!value.trim()) {
             setEmailSuggestions([]);
-            setSearchResult(null);
-            setHasSearched(false);
             return;
         }
 
         const normalizedValue = value.toLowerCase();
-        const sourceEmails = userEmails.length > 0
-            ? userEmails
-            : (searchResult?.users_emails ?? []);
+        // Collect all emails from the loaded data
+        const allEmails = allUserVolumes.map(u => u.email).filter(Boolean);
 
-        if (!sourceEmails.length) {
+        if (!allEmails.length) {
             setEmailSuggestions([]);
             return;
         }
 
-        const matches = sourceEmails
+        const matches = allEmails
             .filter(email => email.toLowerCase().includes(normalizedValue))
             .slice(0, 8);
 
@@ -418,12 +391,7 @@ export default function AnalyticsDashboard() {
         fetchAllUsers(start, end)
             .then(({ users, count }) => {
                 setTotalUsers(count);
-                if (Array.isArray(users) && users.length > 0) {
-                    const emailsFromUsers = users
-                        .map(user => user.email)
-                        .filter((email): email is string => Boolean(email));
-                    setUserEmails(Array.from(new Set(emailsFromUsers)));
-                }
+
                 setTotalUsersLoading(false);
             })
             .catch(err => {
@@ -815,17 +783,13 @@ export default function AnalyticsDashboard() {
                                                 </div>
                                             )}
                                         </div>
-                                        <Button onClick={handleSearch} disabled={isSearching} className="bg-[#1a785f] hover:bg-[#1e896d]">
-                                            {isSearching ? (
-                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            ) : (
-                                                <Search className="h-4 w-4" />
-                                            )}
-                                        </Button>
-
                                     </div>
 
-                                    {searchResult ? (
+                                    {isLoadingVolumes ? (
+                                        <div className="flex justify-center py-8">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                        </div>
+                                    ) : allUserVolumes.length > 0 ? (
                                         <div className="border rounded-lg bg-neutral-50 dark:bg-card dark:border-border">
                                             <Table className="text-center">
                                                 <TableHeader className="bg-muted">
@@ -837,20 +801,24 @@ export default function AnalyticsDashboard() {
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    <TableRow key={searchResult.email}>
-                                                        <TableCell className="font-medium">{searchResult.name || "—"}</TableCell>
-                                                        <TableCell>{searchResult.email || "—"}</TableCell>
-                                                        <TableCell>₹{searchResult.total_funds.toLocaleString()}</TableCell>
-                                                        <TableCell>{searchResult.total_volumes.toLocaleString()}</TableCell>
-                                                    </TableRow>
+                                                    {filteredUsers.length > 0 ? (
+                                                        filteredUsers.map((user) => (
+                                                            <TableRow key={user.email}>
+                                                                <TableCell className="font-medium">{user.name || "—"}</TableCell>
+                                                                <TableCell>{user.email || "—"}</TableCell>
+                                                                <TableCell>₹{user.total_funds.toLocaleString()}</TableCell>
+                                                                <TableCell>{user.total_volumes.toLocaleString()}</TableCell>
+                                                            </TableRow>
+                                                        ))
+                                                    ) : (
+                                                        <TableRow>
+                                                            <TableCell colSpan={4} className="h-24 text-center">
+                                                                No matching users found.
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )}
                                                 </TableBody>
                                             </Table>
-                                        </div>
-                                    ) : hasSearched ? (
-                                        <div className="flex flex-col items-center justify-center py-8 bg-gray-100 dark:bg-[#1e222d] rounded-lg border border-gray-200 dark:border-gray-700 border-dashed">
-                                            <Users className="h-12 w-12 text-muted-foreground mb-4" />
-                                            <h3 className="text-lg font-medium text-foreground mb-2">No user found</h3>
-                                            <p className="text-muted-foreground">Double-check the email address and try again.</p>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center py-8 bg-gray-100 dark:bg-[#1e222d] rounded-lg border border-gray-200 dark:border-gray-700 border-dashed">
