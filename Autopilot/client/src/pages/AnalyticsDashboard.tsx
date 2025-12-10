@@ -45,9 +45,9 @@ const fetchAllUsers = async (startDate?: string, endDate?: string): Promise<{ us
         const params = new URLSearchParams();
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
-        
+
         const url = `/api/all-users${params.toString() ? `?${params.toString()}` : ''}`;
-        
+
         const res = await apiRequest<{ success: boolean, count: number, users: User[] }>(
             "GET",
             url
@@ -71,9 +71,9 @@ const fetchActiveUsers = async (startDate?: string, endDate?: string): Promise<{
         const params = new URLSearchParams();
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
-        
+
         const url = `/api/active-users${params.toString() ? `?${params.toString()}` : ''}`;
-        
+
         const res = await apiRequest<{ success: boolean; count: number; users: any[] }>(
             "GET",
             url
@@ -94,9 +94,9 @@ const fetchTotalFundsDeployed = async (startDate?: string, endDate?: string): Pr
         const params = new URLSearchParams();
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
-        
+
         const url = `/api/total-funds-deployed${params.toString() ? `?${params.toString()}` : ''}`;
-        
+
         const res = await apiRequest<{ success: boolean; total_used_margin: number }>(
             "GET",
             url
@@ -117,9 +117,9 @@ const fetchtotalFunds = async (startDate?: string, endDate?: string): Promise<nu
         const params = new URLSearchParams();
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
-        
+
         const url = `/api/total-funds${params.toString() ? `?${params.toString()}` : ''}`;
-        
+
         const res = await apiRequest<{ success: boolean; total_futures_wallets_inr: number }>(
             "GET",
             url
@@ -140,9 +140,9 @@ const fetchTotalVolumesGenerated = async (startDate?: string, endDate?: string):
         const params = new URLSearchParams();
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
-        
+
         const url = `/api/total-volumes-generated${params.toString() ? `?${params.toString()}` : ''}`;
-        
+
         const res = await apiRequest<{ success: boolean; total_volumes: number }>(
             "GET",
             url
@@ -230,7 +230,7 @@ export default function AnalyticsDashboard() {
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [dateRangeKey, setDateRangeKey] = useState(0); // Used to force re-render when dates change
 
-        // Search state
+    // Search state
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     interface UserVolumeData {
@@ -255,41 +255,49 @@ export default function AnalyticsDashboard() {
 
         const start = formatDateForApi(startDate);
         const end = formatDateForApi(endDate);
-        const params = new URLSearchParams({ email: searchQuery });
+        const params = new URLSearchParams();
         if (start) params.append("startDate", start);
         if (end) params.append("endDate", end);
 
         try {
             const res = await apiRequest<{
-                success: boolean;
                 name: string;
                 email: string;
                 total_funds: number;
                 total_volumes: number;
-                users_emails: string[];
-            }>(
+            }[]>(
                 "GET",
                 `/api/user/total-volumes-generated?${params.toString()}`
             );
 
-            if (res.success) {
-                setSearchResult({
-                    name: res.name,
-                    email: res.email,
-                    total_funds: res.total_funds,
-                    total_volumes: res.total_volumes,
-                    users_emails: res.users_emails
-                });
-                if (Array.isArray(res.users_emails) && res.users_emails.length > 0) {
-                    setUserEmails(prev => Array.from(new Set([...prev, ...res.users_emails])));
+            if (Array.isArray(res)) {
+                // Extract all emails from the response to update suggestions
+                const allEmails = res.map(u => u.email).filter(Boolean);
+                if (allEmails.length > 0) {
+                    setUserEmails(prev => Array.from(new Set([...prev, ...allEmails])));
                 }
-                setEmailSuggestions([]);
+
+                // Find the specific user matching the search query
+                const foundUser = res.find(u => u.email.toLowerCase() === searchQuery.toLowerCase());
+
+                if (foundUser) {
+                    setSearchResult({
+                        name: foundUser.name,
+                        email: foundUser.email,
+                        total_funds: foundUser.total_funds,
+                        total_volumes: foundUser.total_volumes,
+                        users_emails: allEmails
+                    });
+                    setEmailSuggestions([]);
+                } else {
+                    toast({
+                        title: "Not Found",
+                        description: "No data found for this user",
+                        variant: "destructive",
+                    });
+                }
             } else {
-                toast({
-                    title: "Error",
-                    description: "Failed to fetch user volume data",
-                    variant: "destructive",
-                });
+                throw new Error("Invalid response format");
             }
         } catch (error: any) {
             console.error("Error fetching user volume:", error);
@@ -406,7 +414,7 @@ export default function AnalyticsDashboard() {
         setTotalUsersLoading(true);
         const start = formatDateForApi(startDate);
         const end = formatDateForApi(endDate);
-        
+
         fetchAllUsers(start, end)
             .then(({ users, count }) => {
                 setTotalUsers(count);
@@ -429,7 +437,7 @@ export default function AnalyticsDashboard() {
         setTotalActiveUsersLoading(true);
         const start = formatDateForApi(startDate);
         const end = formatDateForApi(endDate);
-        
+
         fetchActiveUsers(start, end)
             .then(({ count }) => {
                 setTotalActiveUsers(count);
@@ -446,7 +454,7 @@ export default function AnalyticsDashboard() {
         setTotalFundsDeployedLoading(true);
         const start = formatDateForApi(startDate);
         const end = formatDateForApi(endDate);
-        
+
         fetchTotalFundsDeployed(start, end)
             .then(total => {
                 setTotalFundsDeployed(total);
@@ -463,7 +471,7 @@ export default function AnalyticsDashboard() {
         setTotalFundsLoading(true);
         const start = formatDateForApi(startDate);
         const end = formatDateForApi(endDate);
-        
+
         fetchtotalFunds(start, end)
             .then(total => {
                 setTotalFunds(total);
@@ -480,7 +488,7 @@ export default function AnalyticsDashboard() {
         setTotalVolumesLoading(true);
         const start = formatDateForApi(startDate);
         const end = formatDateForApi(endDate);
-        
+
         fetchTotalVolumesGenerated(start, end)
             .then(total => {
                 setTotalVolumes(total);
@@ -511,7 +519,7 @@ export default function AnalyticsDashboard() {
     // Fetch all strategies (no date filter as per original implementation)
     useEffect(() => {
         setTotalStrategiesLoading(true);
-        
+
         fetchAllStrategies()
             .then(total => {
                 setTotalStrategies(total);
@@ -619,12 +627,12 @@ export default function AnalyticsDashboard() {
         },
     ];
 
-      return (
-          <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-                <Sidebar />
-                <div className="flex-1 md:ml-[14rem] flex flex-col">
-                  <Header />
-                  <Lowheader />
+    return (
+        <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+            <Sidebar />
+            <div className="flex-1 md:ml-[14rem] flex flex-col">
+                <Header />
+                <Lowheader />
                 {/* Main Content */}
                 <main className="container mx-auto p-6 space-y-6">
                     <div>
@@ -671,8 +679,8 @@ export default function AnalyticsDashboard() {
                                 <span className="text-md text-gray-600 dark:text-gray-200">To</span>
                                 <Popover>
                                     <PopoverTrigger asChild>
-                                        <Button 
-                                            variant="outline" 
+                                        <Button
+                                            variant="outline"
                                             className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground"
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -723,14 +731,14 @@ export default function AnalyticsDashboard() {
                                 Apply
                             </Button>
                             <Button
-                                    onClick={handleResetDateRange}
-                                    disabled={!startDate && !endDate}
-                                    className="text-sm font-medium px-4 py-2 bg-black/80 hover:bg-red-600 text-primary-foreground"
+                                onClick={handleResetDateRange}
+                                disabled={!startDate && !endDate}
+                                className="text-sm font-medium px-4 py-2 bg-black/80 hover:bg-red-600 text-primary-foreground"
                             >
-                                    Clear
+                                Clear
                             </Button>
                         </div>
-                        
+
                         {/* Main Metrics Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
                             {metrics.map((metric, index) => {
@@ -779,7 +787,7 @@ export default function AnalyticsDashboard() {
 
                         {/* Filter Total Volumes Generated By User */}
                         <div className="mb-8">
-                           <div className="bg-white dark:bg-[#17181d] p-6 rounded-lg shadow-md">
+                            <div className="bg-white dark:bg-[#17181d] p-6 rounded-lg shadow-md">
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Filter Total Volumes Generated By User</h3>
                                 <div className="flex flex-col gap-6">
                                     <div className="flex w-full items-center space-x-2">
@@ -814,7 +822,7 @@ export default function AnalyticsDashboard() {
                                                 <Search className="h-4 w-4" />
                                             )}
                                         </Button>
-                                        
+
                                     </div>
 
                                     {searchResult ? (
