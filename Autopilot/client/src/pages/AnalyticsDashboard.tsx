@@ -792,14 +792,14 @@ export default function AnalyticsDashboard() {
                                         </div>
                                     ) : allUserVolumes.length > 0 ? (
                                         <div className="border rounded-lg bg-neutral-50 dark:bg-card dark:border-border">
-                                            <Table className="text-center">
+                                            <Table className="text-start">
                                                 <TableHeader className="bg-muted">
                                                     <TableRow>
-                                                        <TableHead className="text-center">User Name</TableHead>
-                                                        <TableHead className="text-center">User Email</TableHead>
-                                                        <TableHead className="text-center">Total Funds</TableHead>
-                                                        <TableHead className="text-center">Total Qty</TableHead>
-                                                        <TableHead className="text-center">Total Volumes Generated</TableHead>
+                                                        <TableHead className="text-start">User Name</TableHead>
+                                                        <TableHead className="text-start">User Email</TableHead>
+                                                        <TableHead className="text-start">Total Funds</TableHead>
+                                                        <TableHead className="text-start">Total Qty</TableHead>
+                                                        <TableHead className="text-start">Total Volumes Generated</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
@@ -809,8 +809,8 @@ export default function AnalyticsDashboard() {
                                                                 <TableCell className="font-medium">{user.name || "—"}</TableCell>
                                                                 <TableCell>{user.email || "—"}</TableCell>
                                                                 <TableCell>₹{user.total_funds.toLocaleString()}</TableCell>
-                                                                <TableCell>{user.qty.toLocaleString()}</TableCell>
-                                                                <TableCell>{user.total_volumes.toLocaleString()}</TableCell>
+                                                                <TableCell>{user.qty === 0 ? "-" : user.qty.toLocaleString()}</TableCell>
+                                                                <TableCell>{user.total_volumes === 0 ? "-" : user.total_volumes.toLocaleString()}</TableCell>
                                                             </TableRow>
                                                         ))
                                                     ) : (
