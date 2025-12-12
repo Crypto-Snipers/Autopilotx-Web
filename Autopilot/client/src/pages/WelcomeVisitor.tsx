@@ -418,7 +418,7 @@ const Footer = () => {
               <YoutubeIcon />
               <span className="text-xs">YouTube</span>
             </a>
-            <a href="#" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a href="https://www.instagram.com/autopilotx.in/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
               <InstagramIcon />
               <span className="text-xs">Instagram</span>
             </a>
