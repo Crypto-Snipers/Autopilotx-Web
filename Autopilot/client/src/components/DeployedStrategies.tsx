@@ -71,7 +71,7 @@ const DeployedStrategies = () => {
 
                 <div className="mt-4 space-y-2 text-[#06a57f] font-medium">
                   <div className="flex justify-between">
-                    <span>Margin in use:</span>
+                    <span>Margin used for strategy:</span>
                     <span>${Number(strategy.margin || 0) * Number(strategy.multiplier || 1)}</span>
                   </div>
                   <div className="flex justify-between">
