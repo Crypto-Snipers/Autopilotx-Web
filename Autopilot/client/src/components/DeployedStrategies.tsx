@@ -49,15 +49,15 @@ const DeployedStrategies = () => {
             {(Array.isArray(strategies) && strategies.length > 0) ? (strategies.map((strategy: any, index: any) => (
               <div
                 key={index}
-                className={`border border-gray-200 rounded-2xl p-4 mb-4 ${index === strategies.length - 1 ? '' : 'mb-4'
+                className={`bg-muted border shadow-sm rounded-2xl p-4 mb-4 ${index === strategies.length - 1 ? '' : 'mb-4'
                   }`}
               >
-                <div className="flex justify-between items-start mb-1">
+                <div className="flex justify-between items-start">
                   <div className="flex items-center">
-                    <div className="font-medium text-[18px] leading-[28px] font-poppins mb-[18px] mr-3">{strategy.name}</div>
+                    <div className="font-semibold text-[18px] leading-[28px] font-poppins mb-[18px] mr-3">{strategy.name}</div>
                     <span className="text-gray-500 text-sm">{strategy._id}</span>
                   </div>
-                  <div className={`flex items-center px-3 py-1 rounded-full ${strategy.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                  <div className={`flex items-center px-3 py-1 rounded-full ${strategy.status === "active" ? "bg-green-200 text-green-800" : "bg-red-100 text-red-800"}`}
                   >
                     <div className="w-4 h-4 mr-1">
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -67,6 +67,8 @@ const DeployedStrategies = () => {
                     <span className="text-xs font-medium">{strategy.status === "active" ? "Live" : "Inactive"}</span>
                   </div>
                 </div>
+
+                <div className='border-t dark:border-gray-900 border-gray-200  mb-2'></div>
 
 
                 <div className="mt-4 space-y-2 text-[#06a57f] font-medium">
