@@ -51,8 +51,7 @@ function PositionRow({ position }: { position: Position }) {
       <td className="py-3 px-4 text-foreground">{position.ltp}</td>
       <td className="py-3 px-4">
         <div className={`${pnlClass} font-medium`}>
-          {isProfit ? "+" : ""}
-          {unrealizedProfit.toFixed(4)} USDT
+          {isProfit ? "+" : ""} ₹{unrealizedProfit.toFixed(4)}
         </div>
       </td>
     </tr>
@@ -122,10 +121,10 @@ export default function Positions() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-          <Sidebar />
-          <div className="flex-1 md:ml-[14rem] flex flex-col">
-            <Header />
-            <Lowheader />
+      <Sidebar />
+      <div className="flex-1 md:ml-[14rem] flex flex-col">
+        <Header />
+        <Lowheader />
 
         <main className="flex-1 overflow-y-auto p-4">
           <div className="mb-6">
