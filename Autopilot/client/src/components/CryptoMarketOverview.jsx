@@ -279,21 +279,21 @@ export default function CryptoMarketOverview() {
         <CryptoCard
           name="Bitcoin"
           symbol="BTC"
-          apiEndpoint="https://api.autopilotx.in/ohlcv/BTC-USDT?interval=1m&limit=100"
+          apiEndpoint="https://api.autopilotx.in/api/ohlcv/BTC-USDT?interval=1m&limit=100"
           accent="#05b289"
         />
 
         <CryptoCard
           name="Ethereum"
           symbol="ETH"
-          apiEndpoint="https://api.autopilotx.in/ohlcv/ETH-USDT?interval=1m&limit=100"
+          apiEndpoint="https://api.autopilotx.in/api/ohlcv/ETH-USDT?interval=1m&limit=100"
           accent="#208b3a"
         />
 
         <CryptoCard
           name="Solana"
           symbol="SOL"
-          apiEndpoint="https://api.autopilotx.in/ohlcv/SOL-USDT?interval=1m&limit=100"
+          apiEndpoint="https://api.autopilotx.in/api/ohlcv/SOL-USDT?interval=1m&limit=100"
           accent="#34a0a4"
         />
 

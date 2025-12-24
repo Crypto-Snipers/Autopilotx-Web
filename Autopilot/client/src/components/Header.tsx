@@ -42,7 +42,7 @@ const useNotifications = (email: string | undefined) => {
         read: n.read ?? false,
       }));
     },
-    refetchInterval: 10000,           // 10 seconds polling
+    refetchInterval: 20000,           // 20 seconds polling
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     refetchOnReconnect: true,

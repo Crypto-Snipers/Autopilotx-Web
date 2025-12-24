@@ -96,7 +96,7 @@ export default function Positions() {
     enabled: !!user?.email,
     refetchOnWindowFocus: false,
     staleTime: 0,
-    refetchInterval: 3000,
+    refetchInterval: 5000,
   });
 
   const positions: Position[] = Array.isArray(data) ? data : [];

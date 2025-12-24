@@ -265,7 +265,7 @@ export default function Home() {
       }
     },
     retry: 1,
-    refetchInterval: 1000,
+    refetchInterval: 60000,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     refetchOnReconnect: true,
@@ -293,7 +293,7 @@ export default function Home() {
     enabled: !!email,
     staleTime: 30000,
     retry: 1,
-    refetchInterval: 1000,
+    refetchInterval: 30000,
 
     queryFn: async () => {
       if (!email) throw new Error("Email is required");
