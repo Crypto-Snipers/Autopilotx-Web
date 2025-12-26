@@ -58,71 +58,48 @@ export default function History() {
   const [pageSize] = useState(20);
   const { user } = useAuth();
   const { toast } = useToast();
-  // const [nextPage, setNextPage] = useState<number | null>(null);
-  // const [prevPage, setPrevPage] = useState<number | null>(null);
+  const [nextPage, setNextPage] = useState<number | null>(null);
+  const [prevPage, setPrevPage] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [isEndOpen, setIsEndOpen] = useState(false);
 
-  const fetchAllTrades = async () => {
-    if (!user?.email) return;
+  const fetchClientTrades = async () => {
+    if (!user?.email) return [];
 
     setLoading(true);
     try {
-      // Fetch Page 1 to get metadata (total_pages)
-      const res1 = await apiRequest<ApiResponse>(
+      const res = await apiRequest<ApiResponse>(
         "GET",
-        `/api/user/client-history?user_email=${encodeURIComponent(user.email)}&page=1&page_size=${pageSize}&pair=all`
+        `/api/user/client-history?user_email=${encodeURIComponent(user.email)}&page=${page}&page_size=${pageSize}`
       );
 
-      if (res1.status !== "success") {
-        throw new Error(res1.status || "Failed to fetch trades");
+      if (res.status !== "success") {
+        throw new Error(res.status || "Failed to fetch trades");
       }
 
-      const totalPages = res1.total_pages;
-      let allFetchedTrades = [...(res1.data || [])];
-
-      // Store page 1
-      sessionStorage.setItem("trades_page_1", JSON.stringify(res1.data || []));
-
-      // Fetch remaining pages or get from cache
-      const promises = [];
-      for (let i = 2; i <= totalPages; i++) {
-        const cachedPage = sessionStorage.getItem(`trades_page_${i}`);
-        if (cachedPage) {
-          promises.push(Promise.resolve(JSON.parse(cachedPage)));
-        } else {
-          promises.push(
-            apiRequest<ApiResponse>(
-              "GET",
-              `/api/user/client-history?user_email=${encodeURIComponent(user.email)}&page=${i}&page_size=${pageSize}&pair=all`
-            ).then((res) => {
-              if (res.status === 'success') {
-                sessionStorage.setItem(`trades_page_${i}`, JSON.stringify(res.data || []));
-                return res.data || [];
-              }
-              return [];
-            })
-          );
-        }
-      }
-
-      const restData = await Promise.all(promises);
-      restData.forEach((pageData) => {
-        allFetchedTrades = [...allFetchedTrades, ...pageData];
-      });
-
-      setTrades(allFetchedTrades);
+      setNextPage(res.next_page);
+      setPrevPage(res.previous_page);
+      setPage(res.page);
+      return res.data || [];
     } catch (error) {
       console.error("Error fetching trade history:", error);
+      // Show error to user
+      if (error instanceof Error) {
+        // You might want to use a toast or alert here
+        console.error(error.message);
+      }
+      setNextPage(null);
+      setPrevPage(null);
+      return [];
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAllTrades();
-  }, [user?.email]);
+    fetchClientTrades().then(setTrades);
+  }, [page, user?.email, pageSize]);
 
 
   const filteredTrades = trades.filter((trade) => {
@@ -140,13 +117,6 @@ export default function History() {
     }
   });
 
-
-  // Calculate pagination
-  const totalItems = filteredTrades.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const paginatedTrades = filteredTrades.slice((page - 1) * pageSize, page * pageSize);
-
-
   const formatDateForDisplay = (date: Date | null, formatStr: string = 'MMM d, yyyy'): string => {
     if (!date) return 'Pick a date';
     return format(date, formatStr);
@@ -155,7 +125,6 @@ export default function History() {
   const applyFilters = () => {
     setStartDate(tempStartDate);
     setEndDate(tempEndDate);
-    setPage(1);
   };
 
   const clearFilters = () => {
@@ -165,7 +134,6 @@ export default function History() {
     setTempEndDate(null);
     setSymbol("all");
     setSide("all");
-    setPage(1);
   };
 
   return (
@@ -336,8 +304,8 @@ export default function History() {
                         Loading...
                       </td>
                     </tr>
-                  ) : paginatedTrades.length > 0 ? (
-                    paginatedTrades.map((trade, index) => (
+                  ) : filteredTrades.length > 0 ? (
+                    filteredTrades.map((trade, index) => (
                       <tr
                         key={index}
                         className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-muted"
@@ -400,21 +368,21 @@ export default function History() {
             <div className="flex items-center justify-end pt-4">
               <Button
                 size="sm"
-                disabled={page === 1}
-                onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                disabled={!prevPage}
+                onClick={() => prevPage && setPage(prevPage)}
                 className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground"
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
 
               <span className="mx-4 text-sm font-medium text-gray-700 dark:text-muted-foreground">
-                Page {page} of {totalPages || 1}
+                Page {page}
               </span>
 
               <Button
                 size="sm"
-                disabled={page >= totalPages}
-                onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={!nextPage}
+                onClick={() => nextPage && setPage(nextPage)}
                 className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground"
               >
                 <ChevronRight className="h-6 w-6" />
