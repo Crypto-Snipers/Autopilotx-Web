@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Settings } from 'lucide-react';
 import EditStrategyModal from './EditStrategyModal';
 import { type StrategyConfig } from './EditStrategyModal'
+import Altcoin from '@/assets/altcoin.png'
 
 interface PerformanceGraphProps {
   showMarker?: boolean;
@@ -450,20 +451,13 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
         {data.ETH && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-black/40 backdrop-blur-[8px] transition-all duration-500 rounded-lg">
 
-            <svg className="w-14 h-auto mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]" viewBox="0 0 784 1277" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path d="M392.07 0L383.5 29.11V873.74L392.07 882.29L784.13 650.54L392.07 0Z" fillOpacity="0.6" />
-              <path d="M392.07 0L0 650.54L392.07 882.29V472.33V0Z" />
-              <path d="M392.07 956.52L387.9 961.65V1270.42L392.07 1276.81L784.37 724.89L392.07 956.52Z" fillOpacity="0.6" />
-              <path d="M392.07 1276.81V956.52L0 724.89L392.07 1276.81Z" />
-              <path d="M392.07 882.29L784.13 650.54L392.07 472.33V882.29Z" fillOpacity="0.2" />
-              <path d="M0 650.54L392.07 882.29V472.33L0 650.54Z" fillOpacity="0.2" />
-            </svg>
+            <img src={Altcoin} className="w-24 h-24 mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]" alt="Altcoin" />
 
             <h3 className="text-3xl font-semibold text-white mb-1 tracking-wider drop-shadow-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
               COMING SOON
             </h3>
             <p className="dark:text-[#10b981] text-black font-medium tracking-wide drop-shadow-md uppercase text-sm">
-              Ethereum Strategy
+              Altcoin Strategy
             </p>
           </div>
         )}

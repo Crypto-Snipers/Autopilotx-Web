@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar as CalendarIcon, Info, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, Info, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import Lowheader from "@/components/Lowheader";
@@ -64,10 +64,35 @@ export default function History() {
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [isEndOpen, setIsEndOpen] = useState(false);
 
-  const fetchAllTrades = async () => {
+  const fetchAllTrades = async (showLoading = true) => {
     if (!user?.email) return;
 
-    setLoading(true);
+    // Check for cached data and show immediately if available
+    const cachedPage1 = sessionStorage.getItem("trades_page_1");
+    let hasCache = false;
+
+    if (cachedPage1) {
+      try {
+        let allCachedTrades = JSON.parse(cachedPage1);
+        let i = 2;
+        while (true) {
+          const p = sessionStorage.getItem(`trades_page_${i}`);
+          if (!p) break;
+          allCachedTrades = [...allCachedTrades, ...JSON.parse(p)];
+          i++;
+        }
+        setTrades(allCachedTrades);
+        hasCache = true;
+      } catch (e) {
+        console.error("Cache parsing error:", e);
+      }
+    }
+
+    // Only show loading spinner if requested AND no cache is available
+    if (showLoading && !hasCache) {
+      setLoading(true);
+    }
+
     try {
       // Fetch Page 1 to get metadata (total_pages)
       const res1 = await apiRequest<ApiResponse>(
@@ -85,7 +110,7 @@ export default function History() {
       // Store page 1
       sessionStorage.setItem("trades_page_1", JSON.stringify(res1.data || []));
 
-      // Fetch remaining pages or get from cache
+      // Fetch remaining pages (refreshing cache)
       const promises = [];
       for (let i = 2; i <= totalPages; i++) {
         const cachedPage = sessionStorage.getItem(`trades_page_${i}`);
@@ -122,16 +147,25 @@ export default function History() {
 
   useEffect(() => {
     fetchAllTrades();
+
+    // Set up 15-minute polling
+    const POLLING_INTERVAL = 15 * 60 * 1000; // 15 minutes in milliseconds
+    const intervalId = setInterval(() => {
+      console.log("Polling for latest trade data...");
+      fetchAllTrades(false); // background refresh, don't show loading spinner
+    }, POLLING_INTERVAL);
+
+    return () => clearInterval(intervalId);
   }, [user?.email]);
 
 
   const filteredTrades = trades.filter((trade) => {
     try {
       const tradeDate = new Date(trade.entry_time);
-      const matchesSymbol = symbol === "all" || (trade.symbol && trade.symbol.toLowerCase() === symbol.toLowerCase());
+      const matchesSymbol = symbol === "all" || (trade.symbol && trade.symbol.toLowerCase().includes(symbol.toLowerCase()));
       const matchesSide = side === "all" || (trade.position && trade.position.toLowerCase() === side.toLowerCase());
-      const afterStartDate = !startDate || tradeDate >= new Date(startDate.setHours(0, 0, 0, 0));
-      const beforeEndDate = !endDate || tradeDate <= new Date(endDate.setHours(23, 59, 59, 999));
+      const afterStartDate = !startDate || tradeDate >= new Date(new Date(startDate).setHours(0, 0, 0, 0));
+      const beforeEndDate = !endDate || tradeDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999));
 
       return matchesSymbol && matchesSide && afterStartDate && beforeEndDate;
     } catch (error) {
@@ -252,14 +286,17 @@ export default function History() {
               {/* Symbol */}
               <div className="flex items-center gap-2">
                 <span className="text-md text-gray-600 dark:text-gray-200">Symbol</span>
-                <Select value={symbol} onValueChange={setSymbol}>
+                <Select value={symbol} onValueChange={(val) => {
+                  setSymbol(val);
+                  setPage(1);
+                }}>
                   <SelectTrigger className="w-24">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="ethusd">ETH</SelectItem>
-                    <SelectItem value="btcusd">BTC</SelectItem>
+                    <SelectItem value="ETH">ETH</SelectItem>
+                    <SelectItem value="BTC">BTC</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -332,8 +369,11 @@ export default function History() {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={6} className="p-6 text-center text-gray-500 dark:text-muted-foreground">
-                        Loading...
+                      <td colSpan={6} className="p-12 text-center">
+                        <div className="flex flex-col items-center justify-center gap-3 text-gray-500 dark:text-muted-foreground">
+                          <Loader2 className="h-8 w-8 animate-spin text-[#06a57f]" />
+                          <span className="text-sm font-medium">Fetching trade history...</span>
+                        </div>
                       </td>
                     </tr>
                   ) : paginatedTrades.length > 0 ? (

@@ -17,8 +17,9 @@ import {
 } from 'lucide-react';
 import icon from '../assets/8-02.png';
 import "../types/herosection.css";
-import dashboard from '../assets/dashboard.png'
-import MidBanner from '../assets/crs_dashboard_img.jpg'
+import dashboard from '../assets/dashboard.png';
+import MidBanner from '../assets/crs_dashboard_img.jpg';
+import Altcoin from '../assets/altcoin.png';
 import { Menu, X } from "lucide-react";
 
 interface AnimatedSectionProps {
@@ -247,8 +248,8 @@ const MidBannerSection = () => (
 // Strategies Section
 const StrategiesSection = () => {
   const strategies = [
-    { id: 1, pair: "BTC/USDT", name: "Bitcoin Strategy", description: "A dynamic Bitcoin trading strategy built for speed, precision, and consistency.", winRate: 44, maxDrawdown: 6, totalTrades: 246 },
-    { id: 2, pair: "ETH/USDT", name: "Ethereum Strategy", description: "A fast-paced Ethereum scalping strategy designed to capture quick, short-term profits.", winRate: 72, maxDrawdown: 32, totalTrades: 1045 },
+    { id: 1, pair: "BTC", name: "Bitron", description: "A dynamic Bitcoin trading strategy built for speed, precision, and consistency.", winRate: 44, maxDrawdown: 6, totalTrades: 246 },
+    { id: 2, pair: "ETH", name: "Altcoin Strategy", description: "A fast-paced Ethereum scalping strategy designed to capture quick, short-term profits.", winRate: 72, maxDrawdown: 32, totalTrades: 1045 },
   ];
   return (
     <div className="relative text-white flex flex-col items-center justify-center px-4 sm:px-8 overflow-hidden">
@@ -278,7 +279,18 @@ const StrategiesSection = () => {
       </p>
       <div className="flex flex-wrap gap-10 justify-center z-10 mt-12 w-full">
         {strategies.map((item) => (
-          <div key={item.id} className="rounded-2xl shadow-lg overflow-hidden border border-[#05b288]/50 w-full max-w-md sm:max-w-sm bg-[#162B32]/90 backdrop-blur-sm hover:scale-[1.03] transition-transform duration-300">
+          <div key={item.id} className="relative rounded-2xl shadow-lg overflow-hidden border border-[#05b288]/50 w-full max-w-md sm:max-w-sm bg-[#162B32]/90 backdrop-blur-sm hover:scale-[1.03] transition-transform duration-300">
+            {item.name === "Altcoin Strategy" && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center bg-black/40 backdrop-blur-[8px] transition-all duration-500">
+                <img src={Altcoin} className="w-24 h-24 mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]" alt="Altcoin" />
+                <h3 className="text-3xl font-semibold text-white mb-1 tracking-wider drop-shadow-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                  COMING SOON
+                </h3>
+                <p className="dark:text-[#10b981] text-black font-medium tracking-wide drop-shadow-md uppercase text-sm">
+                  Altcoin Strategy
+                </p>
+              </div>
+            )}
             <PerformanceGraph showMarker={item.id === 2} />
             <div className="p-6 rounded-b-2xl bg-[#0F2027]/90">
               <span className="inline-block px-3 py-1 text-sm rounded-full bg-[#05b288]/20 text-[#05b288] mb-2">{item.pair}</span>
