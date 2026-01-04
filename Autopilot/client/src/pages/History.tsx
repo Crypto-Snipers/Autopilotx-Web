@@ -219,7 +219,7 @@ export default function History() {
             <div className="flex flex-wrap justify-between rounded-lg gap-4 items-center mb-6">
               {/* Start Date */}
               <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">From</span>
+                <span className="text-md text-gray-600 dark:text-gray-200">Start Date</span>
                 <Popover open={isStartOpen} onOpenChange={setIsStartOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
@@ -250,7 +250,7 @@ export default function History() {
 
               {/* End Date */}
               <div className="flex items-center gap-2">
-                <span className="text-md text-gray-600 dark:text-gray-200">To</span>
+                <span className="text-md text-gray-600 dark:text-gray-200">End Date</span>
                 <Popover open={isEndOpen} onOpenChange={setIsEndOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
