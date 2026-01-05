@@ -215,6 +215,7 @@ export default function History() {
     // CSV headers
     const headers = [
       'Order Time',
+      'Exit Time',
       'Position',
       'Symbol',
       'Quantity',
@@ -227,6 +228,7 @@ export default function History() {
     // Convert trade data to CSV rows
     const csvRows = filteredTrades.map(trade => [
       format(new Date(trade.entry_time), "yyyy-MM-dd HH:mm:ss"),
+      trade.exit_time ? format(new Date(trade.exit_time), "yyyy-MM-dd HH:mm:ss") : '',
       trade.position.toUpperCase(),
       trade.symbol,
       trade.qty.toFixed(3),
