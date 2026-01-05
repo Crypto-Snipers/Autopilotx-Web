@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar as CalendarIcon, Info, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Info, ChevronLeft, ChevronRight, Loader2, DownloadIcon } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import Lowheader from "@/components/Lowheader";
@@ -202,6 +202,68 @@ export default function History() {
     setPage(1);
   };
 
+  const downloadCSV = () => {
+    if (filteredTrades.length === 0) {
+      toast({
+        title: "No Data",
+        description: "No trades available to download",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // CSV headers
+    const headers = [
+      'Order Time',
+      'Position',
+      'Symbol',
+      'Quantity',
+      'Entry Price',
+      'Exit Price',
+      'PnL',
+      'Currency'
+    ];
+
+    // Convert trade data to CSV rows
+    const csvRows = filteredTrades.map(trade => [
+      format(new Date(trade.entry_time), "yyyy-MM-dd HH:mm:ss"),
+      trade.position.toUpperCase(),
+      trade.symbol,
+      trade.qty.toFixed(3),
+      trade.entry_price.toString(),
+      trade.exit_price?.toString() || '',
+      trade.pnl.toString(),
+      trade.currency
+    ]);
+
+    // Create CSV content
+    const csvContent = [
+      headers.join(','),
+      ...csvRows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    // Generate filename with timestamp
+    const timestamp = format(new Date(), 'yyyy-MM-dd_HH-mm-ss');
+    const filename = `trade_history_${timestamp}.csv`;
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Download Successful",
+      description: `Downloaded ${filteredTrades.length} trades to ${filename}`,
+    });
+  };
+
   return (
     <div className="flex min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
       <Sidebar />
@@ -211,9 +273,19 @@ export default function History() {
 
         <div className="min-h-screen bg-gray-50 dark:bg-[#2d3139] p-6">
           <div className="max-w-8xl mx-auto">
+
+          <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-foreground mb-6">
               History
             </h1>
+
+            <button 
+              onClick={downloadCSV}
+              className="flex items-center gap-2 bg-[#06a57f] hover:bg-[#06a57f]/80 text-white px-4 py-2 rounded-lg"
+            >
+              Download <DownloadIcon className="w-4 h-4" />
+            </button>
+          </div>
 
             {/* Filters */}
             <div className="flex flex-wrap justify-between rounded-lg gap-4 items-center mb-6">
