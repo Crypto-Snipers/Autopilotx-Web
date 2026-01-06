@@ -69,7 +69,13 @@ const useThemeDetector = () => {
 
 export default function Sidebar() {
   const { user, signout } = useAuth();
-  const [role, setRole] = useState<string>("user");
+  // Initialize role from localStorage to prevent flickering during page loads
+  const [role, setRole] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('user_role') || "user";
+    }
+    return "user";
+  });
   const location = window.location.pathname;
   const currentTheme = useThemeDetector();
 
@@ -89,14 +95,17 @@ export default function Sidebar() {
           );
 
           console.log("User role response:", response);
-          if (response?.role === "superadmin" || response?.role === "admin") {
-            setRole(response.role);
-          } else {
-            setRole("user");
-          }
+          const userRole = (response?.role === "superadmin" || response?.role === "admin")
+            ? response.role
+            : "user";
+
+          setRole(userRole);
+          // Persist role to localStorage
+          localStorage.setItem('user_role', userRole);
         } catch (error) {
           console.error("Error checking user role:", error);
           setRole("user");
+          localStorage.setItem('user_role', "user");
         }
       }
     };
@@ -110,6 +119,7 @@ export default function Sidebar() {
       await signout();
       localStorage.removeItem('broker_name');
       localStorage.removeItem('api_verified');
+      localStorage.removeItem('user_role'); // Clear stored role on logout
       clearSessionStorage();
       clearLocalStorage();
       window.location.href = '/signin';
@@ -141,7 +151,6 @@ export default function Sidebar() {
 
   const footerLinks = [
     { name: "Terms & Conditions", icon: <Lock className="w-5 h-5 mr-2" />, path: "/terms" },
-    // { name: "Privacy Policy", icon: <Lock className="w-5 h-5 mr-2" />, path: "/privacy" },
     { name: "LogOut", icon: <LogOut className="w-5 h-5 mr-2" /> },
   ];
 
