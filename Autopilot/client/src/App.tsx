@@ -13,6 +13,7 @@ import Home from "@/pages/Home";
 import Strategies from "@/pages/Strategies";
 import Positions from "@/pages/Positions";
 import History from "@/pages/History";
+import StrategyPerformance from "@/pages/StrategyPerformance";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/not-found";
 import { useAuth } from "./lib/auth";
@@ -87,6 +88,7 @@ function Router() {
       <Route path="/positions" component={() => <Positions />} />
       {/* <Route path="/history" component={() => <ProtectedRoute component={History} />} /> */}
       <Route path="/history" component={() => <History />} />
+      <Route path="/strategy-performance" component={() => <StrategyPerformance />} />
       <Route path="/terms" component={Terms} />
       <Route path="/admin/notifications" component={() => <ProtectedRoute component={AdminNotificationForm} />} />
       <Route path="/admin/approvals" component={() => <ProtectedRoute component={AdminApprovalDashboard} />} />
