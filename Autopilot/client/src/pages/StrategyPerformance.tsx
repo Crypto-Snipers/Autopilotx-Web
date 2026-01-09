@@ -13,6 +13,7 @@ import {
   HelpCircle,
   Loader2,
 } from "lucide-react";
+import { apiRequest } from '@/lib/queryClient';
 
 interface StrategyPerformance {
   strategy_name: string;
@@ -40,21 +41,22 @@ export default function StrategyPerformance() {
     fetchStrategyPerformance();
   }, []);
 
+  // Fetch strategy performance
   const fetchStrategyPerformance = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Get user email from localStorage or auth context
-      const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+      // Get user email from sessionStorage or auth context
+      const userEmail = sessionStorage.getItem('signupEmail') || '';
       
-      const response = await fetch(`/api/strategy-performance?email=${encodeURIComponent(userEmail)}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!userEmail) {
+        throw new Error('User email not found in session storage. Please log in again.');
       }
       
-      const result: ApiResponse = await response.json();
+      console.log('Fetching strategy performance for email:', userEmail);
+      const result: ApiResponse = await apiRequest('GET', `/api/strategy-performance?email=${encodeURIComponent(userEmail)}`);
+      
       setData(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch strategy performance');
@@ -155,14 +157,14 @@ export default function StrategyPerformance() {
           </div>
 
           {data.strategies.map((strategy) => (
-            <div key={strategy.strategy_name} className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border mb-6">
+            <div
+              key={strategy.strategy_name}
+              className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border mb-6"
+            >
               <h5 className="text-lg font-semibold text-heading mb-4">
                 {strategy.strategy_name}
-                <span 
-                  className="text-white text-[11px] px-2 py-1 rounded-full ms-2 ml-2 tracking-wide"
-                  style={{ backgroundColor: getStrategyColor(strategy.strategy_name) }}
-                >
-                  {strategy.strategy_name.slice(0, 3).toUpperCase()}
+                <span className="bg-[#06a57f] text-white text-[11px] px-2 py-1 ml-2 rounded-full tracking-wide">
+                  BTC
                 </span>
               </h5>
               <ul className="mb-6 space-y-3">
@@ -218,7 +220,8 @@ export default function StrategyPerformance() {
                       Max Profit
                     </span>
                     <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
-                      {strategy.max_profit > 0 ? '+' : ''}{formatCurrency(strategy.max_profit)}
+                      {strategy.max_profit > 0 ? "+" : ""}
+                      {formatCurrency(strategy.max_profit)}
                     </span>
                   </a>
                 </li>
@@ -232,7 +235,8 @@ export default function StrategyPerformance() {
                       Max Loss
                     </span>
                     <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
-                      {strategy.max_loss < 0 ? '-' : ''}{formatCurrency(strategy.max_loss)}
+                      {strategy.max_loss < 0 ? "-" : ""}
+                      {formatCurrency(strategy.max_loss)}
                     </span>
                   </a>
                 </li>
@@ -247,17 +251,20 @@ export default function StrategyPerformance() {
                     </span>
                     <span
                       className={`bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5 ${
-                        strategy.approx_pnl > 0 ? "text-[#06a57f]" : "text-red-600"
+                        strategy.approx_pnl > 0
+                          ? "text-[#06a57f]"
+                          : "text-red-600"
                       }`}
                     >
-                      {strategy.approx_pnl > 0 ? "+" : "-"}{formatCurrency(strategy.approx_pnl)}
+                      {strategy.approx_pnl > 0 ? "+" : "-"}
+                      {formatCurrency(strategy.approx_pnl)}
                     </span>
                   </a>
                 </li>
               </ul>
             </div>
           ))}
-          
+
           <div className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border">
             <div>
               <span className="inline-flex items-center text-sm text-body tracking-normal">

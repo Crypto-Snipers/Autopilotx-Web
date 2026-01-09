@@ -275,6 +275,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Strategy Performance API
+  // app.get("/api/strategy-performance", async (req, res) => {
+  //   try {
+  //     const { email } = req.query;
+      
+  //     if (!email || typeof email !== 'string') {
+  //       return res.status(400).json({ message: "Email parameter is required" });
+  //     }
+
+  //     // Normalize email
+  //     const normalizedEmail = email.trim().toLowerCase();
+  //     console.log(`[Strategy Performance] Fetching performance for email: ${normalizedEmail}`);
+      
+  //     // Get user by email
+  //     const user = await storage.getUserByEmail(normalizedEmail);
+  //     if (!user) {
+  //       return res.status(404).json({ message: "User not found" });
+  //     }
+      
+  //     // Get deployed strategies for the user
+  //     const deployedStrategies = await storage.getDeployedStrategies(user.id);
+      
+  //     if (!deployedStrategies || deployedStrategies.length === 0) {
+  //       return res.json({
+  //         email: normalizedEmail,
+  //         strategies: [],
+  //         message: "No deployed strategies found"
+  //       });
+  //     }
+      
+  //     console.log(`[Strategy Performance] Found ${deployedStrategies.length} deployed strategies`);
+      
+  //     // For now, return mock data since we don't have client trades collection
+  //     // TODO: Implement actual trade data processing when client trades collection is available
+  //     const strategyPerformance = deployedStrategies.map(strategy => ({
+  //       strategy_name: strategy.name,
+  //       total_trades: 24,
+  //       profit_trades: 12,
+  //       loss_trades: 12,
+  //       max_profit: 828.79,
+  //       max_loss: -874.08,
+  //       approx_pnl: 1643.79,
+  //     }));
+      
+  //     return res.json({
+  //       email: normalizedEmail,
+  //       strategies: strategyPerformance,
+  //       total_strategies: strategyPerformance.length
+  //     });
+      
+  //   } catch (error) {
+  //     console.error("[Strategy Performance] Error:", error);
+  //     return res.status(500).json({ message: "Internal server error" });
+  //   }
+  // });
+
   app.patch("/api/strategies/:id", isAuthenticated, async (req, res) => {
     try {
       const strategyId = parseInt(req.params.id);
