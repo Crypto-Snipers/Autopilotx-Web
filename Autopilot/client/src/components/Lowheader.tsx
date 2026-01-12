@@ -1,83 +1,89 @@
-import React, { useEffect, useState } from "react";
-import { Menu, Phone, MessageSquare } from "lucide-react";
+"use client";
+
+import { useEffect } from "react";
+import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
-interface CoinDCXTicker {
-  market: string;
-  change_24_hour: string;
-  high: string;
-  low: string;
-  volume: string;
-  last_price: string;
-  bid: string;
-  ask: string;
+interface OHLCVData {
   timestamp: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
 }
+
+interface CryptoPrice {
+  symbol: string;
+  price: number;
+  change: number;
+}
+
+const fetchCryptoData = async (
+  symbol: string
+): Promise<{ price: number; change: number }> => {
+  try {
+    const response = await fetch(
+      `https://api.autopilotx.in/api/ohlcv/${symbol}-USDT?interval=1m&limit=100`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Handle your API response format
+    if (Array.isArray(data) && data.length > 0) {
+      // Parse strings to numbers using parseFloat
+      const first = parseFloat(data[0][4]); // close price of first candle
+      const last = parseFloat(data[data.length - 1][4]); // close price of last candle
+
+      const price = last;
+      const change = ((last - first) / first) * 100;
+
+      return { price, change };
+    }
+
+    return { price: 0, change: 0 };
+  } catch (error) {
+    console.error(`Error fetching ${symbol} data:`, error);
+    return { price: 0, change: 0 };
+  }
+};
 
 export default function Lowheader() {
   const { user } = useAuth();
 
-  useEffect(() => {
+  useEffect(() => {}, [user]);
 
-  }, [user]);
-
-  interface CryptoPrice {
-    symbol: string;
-    price: number;
-    change: number;
-  }
-
-  const { data: cryptoPrices = [], isLoading, error } = useQuery<CryptoPrice[]>({
+  const {
+    data: cryptoPrices = [],
+    isLoading,
+    error,
+  } = useQuery<CryptoPrice[]>({
     queryKey: ["cryptoPrices"],
     queryFn: async () => {
-      try {
-        const response = await fetch('https://api.coindcx.com/exchange/ticker');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data: CoinDCXTicker[] = await response.json();
+      const [btcData, ethData, solData] = await Promise.all([
+        fetchCryptoData("BTC"),
+        fetchCryptoData("ETH"),
+        fetchCryptoData("SOL"),
+      ]);
 
-        // Filter and transform the data to match our expected format
-        const btcData = data.find(item => item.market === 'BTCINR');
-        const ethData = data.find(item => item.market === 'ETHINR');
-        const solData = data.find(item => item.market === 'SOLINR');
-
-        return [
-          {
-            symbol: 'BTC',
-            price: btcData ? parseFloat(btcData.last_price) : 0,
-            change: btcData ? parseFloat(btcData.change_24_hour) : 0
-          },
-          {
-            symbol: 'ETH',
-            price: ethData ? parseFloat(ethData.last_price) : 0,
-            change: ethData ? parseFloat(ethData.change_24_hour) : 0
-          },
-          {
-            symbol: 'SOL',
-            price: solData ? parseFloat(solData.last_price) : 0,
-            change: solData ? parseFloat(solData.change_24_hour) : 0
-          }
-        ];
-      } catch (error) {
-        console.error('Error fetching crypto data:', error);
-        return [
-          { symbol: 'BTC', price: 0, change: 0 },
-          { symbol: 'ETH', price: 0, change: 0 },
-          { symbol: 'SOL', price: 0, change: 0 }
-        ];
-      }
+      return [
+        { symbol: "BTC", price: btcData.price, change: btcData.change },
+        { symbol: "ETH", price: ethData.price, change: ethData.change },
+        { symbol: "SOL", price: solData.price, change: solData.change },
+      ];
     },
-    refetchInterval: 15000, // 15 seconds - half of the cache time
+    refetchInterval: 300000, // 5 minutes
     refetchIntervalInBackground: true,
-    staleTime: 10000, // 10 seconds
+    staleTime: 60000, // 1 minute
     refetchOnWindowFocus: true,
   });
 
   return (
-    // <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 md:px-6 bg-gray-200 opacity-90 rounded-md py-3 overflow-hidden">
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 md:px-6 bg-gray-200 dark:bg-gray-700 opacity-90 rounded-b-lg py-3 overflow-hidden">
       {/* Crypto Data */}
       <div className="overflow-x-auto whitespace-nowrap text-sm sm:text-base md:text-base flex items-center gap-4">
@@ -85,10 +91,9 @@ export default function Lowheader() {
         {cryptoPrices?.map((crypto) => (
           <span key={crypto.symbol} className="font-mono inline-flex items-center gap-1 text-[#1a785f] dark:text-white">
             {crypto.symbol}:
-            {/* <span className={crypto.change >= 0 ? "text-green-600 dark:text-[#00ed64]" : "text-red-500"}> */}
-            <span className={crypto.change >= 0 ? "text-[#06a57f] dark:text-[#06a57f]" : "text-[#06a57f]"}>
-              {crypto.price.toFixed(2)} ({crypto.change >= 0 ? "+" : ""}
-              {crypto.change.toFixed(2)}%)
+            <span className={crypto.change >= 0 ? "text-[#06a57f] dark:text-[#06a57f]" : "text-[#ff3737] dark:text-[#ff3737]"}>
+              {typeof crypto.price === 'number' && !isNaN(crypto.price) ? crypto.price.toFixed(2) : '0.00'} ({crypto.change >= 0 ? "+" : ""}
+              {typeof crypto.change === 'number' && !isNaN(crypto.change) ? crypto.change.toFixed(2) : '0.00'}%)
             </span>
           </span>
         ))}

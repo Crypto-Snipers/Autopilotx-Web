@@ -12,6 +12,7 @@ import Lowheader from "@/components/Lowheader";
 import { getSessionItem } from "@/lib/sessionStorageUtils";
 import { apiRequest } from "@/lib/queryClient";
 import NoPositionFound from "@/assets/undraw_no_open_positions_found.svg"
+import { DownloadIcon } from "lucide-react";
 
 type StrategyViewType = "all" | "deployed";
 
@@ -546,15 +547,32 @@ export default function Strategies() {
   }
 
   return (
-      <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-            <Sidebar />
-            <div className="flex-1 md:ml-[14rem] flex flex-col">
-              <Header />
-              <Lowheader />
+    <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+      <Sidebar />
+      <div className="flex-1 md:ml-[14rem] flex flex-col">
+        <Header />
+        <Lowheader />
 
         <main className="px-4 py-2 md:p-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">Strategies</h1>
+            <Button
+              onClick={() => {
+                const downloadCSV = () => {
+                  const csvUrl = '/src/assets/STRATEGY_1_BOLLINGER_BANDS.csv';
+                  const link = document.createElement('a');
+                  link.href = csvUrl;
+                  link.download = 'STRATEGY_1_BOLLINGER_BANDS.csv';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                };
+                downloadCSV();
+              }}
+              className="flex items-center gap-2 bg-[#06a57f] hover:bg-[#06a57f]/80 text-white px-4 py-2 rounded-lg"
+            >
+              Download Backtest <DownloadIcon className="w-4 h-4" />
+            </Button>
             {isLoading && (
               <div className="flex items-center text-sm text-gray-500">
                 <svg
@@ -590,10 +608,11 @@ export default function Strategies() {
               <Button
                 variant="strategy"
                 onClick={() => setViewType("all")}
-                className={`m-2 ${viewType === "all"
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-black"
-                  }`}
+                className={`m-2 ${
+                  viewType === "all"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-black"
+                }`}
               >
                 {viewType === "all" && (
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -604,17 +623,17 @@ export default function Strategies() {
               <Button
                 variant="strategy"
                 onClick={() => setViewType("deployed")}
-                className={`m-2 ${viewType === "deployed"
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-black"
-                  }`}
+                className={`m-2 ${
+                  viewType === "deployed"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-black"
+                }`}
               >
                 {viewType === "deployed" && (
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                 )}
                 Deployed Strategies
               </Button>
-
             </div>
           </div>
 
@@ -664,7 +683,6 @@ export default function Strategies() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.isArray(strategies) && strategies.length > 0 ? (
                 strategies.map((strategy, index: number) => (
-
                   <Card
                     key={strategy._id}
                     className="rounded-3xl border p-5 shadow-sm hover:shadow-md transition-shadow"
@@ -679,7 +697,6 @@ export default function Strategies() {
                           +{strategy.Returns ?? "0"}%
                         </span>
                       </div>
-
 
                       {/* Description */}
                       <p className="text-sm text-gray-800 dark:text-white mb-3">
@@ -709,30 +726,28 @@ export default function Strategies() {
                         <div className="flex justify-between">
                           <div className="text-gray-500">Total Trades:</div>
                           <div className="font-semibold">
-                            {strategy.TotalTrades ?? "0"
-                            }
+                            {strategy.TotalTrades ?? "0"}
                           </div>
                         </div>
                       </div>
                       <div className="flex justify-between gap-2">
                         <Button
                           variant={
-                            strategy.status === 'paused'
+                            strategy.status === "paused"
                               ? "secondary"
                               : "secondary"
                           }
-                          className={`w-full text-sm font-medium py-2 px-4 rounded-md !bg-[#0e65f2] hover:!bg-[#0d5ce8] ${!deployedStrategyNames.includes(strategy.name)
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                            }`}
+                          className={`w-full text-sm font-medium py-2 px-4 rounded-md !bg-[#0e65f2] hover:!bg-[#0d5ce8] ${
+                            !deployedStrategyNames.includes(strategy.name)
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
                           onClick={() => handleStrategyStatus(strategy)}
-                          disabled={!deployedStrategyNames.includes(strategy.name)}
+                          disabled={
+                            !deployedStrategyNames.includes(strategy.name)
+                          }
                         >
-                          {strategy.status === 'paused' ? (
-                            "Resume"
-                          ) : (
-                            "Pause"
-                          )}
+                          {strategy.status === "paused" ? "Resume" : "Pause"}
                         </Button>
 
                         <Button
@@ -1131,12 +1146,20 @@ export default function Strategies() {
                             fill="#010E30"
                           />
                         </svg> */}
-                        <img src={NoPositionFound} className="h-40 w-auto" alt="No open positions found image" />
+                        <img
+                          src={NoPositionFound}
+                          className="h-40 w-auto"
+                          alt="No open positions found image"
+                        />
                         <p className="text-gray-500">No Strategy Deployed</p>
                       </div>
                     ) : (
                       <div className="p-6 flex flex-col items-center justify-center h-64 space-y-4">
-                        <img src={NoPositionFound} className="h-40 w-auto" alt="No open positions found image" />
+                        <img
+                          src={NoPositionFound}
+                          className="h-40 w-auto"
+                          alt="No open positions found image"
+                        />
                         {/* <svg
                           width="184"
                           height="183"
@@ -1525,8 +1548,8 @@ export default function Strategies() {
             message="deactivated"
           />
         </main>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 
 }

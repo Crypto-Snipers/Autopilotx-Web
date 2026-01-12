@@ -145,9 +145,21 @@ export default function Sidebar() {
   ];
 
   const socialLinks = [
-    { name: "YouTube Channel", icon: <Youtube className="w-5 h-5 mr-2 text-[#06a57f]" />, url: "https://www.youtube.com/@autopilotx_in" },
-    { name: "Join Telegram", icon: <MessageCircle className="w-5 h-5 mr-2 text-[#06a57f]" />, url: "https://web.telegram.org/k/#@autopilotx_in" },
-    { name: "Follow on Instagram", icon: <Instagram className="w-5 h-5 mr-2 text-[#06a57f]" />, url: "https://www.instagram.com/autopilotx.in/" },
+    {
+      name: "YouTube Channel",
+      icon: <Youtube className="w-5 h-5 mr-2 text-[#06a57f]" />,
+      url: "https://www.youtube.com/@SatishKVideos",
+    },
+    {
+      name: "Join Telegram",
+      icon: <MessageCircle className="w-5 h-5 mr-2 text-[#06a57f]" />,
+      url: "https://web.telegram.org/k/#@autopilotx_in",
+    },
+    {
+      name: "Follow on Instagram",
+      icon: <Instagram className="w-5 h-5 mr-2 text-[#06a57f]" />,
+      url: "https://www.instagram.com/autopilotx.in/",
+    },
   ];
 
   const footerLinks = [
