@@ -56,8 +56,16 @@ const TradingGreetingCard = ({ userName, brokerName }: TradingGreetingCardProps)
   ];
 
   const coindcxOptions = [
-    { icon: <Plus className='w-5 h-5' />, name: 'Add Broker', action: 'addBroker' },
-    { icon: <UserRoundPlus className='w-5 h-5' />, name: 'Create Account', href: 'https://account.coindcx.com/signup' }
+    {
+      icon: <Plus className="w-5 h-5" />,
+      name: "Add Broker",
+      action: "addBroker",
+    },
+    {
+      icon: <UserRoundPlus className="w-5 h-5" />,
+      name: "Create Account",
+      href: "https://join.coindcx.com/invite/BUiSC",
+    },
   ];
 
 

@@ -4,7 +4,6 @@ import Header from '@/components/Header'
 import Lowheader from '@/components/Lowheader'
 import {
   ChartColumnBig,
-  Award,
   Smile,
   Frown,
   TrendingUp,

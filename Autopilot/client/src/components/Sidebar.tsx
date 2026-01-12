@@ -134,7 +134,7 @@ export default function Sidebar() {
     { name: "Home", path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
     { name: "Strategies", path: "/strategies", icon: <ChartColumnDecreasing className="w-5 h-5 mr-2" /> },
     { name: "Positions", path: "/positions", icon: <Layers className="w-5 h-5 mr-2" /> },
-    { name: "History", path: "/history", icon: <History className="w-5 h-5 mr-2" /> },
+    { name: "History", path: "https://coindcx.com/stats/futures/orders", icon: <History className="w-5 h-5 mr-2" /> },
     { name: "Strategy Performance", path: "/strategy-performance", icon: <Activity className="w-5 h-5 mr-2" /> },
 
     ...(role === "admin" || role === "superadmin" ? [{ name: "Notifications", path: "/admin/notifications", icon: <Settings className="w-5 h-5 mr-2" /> }] : []),

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { TrendingUp, Users, Wallet, BarChart3, Activity, Calendar as CalendarIcon, Search, Loader2 } from "lucide-react"
+import { TrendingUp, Users, Wallet, BarChart3, Activity, Calendar as CalendarIcon } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import Lowheader from "@/components/Lowheader"
 import { apiRequest } from "@/lib/queryClient"
 import { useToast } from "@/hooks/use-toast"
 import { useLocation } from "wouter"
-import CryptoMarketOverview from "@/components/CryptoMarketOverview"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
