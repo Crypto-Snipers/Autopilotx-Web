@@ -14,9 +14,7 @@ import { useTheme } from "@/context/ThemeContext";
 // Register required Chart.js components
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Filler);
 
-/* =========================================================================
-   Helper Functions
-   ========================================================================= */
+// Helper Functions
 
 // Format large numbers neatly
 const formatNumber = (num) => {
@@ -38,9 +36,33 @@ const hexToRgba = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-// Format timestamps to "12 am", "1 am" style
-const toHourTick = (d) =>
-  new Date(d).toLocaleTimeString(undefined, { hour: "numeric" }).toLowerCase();
+// Format timestamps to show proper time intervals
+const toHourTick = (d) => {
+  const date = new Date(d);
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 should be 12
+  
+  return `${hours}:${minutes} ${ampm}`;
+};
+
+// Format absolute time (e.g., "13 Jan 2026, 12:20 pm")
+const formatAbsoluteTime = (date) => {
+  if (!date) return "Never";
+  
+  const day = date.getDate();
+  const month = date.toLocaleDateString('en-US', { month: 'short' });
+  const year = date.getFullYear();
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 should be 12
+  
+  return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
+};
 
 // CryptoCard Component
 
@@ -56,6 +78,7 @@ const CryptoCard = ({
   const [err, setErr] = useState(null);
   const [price, setPrice] = useState(0);
   const [change24h, setChange24h] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -74,9 +97,9 @@ const CryptoCard = ({
             c: Number(candle[4]),                 // close price
           }));
 
-
           setCandles(normalized);
           setErr(null);
+          setLastUpdated(new Date()); // Set last updated when data is processed
 
           // Calculate latest price & 24h change
           const first = normalized[0]?.c;
@@ -128,8 +151,8 @@ const CryptoCard = ({
           data: points,
           borderColor: accent,
           pointRadius: 0,
-          borderWidth: 2,
-          tension: 0.4,
+          borderWidth: 3,
+          tension: 0.2,
           fill: true,
           backgroundColor: (ctx) => {
             const { chart } = ctx;
@@ -168,8 +191,13 @@ const CryptoCard = ({
           },
           ticks: {
             color: theme === 'dark' ? '#9ca3af' : '#000',
-            maxTicksLimit: 8,
-            font: { size: 11 }
+            maxTicksLimit: 6,
+            font: { size: 11 },
+            callback: function(value, index) {
+              const label = this.getLabelForValue(value);
+              const step = Math.ceil(this.getLabels().length / 6);
+              return index % step === 0 ? label : '';
+            }
           },
         },
         y: {
@@ -185,7 +213,6 @@ const CryptoCard = ({
       },
       elements: { point: { radius: 0 } },
     }),
-    // --- CHANGE: Added theme to the dependency array to trigger re-renders on theme change ---
     [symbol, theme]
   );
 
@@ -246,8 +273,10 @@ const CryptoCard = ({
         <Line ref={chartRef} data={data} options={options} />
       </div>
 
-      <div className="mt-3 pt-3 border-t border-slate-100 dark:border-border text-xs text-slate-400 dark:text-muted-foreground">
-        Last updated: {new Date().toLocaleString()}
+      <div className="mt-4 pt-4 border-b border-slate-100 dark:border-gray-200/20"></div>
+
+      <div className="mt-1 pt-1 border-t border-slate-100 dark:border-border text-xs text-slate-400 dark:text-muted-foreground">
+        Last updated {formatAbsoluteTime(lastUpdated)}
       </div>
     </div>
   );
@@ -272,7 +301,8 @@ export default function CryptoMarketOverview() {
           Crypto Market Overview
         </h2>
         <p className="text-sm text-slate-500 dark:text-muted-foreground">
-          Live price performance (1-minute candles, last 24 hours)
+          {/* Live price performance (1-minute candles, last 24 hours) */}
+          Live price performance
         </p>
       </div>
       <div className="grid grid-cols-1 gap-6">
@@ -296,7 +326,6 @@ export default function CryptoMarketOverview() {
           apiEndpoint="https://api.autopilotx.in/api/ohlcv/SOL-USDT?interval=1m&limit=100"
           accent="#34a0a4"
         />
-
       </div>
     </div>
   );

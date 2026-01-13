@@ -235,6 +235,7 @@ export default function AnalyticsDashboard() {
         name: string;
         email: string;
         total_funds: number;
+        deployed_funds: number;
         qty: number;
         total_volumes: number;
     }
@@ -797,6 +798,7 @@ export default function AnalyticsDashboard() {
                                                         <TableHead className="text-start">User Name</TableHead>
                                                         <TableHead className="text-start">User Email</TableHead>
                                                         <TableHead className="text-start">Total Funds</TableHead>
+                                                        <TableHead className="text-start">Deployed Funds</TableHead>
                                                         <TableHead className="text-start">Total Qty</TableHead>
                                                         <TableHead className="text-start">Total Volumes Generated</TableHead>
                                                     </TableRow>
@@ -808,13 +810,14 @@ export default function AnalyticsDashboard() {
                                                                 <TableCell className="font-medium">{user.name || "—"}</TableCell>
                                                                 <TableCell>{user.email || "—"}</TableCell>
                                                                 <TableCell>₹{user.total_funds.toLocaleString()}</TableCell>
+                                                                <TableCell>₹{user.deployed_funds.toLocaleString()}</TableCell>
                                                                 <TableCell>{user.qty === 0 ? "-" : user.qty.toLocaleString()}</TableCell>
                                                                 <TableCell>{user.total_volumes === 0 ? "-" : user.total_volumes.toLocaleString()}</TableCell>
                                                             </TableRow>
                                                         ))
                                                     ) : (
                                                         <TableRow>
-                                                            <TableCell colSpan={4} className="h-24 text-center">
+                                                            <TableCell colSpan={6} className="h-24 text-center">
                                                                 No matching users found.
                                                             </TableCell>
                                                         </TableRow>
