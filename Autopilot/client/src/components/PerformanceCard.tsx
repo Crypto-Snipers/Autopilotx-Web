@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import CongratulationsPopup from '@/components/congratulationsPopup';
 import { apiRequest } from '@/lib/queryClient';
-import { Settings } from 'lucide-react';
+import { Settings, DownloadIcon } from "lucide-react";
 import EditStrategyModal from './EditStrategyModal';
 import { type StrategyConfig } from './EditStrategyModal'
 import Altcoin from '@/assets/altcoin.png'
@@ -248,7 +248,6 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
         "POST",
         `/api/add-strategy?${params.toString()}`
       );
-
       if (response.status === 'fail') {
         throw new Error(response.message || "Failed to deploy strategy.");
       }
@@ -353,30 +352,66 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
     );
   };
 
-
-
   return (
     <>
       <div className="bg-white dark:bg-[#17181d] rounded-2xl shadow-sm px-5 py-5 w-full border border-gray-300 dark:border-gray-800 max-w-[540px] relative">
+        <div className="flex justify-end">
+          <div className="relative group">
+            <button
+              onClick={() => {
+                const downloadCSV = () => {
+                  const csvUrl = "/src/assets/STRATEGY_1_BOLLINGER_BANDS.csv";
+                  const link = document.createElement("a");
+                  link.href = csvUrl;
+                  link.download = "STRATEGY_1_BOLLINGER_BANDS.csv";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                };
+                downloadCSV();
+              }}
+              className="text-black/80 dark:text-white/80 pb-2"
+            >
+              <DownloadIcon className="w-5 h-5" />
+            </button>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+              Download backtest
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                <div className="border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Performance Graph */}
         <PerformanceGraph showMarker={showMarker} />
 
         {/* Strategy Info */}
         <div className="mt-2 mb-4">
-          <h3 className="text-lg leading-tight font-bold text-gray-800 dark:text-white mb-1">{data.name}</h3>
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{data.type}</p>
+          <h3 className="text-lg leading-tight font-bold text-gray-800 dark:text-white mb-1">
+            {data.name}
+          </h3>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            {data.type}
+          </p>
         </div>
 
         {/* Crypto Badges */}
         <div className="flex gap-2 mb-4">
           {data.BTC && (
-            <span className="bg-[#06a57f] text-white text-[11px] px-2 py-1 rounded-full tracking-wide">BTC</span>
+            <span className="bg-[#06a57f] text-white text-[11px] px-2 py-1 rounded-full tracking-wide">
+              BTC
+            </span>
           )}
           {data.ETH && (
-            <span className="bg-[#06a57f] text-white text-[11px] px-2 py-1 rounded-full tracking-wide">ETH</span>
+            <span className="bg-[#06a57f] text-white text-[11px] px-2 py-1 rounded-full tracking-wide">
+              ETH
+            </span>
           )}
           {data.SOL && (
-            <span className="bg-purple-100 text-purple-800 text-[11px] px-2 py-1 rounded-full tracking-wide">SOL</span>
+            <span className="bg-purple-100 text-purple-800 text-[11px] px-2 py-1 rounded-full tracking-wide">
+              SOL
+            </span>
           )}
         </div>
 
@@ -405,11 +440,15 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
         {/* Meta info */}
         <div className="flex flex-col gap-1.5 bg-muted rounded-xl p-2 text-sm text-foreground mb-4">
           <div className="flex justify-between">
-            <div className="font-medium text-gray-500 dark:text-gray-400">Max Drawdown</div>
+            <div className="font-medium text-gray-500 dark:text-gray-400">
+              Max Drawdown
+            </div>
             <div className="font-bold">{data.MaxDrawdown ?? "0"}%</div>
           </div>
           <div className="flex justify-between">
-            <div className="font-medium text-gray-500 dark:text-gray-300">Total Trades:</div>
+            <div className="font-medium text-gray-500 dark:text-gray-300">
+              Total Trades:
+            </div>
             <div className="font-bold">{data.TotalTrades ?? "0"}</div>
           </div>
         </div>
@@ -427,7 +466,9 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
           </div>
 
           <div className="flex items-center justify-center w-1/2 border border-[#06a57f] rounded-full px-3 h-8">
-            <div className="text-sm font-semibold text-[#06a57f]">Multiplier</div>
+            <div className="text-sm font-semibold text-[#06a57f]">
+              Multiplier
+            </div>
             <input
               type="number"
               min={1}
@@ -450,8 +491,11 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
         {/* === COMING SOON OVERLAY === */}
         {data.ETH && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-black/40 backdrop-blur-[8px] transition-all duration-500 rounded-lg">
-
-            <img src={Altcoin} className="w-24 h-24 mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]" alt="Altcoin" />
+            <img
+              src={Altcoin}
+              className="w-24 h-24 mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+              alt="Altcoin"
+            />
 
             <h3 className="text-3xl font-semibold text-white mb-1 tracking-wider drop-shadow-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
               COMING SOON

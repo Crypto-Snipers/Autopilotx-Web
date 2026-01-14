@@ -12,7 +12,6 @@ import Lowheader from "@/components/Lowheader";
 import { getSessionItem } from "@/lib/sessionStorageUtils";
 import { apiRequest } from "@/lib/queryClient";
 import NoPositionFound from "@/assets/undraw_no_open_positions_found.svg"
-import { DownloadIcon } from "lucide-react";
 
 type StrategyViewType = "all" | "deployed";
 
@@ -556,23 +555,6 @@ export default function Strategies() {
         <main className="px-4 py-2 md:p-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">Strategies</h1>
-            <Button
-              onClick={() => {
-                const downloadCSV = () => {
-                  const csvUrl = '/src/assets/STRATEGY_1_BOLLINGER_BANDS.csv';
-                  const link = document.createElement('a');
-                  link.href = csvUrl;
-                  link.download = 'STRATEGY_1_BOLLINGER_BANDS.csv';
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                };
-                downloadCSV();
-              }}
-              className="flex items-center gap-2 bg-[#06a57f] hover:bg-[#06a57f]/80 text-white px-4 py-2 rounded-lg"
-            >
-              Download Backtest <DownloadIcon className="w-4 h-4" />
-            </Button>
             {isLoading && (
               <div className="flex items-center text-sm text-gray-500">
                 <svg

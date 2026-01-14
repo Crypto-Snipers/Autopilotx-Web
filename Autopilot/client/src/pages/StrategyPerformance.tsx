@@ -192,12 +192,14 @@ export default function StrategyPerformance() {
               key={strategy.strategy_name}
               className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border mb-6"
             >
-              <h5 className="text-2xl font-semibold text-heading mb-4">
+              <h5 className="text-2xl font-semibold text-heading text-center mb-1">
                 {strategy.strategy_name}
                 <span className="bg-[#06a57f] text-white text-sm px-2 py-1 ml-2 rounded-full tracking-wide">
-                  BTC
+                  {strategy.strategy_name == "Bitron" ? "BTC" : "ETH"}
                 </span>
               </h5>
+              <div className="border-t-2 border-gray-200 dark:border-gray-700 my-4"></div>
+
 
               {/* Date Filter */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -250,7 +252,7 @@ export default function StrategyPerformance() {
                 </div>
               </div>
 
-              <div className='border border-t-gray-200/40 mb-4'></div>
+              <div className="border-t-2 border-gray-200 dark:border-gray-700 my-4"></div>
 
               <ul className="mb-6 space-y-3">
                 <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
