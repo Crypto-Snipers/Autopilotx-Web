@@ -160,6 +160,7 @@ export default function AdminDashboard() {
     const [isAuthLoading, setIsAuthLoading] = useState(true)
     const [statusFilter, setStatusFilter] = useState<string>("Pending")
     const [searchQuery, setSearchQuery] = useState("")
+    const [dateFilter, setDateFilter] = useState<string>("latest")
     const [filteredUsers, setFilteredUsers] = useState<User[]>([])
 
     // Checks Admin access
@@ -257,21 +258,33 @@ export default function AdminDashboard() {
     // Get filtered users for display
     const users: User[] = filteredUsersData || []
 
-    // Filtered Users based on search
+    // Filtered Users based on search and date
     useEffect(() => {
         const query = searchQuery.toLowerCase()
-        if (!query.trim()) {
-            setFilteredUsers(users)
-        } else {
-            setFilteredUsers(
-                users.filter((user) =>
-                    [user.name, user.email, user.broker_name, user.broker_id].some((field) =>
-                        field.toLowerCase().includes(query)
-                    )
+        let filtered = users
+        
+        // Apply search filter
+        if (query.trim()) {
+            filtered = users.filter((user) =>
+                [user.name, user.email, user.broker_name, user.broker_id].some((field) =>
+                    field.toLowerCase().includes(query)
                 )
             )
         }
-    }, [searchQuery, users])
+        
+        // Apply date filter
+        if (dateFilter === "latest") {
+            filtered = [...filtered].sort((a, b) => 
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            )
+        } else if (dateFilter === "oldest") {
+            filtered = [...filtered].sort((a, b) => 
+                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            )
+        }
+        
+        setFilteredUsers(filtered)
+    }, [searchQuery, users, dateFilter])
 
     // Approve Users Mutation
     const approveMutation = useMutation({
@@ -564,6 +577,15 @@ export default function AdminDashboard() {
                                         <SelectItem value="Pending">Pending</SelectItem>
                                         <SelectItem value="Approved">Approved</SelectItem>
                                         <SelectItem value="All">All</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Select value={dateFilter} onValueChange={setDateFilter}>
+                                    <SelectTrigger className="w-full sm:w-40">
+                                        <SelectValue placeholder="Sort by date" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="latest">Latest First</SelectItem>
+                                        <SelectItem value="oldest">Oldest First</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
