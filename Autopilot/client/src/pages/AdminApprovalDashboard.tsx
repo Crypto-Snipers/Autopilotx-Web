@@ -349,331 +349,203 @@ export default function AdminDashboard() {
     const isLoading = allUsersLoading || filteredUsersLoading
 
     return (
-        // <div className="flex min-h-screen bg-neutral-50 dark:dark:bg-[#2d3139]">
-        //     <Sidebar />
-
-        //     <div className="flex-1 md:ml-[14rem]">
-        //         <Header />
-        //         <Lowheader />
-        //         <div className="container mx-auto p-6 space-y-6">
-        //             {/* Header */}
-        //             <div className="flex items-center justify-between">
-        //                 <div>
-        //                     <h1 className="text-2xl font-semibold">Approval Dashboard</h1>
-        //                 </div>
-        //             </div>
-
-        //             {/* Metrics - Always shows overall totals */}
-        //             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
-        //                 <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-        //                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        //                         <CardTitle className="text-sm font-medium text-white">Pending Approvals</CardTitle>
-        //                         <Clock className="h-4 w-4 text-white" />
-        //                     </CardHeader>
-        //                     <CardContent>
-        //                         <div className="text-2xl font-bold text-white">{metrics.pendingApprovals}</div>
-        //                     </CardContent>
-        //                 </Card>
-        //                 <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-        //                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        //                         <CardTitle className="text-sm font-medium text-white">Total Users</CardTitle>
-        //                         <Users className="h-4 w-4 text-white" />
-        //                     </CardHeader>
-        //                     <CardContent>
-        //                         <div className="text-2xl font-bold text-white">{metrics.totalUsers}</div>
-        //                     </CardContent>
-        //                 </Card>
-        //                 <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-        //                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        //                         <CardTitle className="text-sm font-medium text-white">Approved Users</CardTitle>
-        //                         <UserCheck className="h-4 w-4 text-white" />
-        //                     </CardHeader>
-        //                     <CardContent>
-        //                         <div className="text-2xl font-bold text-white">{metrics.totalApproved}</div>
-        //                     </CardContent>
-        //                 </Card>
-        //             </div>
-
-        //             {/* Filters */}
-        //             <Card className="dark:bg-background">
-        //                 <CardHeader>
-        //                     <CardTitle>User Management</CardTitle>
-        //                 </CardHeader>
-        //                 <CardContent>
-        //                     <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        //                         <div className="flex-1">
-        //                             <div className="relative">
-        //                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        //                                 <Input
-        //                                     placeholder="Search by name, email, broker name, or broker ID..."
-        //                                     value={searchQuery}
-        //                                     onChange={(e) => setSearchQuery(e.target.value)}
-        //                                     className="pl-10"
-        //                                 />
-        //                             </div>
-        //                         </div>
-        //                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-        //                             <SelectTrigger className="w-full sm:w-48">
-        //                                 <SelectValue placeholder="Filter by status" />
-        //                             </SelectTrigger>
-        //                             <SelectContent>
-        //                                 <SelectItem value="Pending">Pending</SelectItem>
-        //                                 <SelectItem value="Approved">Approved</SelectItem>
-        //                                 <SelectItem value="All">All</SelectItem>
-        //                             </SelectContent>
-        //                         </Select>
-        //                     </div>
-
-        //                     {/* Table */}
-        //                     <div className="border rounded-lg bg-neutral-50">
-        //                         {isLoading ? (
-        //                             <div className="flex items-center justify-center py-12">
-        //                                 <div className="flex items-center space-x-2">
-        //                                     <Loader2 className="h-6 w-6 animate-spin" />
-        //                                     <span>Loading users...</span>
-        //                                 </div>
-        //                             </div>
-        //                         ) : filteredUsers.length === 0 ? (
-        //                             <div className="flex flex-col items-center justify-center py-12 text-center">
-        //                                 <Users className="h-12 w-12 text-muted-foreground mb-4" />
-        //                                 <h3 className="text-lg font-medium mb-2">No users found</h3>
-        //                                 <p className="text-muted-foreground">
-        //                                     {searchQuery ? "Try adjusting your search criteria." : "No users match the current filter."}
-        //                                 </p>
-        //                             </div>
-        //                         ) : (
-        //                             <Table>
-        //                                 <TableHeader>
-        //                                     <TableRow>
-        //                                         <TableHead>Name</TableHead>
-        //                                         <TableHead>Email</TableHead>
-        //                                         <TableHead>Broker Name</TableHead>
-        //                                         <TableHead>Broker ID</TableHead>
-        //                                         <TableHead>Registered On</TableHead>
-        //                                         <TableHead>Status</TableHead>
-        //                                         <TableHead>Actions</TableHead>
-        //                                     </TableRow>
-        //                                 </TableHeader>
-        //                                 <TableBody>
-        //                                     {filteredUsers.map((user) => (
-        //                                         <TableRow key={user.email}>
-        //                                             <TableCell className="font-medium">{user.name}</TableCell>
-        //                                             <TableCell>{user.email}</TableCell>
-        //                                             <TableCell>{user.broker_name}</TableCell>
-        //                                             <TableCell className="flex items-center gap-2">
-        //                                                 {user.broker_id && (
-        //                                                     <>
-        //                                                         {user.broker_id}
-        //                                                         <button
-        //                                                             onClick={() => handleCopy(user.broker_id)}
-        //                                                             className="text-muted-foreground hover:text-foreground transition"
-        //                                                             title="Copy Broker ID"
-        //                                                         >
-        //                                                             <Copy className="w-4 h-4" />
-        //                                                         </button>
-        //                                                     </>
-        //                                                 )}
-        //                                             </TableCell>
-        //                                             <TableCell>{formatDate(user.created_at)}</TableCell>
-        //                                             <TableCell>
-        //                                                 <Badge variant={getStatusBadgeVariant(user.status)}>{user.status}</Badge>
-        //                                             </TableCell>
-        //                                             <TableCell>
-        //                                                 {user.status === "Pending" && (
-        //                                                     <Button
-        //                                                         size="sm"
-        //                                                         onClick={() => approveMutation.mutate(user.email)}
-        //                                                         disabled={
-        //                                                             approveMutation.isPending &&
-        //                                                             approveMutation.variables === user.email
-        //                                                         }
-        //                                                         className="bg-[#05b288] hover:bg-[#06a57f] font-semibold cursor-pointer"
-        //                                                     >
-        //                                                         {approveMutation.isPending &&
-        //                                                             approveMutation.variables === user.email ? (
-        //                                                             <Loader2 className="h-4 w-4 animate-spin" />
-        //                                                         ) : (
-        //                                                             "Approve"
-        //                                                         )}
-        //                                                     </Button>
-        //                                                 )}
-        //                                             </TableCell>
-        //                                         </TableRow>
-        //                                     ))}
-        //                                 </TableBody>
-        //                             </Table>
-        //                         )}
-        //                     </div>
-        //                 </CardContent>
-        //             </Card>
-        //         </div>
-        //     </div>
-        // </div>
-            <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-                    <Sidebar />
-                    <div className="flex-1 md:ml-[14rem] flex flex-col">
-                      <Header />
-                      <Lowheader />
-                <div className="container mx-auto p-6 space-y-6">
-                    {/* Header */}
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-semibold text-foreground">Approval Dashboard</h1>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
-                        <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-white">Pending Approvals</CardTitle>
-                                <Clock className="h-4 w-4 text-white" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-white">{metrics.pendingApprovals}</div>
-                            </CardContent>
-                        </Card>
-                        <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-white">Total Users</CardTitle>
-                                <Users className="h-4 w-4 text-white" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-white">{metrics.totalUsers}</div>
-                            </CardContent>
-                        </Card>
-                        <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-white">Approved Users</CardTitle>
-                                <UserCheck className="h-4 w-4 text-white" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-white">{metrics.totalApproved}</div>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Filters */}
-                    <Card className="bg-card">
-                        <CardHeader>
-                            <CardTitle>User Management</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                                <div className="flex-1">
-                                    <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input
-                                            placeholder="Search by name, email, broker name, or broker ID..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="pl-10"
-                                        />
-                                    </div>
-                                </div>
-                                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                    <SelectTrigger className="w-full sm:w-48">
-                                        <SelectValue placeholder="Filter by status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Pending">Pending</SelectItem>
-                                        <SelectItem value="Approved">Approved</SelectItem>
-                                        <SelectItem value="All">All</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Select value={dateFilter} onValueChange={setDateFilter}>
-                                    <SelectTrigger className="w-full sm:w-40">
-                                        <SelectValue placeholder="Sort by date" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="latest">Latest First</SelectItem>
-                                        <SelectItem value="oldest">Oldest First</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Table */}
-                            <div className="border rounded-lg bg-neutral-50 dark:bg-card dark:border-border">
-                                {isLoading ? (
-                                    <div className="flex items-center justify-center py-12">
-                                        <div className="flex items-center space-x-2 text-muted-foreground">
-                                            <Loader2 className="h-6 w-6 animate-spin" />
-                                            <span>Loading users...</span>
-                                        </div>
-                                    </div>
-                                ) : filteredUsers.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                                        <Users className="h-12 w-12 text-muted-foreground mb-4" />
-                                        <h3 className="text-lg font-medium text-foreground mb-2">No users found</h3>
-                                        <p className="text-muted-foreground">
-                                            {searchQuery ? "Try adjusting your search criteria." : "No users match the current filter."}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <Table>
-                                        <TableHeader className="bg-muted">
-                                            <TableRow>
-                                                <TableHead>Name</TableHead>
-                                                <TableHead>Email</TableHead>
-                                                <TableHead>Broker Name</TableHead>
-                                                <TableHead>Broker ID</TableHead>
-                                                <TableHead>Registered On</TableHead>
-                                                <TableHead>Status</TableHead>
-                                                <TableHead>Actions</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {filteredUsers.map((user) => (
-                                                <TableRow key={user.email}>
-                                                    <TableCell className="font-medium">{user.name}</TableCell>
-                                                    <TableCell>{user.email}</TableCell>
-                                                    <TableCell>{user.broker_name}</TableCell>
-                                                    <TableCell className="flex items-center gap-2">
-                                                        {user.broker_id && (
-                                                            <>
-                                                                {user.broker_id}
-                                                                <button
-                                                                    onClick={() => handleCopy(user.broker_id)}
-                                                                    className="text-muted-foreground hover:text-foreground transition"
-                                                                    title="Copy Broker ID"
-                                                                >
-                                                                    <Copy className="w-4 h-4" />
-                                                                </button>
-                                                            </>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell>{formatDate(user.created_at)}</TableCell>
-                                                    <TableCell>
-                                                        <Badge variant={getStatusBadgeVariant(user.status)}>{user.status}</Badge>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {user.status === "Pending" && (
-                                                            <Button
-                                                                size="sm"
-                                                                onClick={() => approveMutation.mutate(user.email)}
-                                                                disabled={
-                                                                    approveMutation.isPending &&
-                                                                    approveMutation.variables === user.email
-                                                                }
-                                                                className="bg-[#1a785f] hover:bg-[#05b288] text-primary-foreground font-semibold cursor-pointer"
-                                                            >
-                                                                {approveMutation.isPending &&
-                                                                    approveMutation.variables === user.email ? (
-                                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                                ) : (
-                                                                    "Approve"
-                                                                )}
-                                                            </Button>
-                                                        )}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+      <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+        <Sidebar />
+        <div className="flex-1 md:ml-[14rem] flex flex-col">
+          <Header />
+          <Lowheader />
+          <div className="container mx-auto p-6 space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-semibold text-foreground">
+                  Approval Dashboard
+                </h1>
+              </div>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+              <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">
+                    Pending Approvals
+                  </CardTitle>
+                  <Clock className="h-4 w-4 text-white" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">
+                    {metrics.pendingApprovals}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">
+                    Total Users
+                  </CardTitle>
+                  <Users className="h-4 w-4 text-white" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">
+                    {metrics.totalUsers}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">
+                    Approved Users
+                  </CardTitle>
+                  <UserCheck className="h-4 w-4 text-white" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">
+                    {metrics.totalApproved}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Filters */}
+            <Card className="bg-card">
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Table Header */}
+                <div className="sticky top-16 bg-card z-10 border-b">
+                  <div className="flex flex-col sm:flex-row gap-4 mb-6 pt-2">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          placeholder="Search by name, email, broker name, or broker ID..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
+                      <SelectTrigger className="w-full sm:w-48">
+                        <SelectValue placeholder="Filter by status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Approved">Approved</SelectItem>
+                        <SelectItem value="All">All</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={dateFilter} onValueChange={setDateFilter}>
+                      <SelectTrigger className="w-full sm:w-40">
+                        <SelectValue placeholder="Sort by date" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="latest">Latest First</SelectItem>
+                        <SelectItem value="oldest">Oldest First</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Table Content*/}
+                <div className="border rounded-lg bg-neutral-50 dark:bg-card dark:border-border">
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="flex items-center space-x-2 text-muted-foreground">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                        <span>Loading users...</span>
+                      </div>
+                    </div>
+                  ) : filteredUsers.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
+                        No users found
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {searchQuery
+                          ? "Try adjusting your search criteria."
+                          : "No users match the current filter."}
+                      </p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader className="bg-muted">
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Broker Name</TableHead>
+                          <TableHead>Broker ID</TableHead>
+                          <TableHead>Registered On</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredUsers.map((user) => (
+                          <TableRow key={user.email}>
+                            <TableCell className="font-medium">
+                              {user.name}
+                            </TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.broker_name}</TableCell>
+                            <TableCell className="flex items-center gap-2">
+                              {user.broker_id && (
+                                <>
+                                  {user.broker_id}
+                                  <button
+                                    onClick={() => handleCopy(user.broker_id)}
+                                    className="text-muted-foreground hover:text-foreground transition"
+                                    title="Copy Broker ID"
+                                  >
+                                    <Copy className="w-4 h-4" />
+                                  </button>
+                                </>
+                              )}
+                            </TableCell>
+                            <TableCell>{formatDate(user.created_at)}</TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={getStatusBadgeVariant(user.status)}
+                              >
+                                {user.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {user.status === "Pending" && (
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    approveMutation.mutate(user.email)
+                                  }
+                                  disabled={
+                                    approveMutation.isPending &&
+                                    approveMutation.variables === user.email
+                                  }
+                                  className="bg-[#1a785f] hover:bg-[#05b288] text-primary-foreground font-semibold cursor-pointer"
+                                >
+                                  {approveMutation.isPending &&
+                                  approveMutation.variables === user.email ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    "Approve"
+                                  )}
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-    )
+      </div>
+    );
 }
