@@ -480,6 +480,8 @@ export default function Home() {
     }
   }, [futureWallet, isBalanceError, isLoadingBalance, brokerName]);
 
+
+  // Helper function to format currency display
   const formatBalanceDisplay = () => {
     if (isLoadingBalance) return 'Loading…';
 
@@ -487,30 +489,22 @@ export default function Home() {
     const showINR = currencies.includes('inr') && balances.inr > 0;
     const showUSD = currencies.includes('usd') && balances.usd > 0;
 
-    // Check if user email matches the special condition
-    const shouldMultiplyBalance = email === 'manishawork13@gmail.com';
-    const multiplier = shouldMultiplyBalance ? 3 : 1;
-
     if (brokerName === 'coindcx') {
       // For CoinDCX, show both if both are available and > 0
       if (showUSD && showINR) {
-        const usdAmount = balances.usd * multiplier;
-        const inrAmount = balances.inr * multiplier;
-        return `$${usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${inrAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${balances.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${balances.inr.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       } else if (showINR) {
-        const inrAmount = balances.inr * multiplier;
-        return `₹${inrAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `₹${balances.inr.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       } else {
-        const usdAmount = balances.usd * multiplier;
-        return `$${usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${balances.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
     } else {
       // For Delta Exchange, show USD only
-      const usdAmount = balances.usd * multiplier;
-      return `$${usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      return `$${balances.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
   };
 
+  // Helper function to get total balance value for color coding
   const getTotalBalanceForColor = () => {
     // Use USD as primary, but if only INR is available, use that
     if (currencies.includes('usd') && balances.usd > 0) {

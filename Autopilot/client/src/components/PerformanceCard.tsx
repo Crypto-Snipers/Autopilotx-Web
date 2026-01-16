@@ -355,33 +355,6 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
   return (
     <>
       <div className="bg-white dark:bg-[#17181d] rounded-2xl shadow-sm px-5 py-5 w-full border border-gray-300 dark:border-gray-800 max-w-[540px] relative">
-        <div className="flex justify-end">
-          <div className="relative group">
-            <button
-              onClick={() => {
-                const downloadCSV = () => {
-                  const csvUrl = "/src/assets/STRATEGY_1_BOLLINGER_BANDS.csv";
-                  const link = document.createElement("a");
-                  link.href = csvUrl;
-                  link.download = "STRATEGY_1_BOLLINGER_BANDS.csv";
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                };
-                downloadCSV();
-              }}
-              className="text-black/80 dark:text-white/80 pb-2"
-            >
-              <DownloadIcon className="w-5 h-5" />
-            </button>
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-              Download backtest
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                <div className="border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Performance Graph */}
         <PerformanceGraph showMarker={showMarker} />
@@ -421,9 +394,28 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
         </p>
 
         {/* Backtested Report */}
-        <p className="bg-gradient-to-r from-[#10b981] to-white text-transparent bg-clip-text font-bold text-sm leading-relaxed mb-5">
-          Backtested Report - 2025
-        </p>
+        <div className="flex items-center justify-between mb-5 bg-muted rounded-lg p-2 border-dashed border border-gray-300 dark:border-gray-600">
+          <p className="text-[#10b981] font-semibold text-sm leading-relaxed">
+            Backtested Report - Last 6 yrs
+          </p>
+          <button
+            onClick={() => {
+              const downloadCSV = () => {
+                const csvUrl = "/STRATEGY_1_BOLLINGER_BANDS.csv";
+                const link = document.createElement("a");
+                link.href = csvUrl;
+                link.download = "STRATEGY_1_BOLLINGER_BANDS.csv";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              };
+              downloadCSV();
+            }}
+            className="text-black/80 dark:text-white/80 hover:text-[#06a57f] dark:hover:text-[#06a57f] pb-2"
+          >
+            <DownloadIcon className="w-5 h-5" />
+          </button>
+        </div>
 
         {/* Win Rate */}
         <div className="text-sm font-semibold text-gray-800 dark:text-white mb-4 flex justify-between">

@@ -68,7 +68,6 @@ const AnimatedSection = ({ children, className = '' }: AnimatedSectionProps) => 
 // Header component
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-
   return (
     <header className="w-full fixed top-0 left-0 z-50 bg-[#0F2027]/80 backdrop-blur-md border-b border-slate-900">
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 py-2">
