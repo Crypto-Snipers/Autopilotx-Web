@@ -19,7 +19,7 @@ import icon from '../assets/8-02.png';
 import "../types/herosection.css";
 import dashboard from '../assets/dashboard.png';
 import MidBanner from '../assets/crs_dashboard_img.jpg';
-import Altcoin from '../assets/altcoin.png';
+import Ethereum from '../assets/ethereum.png';
 import { Menu, X } from "lucide-react";
 
 interface AnimatedSectionProps {
@@ -247,24 +247,58 @@ const MidBannerSection = () => (
 // Strategies Section
 const StrategiesSection = () => {
   const strategies = [
-    { id: 1, pair: "BTC", name: "Bitron", description: "A dynamic Bitcoin trading strategy built for speed, precision, and consistency.", winRate: 44, maxDrawdown: 6, totalTrades: 246 },
-    { id: 2, pair: "ETH", name: "Altcoin Strategy", description: "A fast-paced Ethereum scalping strategy designed to capture quick, short-term profits.", winRate: 72, maxDrawdown: 32, totalTrades: 1045 },
+    { id: 1, pair: "BTC", name: "Bitron", description: "A dynamic Bitcoin trading strategy built for speed, precision, and consistency.", winRate: 44, maxDrawdown: 6, totalTrades: 330 },
+    { id: 2, pair: "ETH", name: "Ethereum Strategy", description: "A fast-paced Ethereum scalping strategy designed to capture quick, short-term profits.", winRate: 72, maxDrawdown: 32, totalTrades: 1045 },
   ];
   return (
     <div className="relative text-white flex flex-col items-center justify-center px-4 sm:px-8 overflow-hidden">
       {/* Background Lines with Glowing Dots */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <svg className="w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          className="w-full h-full"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           {[
-            { color: "#05b288", points: "0,300 200,250 400,280 600,240 800,300 1000,250 1200,280 1400,260 1600,300 1800,270", yValues: [300, 250, 280, 240, 300, 250, 280, 260, 300, 270] },
-            { color: "#4FFFE2", points: "0,350 200,310 400,330 600,290 800,360 1000,310 1200,340 1400,320 1600,350 1800,315", yValues: [350, 310, 330, 290, 360, 310, 340, 320, 350, 315] },
-            { color: "#06a57f", points: "0,400 200,370 400,380 600,350 800,400 1000,370 1200,390 1400,375 1600,395 1800,360", yValues: [400, 370, 380, 350, 400, 370, 390, 375, 395, 360] },
+            {
+              color: "#05b288",
+              points:
+                "0,300 200,250 400,280 600,240 800,300 1000,250 1200,280 1400,260 1600,300 1800,270",
+              yValues: [300, 250, 280, 240, 300, 250, 280, 260, 300, 270],
+            },
+            {
+              color: "#4FFFE2",
+              points:
+                "0,350 200,310 400,330 600,290 800,360 1000,310 1200,340 1400,320 1600,350 1800,315",
+              yValues: [350, 310, 330, 290, 360, 310, 340, 320, 350, 315],
+            },
+            {
+              color: "#06a57f",
+              points:
+                "0,400 200,370 400,380 600,350 800,400 1000,370 1200,390 1400,375 1600,395 1800,360",
+              yValues: [400, 370, 380, 350, 400, 370, 390, 375, 395, 360],
+            },
           ].map((line, lineIndex) => (
             <g key={`line-${lineIndex}`}>
-              <polyline points={line.points} fill="none" stroke={line.color} strokeWidth="2" />
-              {[0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800].map((x, i) => (
-                <circle key={`dot${lineIndex}-${i}`} cx={x} cy={line.yValues[i]} r="5" fill={line.color} style={{ filter: `drop-shadow(0 0 8px ${line.color})` }} className="animate-pulse" />
-              ))}
+              <polyline
+                points={line.points}
+                fill="none"
+                stroke={line.color}
+                strokeWidth="2"
+              />
+              {[0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800].map(
+                (x, i) => (
+                  <circle
+                    key={`dot${lineIndex}-${i}`}
+                    cx={x}
+                    cy={line.yValues[i]}
+                    r="5"
+                    fill={line.color}
+                    style={{ filter: `drop-shadow(0 0 8px ${line.color})` }}
+                    className="animate-pulse"
+                  />
+                )
+              )}
             </g>
           ))}
         </svg>
@@ -274,26 +308,38 @@ const StrategiesSection = () => {
         Proven Strategies at Your Fingertips
       </h1>
       <p className="text-center mt-6 text-base sm:text-lg text-slate-400 max-w-3xl mx-auto">
-        Discover data-backed, performance-tested trading strategies built by experts. Deploy instantly and start trading with confidence.
+        Discover data-backed, performance-tested trading strategies built by
+        experts. Deploy instantly and start trading with confidence.
       </p>
       <div className="flex flex-wrap gap-10 justify-center z-10 mt-12 w-full">
         {strategies.map((item) => (
-          <div key={item.id} className="relative rounded-2xl shadow-lg overflow-hidden border border-[#05b288]/50 w-full max-w-md sm:max-w-sm bg-[#162B32]/90 backdrop-blur-sm hover:scale-[1.03] transition-transform duration-300">
+          <div
+            key={item.id}
+            className="relative rounded-2xl shadow-lg overflow-hidden border border-[#05b288]/50 w-full max-w-md sm:max-w-sm bg-[#162B32]/90 backdrop-blur-sm hover:scale-[1.03] transition-transform duration-300"
+          >
             {item.name === "Altcoin Strategy" && (
               <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center bg-black/40 backdrop-blur-[8px] transition-all duration-500">
-                <img src={Altcoin} className="w-24 h-24 mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]" alt="Altcoin" />
+                <img
+                  src={Ethereum}
+                  className="w-24 h-24 mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                  alt="Altcoin"
+                />
                 <h3 className="text-3xl font-semibold text-white mb-1 tracking-wider drop-shadow-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
                   COMING SOON
                 </h3>
                 <p className="dark:text-[#10b981] text-black font-medium tracking-wide drop-shadow-md uppercase text-sm">
-                  Altcoin Strategy
+                  Ethereum Strategy
                 </p>
               </div>
             )}
             <PerformanceGraph showMarker={item.id === 2} />
             <div className="p-6 rounded-b-2xl bg-[#0F2027]/90">
-              <span className="inline-block px-3 py-1 text-sm rounded-full bg-[#05b288]/20 text-[#05b288] mb-2">{item.pair}</span>
-              <h2 className="text-xl font-semibold text-white mb-2">{item.name}</h2>
+              <span className="inline-block px-3 py-1 text-sm rounded-full bg-[#05b288]/20 text-[#05b288] mb-2">
+                {item.pair}
+              </span>
+              <h2 className="text-xl font-semibold text-white mb-2">
+                {item.name}
+              </h2>
               <p className="text-sm text-gray-300 mb-4">{item.description}</p>
               <div className="mb-3">
                 <div className="flex justify-between text-xs font-medium mb-1 text-gray-400">
@@ -301,15 +347,24 @@ const StrategiesSection = () => {
                   <span className="text-white">{item.winRate}%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-700 rounded-full">
-                  <div className="h-2 rounded-full bg-gradient-to-r from-[#06a57f] via-[#05b289] to-[#05b288]" style={{ width: `${item.winRate}%` }}></div>
+                  <div
+                    className="h-2 rounded-full bg-gradient-to-r from-[#06a57f] via-[#05b289] to-[#05b288]"
+                    style={{ width: `${item.winRate}%` }}
+                  ></div>
                 </div>
               </div>
               <div className="space-y-2 text-sm mb-6">
-                <div className="flex justify-between"><span className="text-gray-400">Max Drawdown</span><span className="text-white">{item.maxDrawdown}%</span></div>
-                <div className="flex justify-between"><span className="text-gray-400">Total Trades</span><span className="text-white">{item.totalTrades}</span></div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Max Drawdown</span>
+                  <span className="text-white">{item.maxDrawdown}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Total Trades</span>
+                  <span className="text-white">{item.totalTrades}</span>
+                </div>
               </div>
               <button
-                onClick={() => window.location.href = "/signin"}
+                onClick={() => (window.location.href = "/signin")}
                 className="w-full py-2.5 text-sm rounded-full font-semibold text-[#05b289] border border-[#05b289] hover:bg-[#05b289] hover:text-white transition"
               >
                 Learn More

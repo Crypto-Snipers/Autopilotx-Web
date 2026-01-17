@@ -6,7 +6,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Settings, DownloadIcon } from "lucide-react";
 import EditStrategyModal from './EditStrategyModal';
 import { type StrategyConfig } from './EditStrategyModal'
-import Altcoin from '@/assets/altcoin.png'
+import Ethereum from '@/assets/ethereum.png'
 
 interface PerformanceGraphProps {
   showMarker?: boolean;
@@ -355,7 +355,6 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
   return (
     <>
       <div className="bg-white dark:bg-[#17181d] rounded-2xl shadow-sm px-5 py-5 w-full border border-gray-300 dark:border-gray-800 max-w-[540px] relative">
-
         {/* Performance Graph */}
         <PerformanceGraph showMarker={showMarker} />
 
@@ -396,15 +395,15 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
         {/* Backtested Report */}
         <div className="flex items-center justify-between mb-5 bg-muted rounded-lg p-2 border-dashed border border-gray-300 dark:border-gray-600">
           <p className="text-[#10b981] font-semibold text-sm leading-relaxed">
-            Backtested Report - Last 6 yrs
+            Backtested Report - Last 1 year
           </p>
           <button
             onClick={() => {
               const downloadCSV = () => {
-                const csvUrl = "/STRATEGY_1_BOLLINGER_BANDS.csv";
+                const csvUrl = "/TRADES_STRATEGIES_1Y.xlsx";
                 const link = document.createElement("a");
                 link.href = csvUrl;
-                link.download = "STRATEGY_1_BOLLINGER_BANDS.csv";
+                link.download = "TRADES_STRATEGIES.xlsx";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -478,16 +477,16 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
         {data.ETH && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-black/40 backdrop-blur-[8px] transition-all duration-500 rounded-lg">
             <img
-              src={Altcoin}
+              src={Ethereum}
               className="w-24 h-24 mb-5 text-white/90 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-              alt="Altcoin"
+              alt="Ethereum logo"
             />
 
             <h3 className="text-3xl font-semibold text-white mb-1 tracking-wider drop-shadow-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
               COMING SOON
             </h3>
             <p className="dark:text-[#10b981] text-black font-medium tracking-wide drop-shadow-md uppercase text-sm">
-              Altcoin Strategy
+              Ethereum Strategy
             </p>
           </div>
         )}
