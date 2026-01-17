@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useLocation } from 'wouter'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 import Lowheader from '@/components/Lowheader'
@@ -36,6 +37,7 @@ interface ApiResponse {
 }
 
 export default function StrategyPerformance() {
+  const [_, navigate] = useLocation();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +46,12 @@ export default function StrategyPerformance() {
   const [filterActive, setFilterActive] = useState<boolean>(false);
 
   useEffect(() => {
+    // Check if user email exists in session storage
+    const userEmail = sessionStorage.getItem('signupEmail');
+    if (!userEmail) {
+      navigate('/welcomevisitor');
+      return;
+    }
     fetchStrategyPerformance();
   }, []);
 

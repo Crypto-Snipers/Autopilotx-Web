@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import Sidebar from "@/components/Sidebar";
@@ -50,8 +51,19 @@ type StrategyStatusResponse = {
 }
 
 export default function Strategies() {
+  const [_, navigate] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Check if user email exists in session storage
+  useEffect(() => {
+    const userEmail = sessionStorage.getItem('signupEmail');
+    if (!userEmail) {
+      navigate('/welcomevisitor');
+      return;
+    }
+  }, []);
+
   const [isCongratsPopupOpen, setIsCongratsPopupOpen] = useState(false);
   const [viewType, setViewType] = useState<StrategyViewType>("all");
   const [refreshKey, setRefreshKey] = useState(0); // Add this line for force refresh

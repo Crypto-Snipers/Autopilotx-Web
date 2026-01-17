@@ -305,7 +305,7 @@ export default function Home() {
 
       console.log("🔥 FUTURES WALLET RECEIVED:", res);
 
-      return res; // ✔ res IS the number
+      return res;
     }
   });
 
@@ -328,103 +328,6 @@ export default function Home() {
 
     return () => clearTimeout(timeoutId);
   };
-
-  // useEffect(() => {
-  //   if (Balances) {
-  //     try {
-  //       console.log('Balance data from API:', Balances);
-
-  //       // Handle new format with both USD and INR
-  //       if (typeof Balances === 'object' && Balances.balance && typeof Balances.balance === 'object') {
-  //         const { balance, currency } = Balances;
-
-  //         // Set balances for both currencies
-  //         setBalances({
-  //           usd: balance.usd || 0,
-  //           inr: balance.inr || 0
-  //         });
-
-  //         // Set available currencies based on API response
-  //         if (Array.isArray(currency)) {
-  //           setCurrencies(currency);
-  //         } else if (typeof currency === 'string') {
-  //           setCurrencies([currency]);
-  //         } else {
-  //           // Default based on broker
-  //           setCurrencies(brokerName === 'coindcx' ? ['usd', 'inr'] : ['usd']);
-  //         }
-
-  //         // Update session storage with new format
-  //         sessionStorage.setItem("balances", JSON.stringify({ usd: balance.usd || 0, inr: balance.inr || 0 }));
-  //         sessionStorage.setItem("currencies", JSON.stringify(Array.isArray(currency) ? currency : [currency || 'usd']));
-
-  //       } else {
-  //         // Handle backward compatibility with old single balance format
-  //         const balanceValue = typeof Balances.balance === 'number' 
-  //           ? Balances.balance 
-  //           : typeof Balances.balance === 'object'
-  //             ? Balances.balance.usd || Balances.balance.inr || 0
-  //             : parseFloat(String(Balances.balance));
-  //         if (!isNaN(balanceValue)) {
-  //           const rawCurrency = Balances.currency || 'usd';
-  //           // Normalize currency whether it's a string or an array
-  //           const currencyStr = Array.isArray(rawCurrency) ? (rawCurrency[0] || 'usd') : String(rawCurrency || 'usd');
-  //           const currencyLower = currencyStr.toLowerCase();
-
-  //           if (currencyLower === 'inr') {
-  //             setBalances({ usd: 0, inr: balanceValue });
-  //             setCurrencies(['inr']);
-  //           } else {
-  //             setBalances({ usd: balanceValue, inr: 0 });
-  //             setCurrencies(['usd']);
-  //           }
-
-  //           // Update session storage
-  //           sessionStorage.setItem("balances", JSON.stringify({
-  //             usd: currencyLower === 'usd' ? balanceValue : 0,
-  //             inr: currencyLower === 'inr' ? balanceValue : 0
-  //           }));
-  //           sessionStorage.setItem("currencies", JSON.stringify([currencyLower]));
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error('Error parsing balance data:', error);
-  //     }
-  //   } else if (isBalanceError || isLoadingBalance) {
-  //     // Fallback logic remains similar but updated for new state structure
-  //     if (brokerData && brokerData.balances && brokerData.balances.USDT) {
-  //       try {
-  //         const balanceFromBroker = parseFloat(brokerData.balances.USDT);
-  //         if (!isNaN(balanceFromBroker)) {
-  //           console.log('Setting balance from broker data:', balanceFromBroker);
-  //           setBalances({ usd: balanceFromBroker, inr: 0 });
-  //           setCurrencies(['usd']);
-  //           sessionStorage.setItem("balances", JSON.stringify({ usd: balanceFromBroker, inr: 0 }));
-  //           sessionStorage.setItem("currencies", JSON.stringify(['usd']));
-  //         }
-  //       } catch (error) {
-  //         console.error('Error parsing broker balance data:', error);
-  //       }
-  //     } else {
-  //       // Try to get from session storage
-  //       const storedBalances = sessionStorage.getItem("balances");
-  //       const storedCurrencies = sessionStorage.getItem("currencies");
-  //       if (storedBalances && storedCurrencies) {
-  //         try {
-  //           const parsedBalances = JSON.parse(storedBalances);
-  //           const parsedCurrencies = JSON.parse(storedCurrencies);
-  //           if (parsedBalances && parsedCurrencies) {
-  //             console.log('Setting balances from session storage:', parsedBalances);
-  //             setBalances(parsedBalances);
-  //             setCurrencies(parsedCurrencies);
-  //           }
-  //         } catch (error) {
-  //           console.error('Error parsing stored balance data:', error);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }, [Balances, brokerData, isBalanceError, isLoadingBalance, brokerName]);
 
   useEffect(() => {
     if (typeof futureWallet === "number" && !isNaN(futureWallet)) {

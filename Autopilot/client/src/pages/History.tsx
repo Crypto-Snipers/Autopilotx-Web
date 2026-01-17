@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar as CalendarIcon, Info, ChevronLeft, ChevronRight, Loader2, DownloadIcon } from "lucide-react";
@@ -47,9 +48,19 @@ interface ApiResponse {
 }
 
 export default function History() {
+  const navigate = useNavigate();
   const [trades, setTrades] = useState<TradeData[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+
+  // Check if user email exists in session storage
+  useEffect(() => {
+    const userEmail = sessionStorage.getItem('signupEmail');
+    if (!userEmail) {
+      navigate('/welcomevisitor');
+      return;
+    }
+  }, []);
   const [tempStartDate, setTempStartDate] = useState<Date | null>(null);
   const [tempEndDate, setTempEndDate] = useState<Date | null>(null);
   const [symbol, setSymbol] = useState("all");

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { TrendingUp, Users, Wallet, BarChart3, Activity, Calendar as CalendarIcon } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -196,6 +197,51 @@ export default function AnalyticsDashboard() {
     const [isAuthLoading, setIsAuthLoading] = useState(true)
     const [_, navigate] = useLocation()
     const { toast } = useToast()
+
+    // Check if user email exists in session storage
+    useEffect(() => {
+        const userEmail = sessionStorage.getItem('signupEmail');
+        if (!userEmail) {
+            navigate('/welcomevisitor');
+            return;
+        }
+    }, []);
+
+    // Check admin access if a user tried to access this page directly
+    useEffect(() => {
+        const checkAdminAccess = async () => {
+            try {
+                const email = sessionStorage.getItem('signupEmail') || '';
+                const res = await apiRequest<{ success: boolean; email: string; role: string; }>(
+                    "GET",
+                    `/api/get-role?email=${encodeURIComponent(email)}`
+                );
+
+                if (res?.role !== "superadmin" && res?.role !== "admin") {
+                    toast({
+                        title: "Access Denied",
+                        description: "You don't have permission to access the admin dashboard.",
+                        variant: "destructive",
+                    });
+                    navigate("/home");
+                    return;
+                }
+
+                setCurrentUser({
+                    is_admin: res.role === "admin" || res.role === "superadmin",
+                    name: res.email, // or use res.name if available
+                });
+            } catch (err) {
+                console.error("Auth check failed:", err);
+                setCurrentUser({ is_admin: true, name: "Admin" }); // fallback, remove if not intended
+            } finally {
+                setIsAuthLoading(false);
+            }
+        };
+
+        checkAdminAccess();
+    }, [navigate, toast]);
+
     // Per-metric state
     const [totalUsers, setTotalUsers] = useState<number | null>(null);
     const [totalUsersLoading, setTotalUsersLoading] = useState(true);

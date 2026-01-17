@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -62,6 +63,16 @@ export default function Positions() {
   const { user } = useAuth();
   const { theme } = useTheme();
   const queryClient = useQueryClient();
+  const [_, navigate] = useLocation();
+
+  // Check if user email exists in session storage
+  useEffect(() => {
+    const userEmail = sessionStorage.getItem('signupEmail');
+    if (!userEmail) {
+      navigate('/welcomevisitor');
+      return;
+    }
+  }, []);
   const pollingIntervalRef = useRef<NodeJS.Timeout>();
 
   // Fetch positions from backend
