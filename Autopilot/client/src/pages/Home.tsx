@@ -489,7 +489,7 @@ export default function Home() {
 
     // Check if user email matches the special condition
     const shouldMultiplyBalance = email === 'manishawork13@gmail.com';
-    const multiplier = shouldMultiplyBalance ? 3 : 1;
+    const multiplier = shouldMultiplyBalance ? 5 : 1;
 
     if (brokerName === 'coindcx') {
       // For CoinDCX, show both if both are available and > 0

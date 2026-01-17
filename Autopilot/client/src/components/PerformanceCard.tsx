@@ -472,12 +472,6 @@ const PerformanceCard: React.FC<PerformanceCardProps> = ({ data, showMarker = fa
               disabled={isCongratsPopupOpen}
             />
           </div>
-
-          {(role === "admin" || role === "superadmin") && (
-            <button onClick={handleOpenEdit} className="cursor-pointer ml-1">
-              <Settings className="text-[#06a57f] w-5 h-5" />
-            </button>
-          )}
         </div>
 
         {/* === COMING SOON OVERLAY === */}
