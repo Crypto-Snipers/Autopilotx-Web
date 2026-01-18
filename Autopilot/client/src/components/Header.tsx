@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useTheme } from "@/context/ThemeContext";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
 
 type NotificationType = 'success' | 'warning' | 'info' | 'error';
 interface Notification {
@@ -54,7 +53,6 @@ const useNotifications = (email: string | undefined) => {
 
 export default function Header() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   // --- CHANGE: Get theme and toggle function from the global context ---
   const { theme, toggleTheme } = useTheme();
 
@@ -211,9 +209,9 @@ export default function Header() {
     
     // If both email and username are not available, user is logged out
     if (!userEmail && !storedUserName) {
-      navigate("/welcome-visitors");
+      window.location.href = "/welcome-visitors";
     }
-  }, [user, navigate]);
+  }, [user]);
 
   // Remove a notification by id
   const removeNotification = async (id: string) => {
