@@ -352,6 +352,14 @@ export default function Strategies() {
     queryFn: async (): Promise<Array<Strategy>> => {
       console.log("Fetching strategies with viewType:", viewType);
 
+      // Check if user is authenticated
+      const userEmail = sessionStorage.getItem('signupEmail');
+      if (!userEmail || !user?.email) {
+        console.log("No authenticated user found, redirecting to welcome visitor");
+        navigate('/welcomevisitor');
+        return [];
+      }
+
       if (viewType === "deployed") {
         if (!user?.email) {
           console.log(
