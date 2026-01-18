@@ -69,7 +69,7 @@ export default function Positions() {
   useEffect(() => {
     const userEmail = sessionStorage.getItem('signupEmail');
     if (!userEmail) {
-      navigate('/welcomevisitor');
+      navigate('/visitor');
       return;
     }
   }, []);

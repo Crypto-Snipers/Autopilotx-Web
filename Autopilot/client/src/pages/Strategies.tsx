@@ -356,7 +356,7 @@ export default function Strategies() {
       const userEmail = sessionStorage.getItem('signupEmail');
       if (!userEmail || !user?.email) {
         console.log("No authenticated user found, redirecting to welcome visitor");
-        navigate('/welcomevisitor');
+        navigate("/visitor");
         return [];
       }
 

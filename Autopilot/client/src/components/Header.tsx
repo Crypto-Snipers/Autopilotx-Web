@@ -209,7 +209,7 @@ export default function Header() {
     
     // If both email and username are not available, user is logged out
     if (!userEmail && !storedUserName) {
-      window.location.href = "/welcome-visitors";
+      window.location.href = "/visitor";
     }
   }, [user]);
 

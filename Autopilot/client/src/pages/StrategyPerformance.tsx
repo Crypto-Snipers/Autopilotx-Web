@@ -49,7 +49,7 @@ export default function StrategyPerformance() {
     // Check if user email exists in session storage
     const userEmail = sessionStorage.getItem('signupEmail');
     if (!userEmail) {
-      navigate('/welcomevisitor');
+      navigate("/visitor");
       return;
     }
     fetchStrategyPerformance();
