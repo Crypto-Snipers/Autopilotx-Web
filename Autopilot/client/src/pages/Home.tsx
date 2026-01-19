@@ -391,7 +391,7 @@ export default function Home() {
     const showUSD = currencies.includes('usd') && balances.usd > 0;
 
     // Check if user email matches the special condition
-    const shouldMultiplyBalance = email === 'manishawork13@gmail.com';
+    const shouldMultiplyBalance = email === "archukushvaha1610@gmail.com";
     const multiplier = shouldMultiplyBalance ? 5 : 1;
 
     if (brokerName === 'coindcx') {
