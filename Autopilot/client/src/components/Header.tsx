@@ -348,7 +348,7 @@ export default function Header() {
               <div className="text-sm text-left hidden sm:block">
                 <div className="font-medium text-foreground">{user?.identities?.[0]?.identity_data?.full_name || user?.user_metadata?.full_name || userName || "User"}</div>
                 <div className="text-xs text-muted-foreground">
-                  {user?.email || "user@example.com"}
+                  {user?.email || "Logged Out"}
                 </div>
               </div>
             </button>

@@ -195,7 +195,9 @@ export default function StrategyPerformance() {
             </p>
           </div>
 
-          {data.strategies.map((strategy) => (
+          {data.strategies
+            .filter((strategy) => strategy.strategy_name === "Bitron")
+            .map((strategy) => (
             <div
               key={strategy.strategy_name}
               className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border mb-6"
