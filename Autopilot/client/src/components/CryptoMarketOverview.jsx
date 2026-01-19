@@ -10,6 +10,8 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useTheme } from "@/context/ThemeContext";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 // Register required Chart.js components
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Filler);
@@ -73,71 +75,59 @@ const CryptoCard = ({
   accent = "#1E3A8A", // default blue
 }) => {
   const { theme } = useTheme(); // Access current theme
-  const [candles, setCandles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState(null);
-  const [price, setPrice] = useState(0);
-  const [change24h, setChange24h] = useState(0);
-  const [lastUpdated, setLastUpdated] = useState(null);
   const chartRef = useRef(null);
 
-  useEffect(() => {
-    let alive = true;
-    let timeoutId = null;
+  // Fetch data using useQuery with 5-minute refetch interval
+  const { data: rawData, isLoading, error } = useQuery({
+    queryKey: ['cryptoData', symbol],
+    queryFn: async () => {
+      return await apiRequest("GET", apiEndpoint);
+    },
+    refetchInterval: 5 * 60 * 1000, // 5 minutes in milliseconds
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 4 * 60 * 1000, // 4 minutes stale time
+  });
 
-    setLoading(true);
+  // Process the fetched data
+  const { candles, price, change24h, lastUpdated } = useMemo(() => {
+    if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
+      return {
+        candles: [],
+        price: 0,
+        change24h: 0,
+        lastUpdated: null
+      };
+    }
 
-    const processData = (data) => {
-      if (!alive) return;
+    try {
+      const normalized = rawData.map((candle) => ({
+        t: new Date(candle[0]).toISOString(), // timestamp
+        c: Number(candle[4]),                 // close price
+      }));
 
-      try {
-        if (Array.isArray(data) && data.length > 0) {
-          const normalized = data.map((candle) => ({
-            t: new Date(candle[0]).toISOString(), // timestamp
-            c: Number(candle[4]),                 // close price
-          }));
+      // Calculate latest price & 24h change
+      const first = normalized[0]?.c;
+      const last = normalized[normalized.length - 1]?.c;
+      const currentPrice = last || 0;
+      const priceChange = first && last ? ((last - first) / first) * 100 : 0;
 
-          setCandles(normalized);
-          setErr(null);
-          setLastUpdated(new Date()); // Set last updated when data is processed
-
-          // Calculate latest price & 24h change
-          const first = normalized[0]?.c;
-          const last = normalized[normalized.length - 1]?.c;
-          if (first && last) {
-            setPrice(last);
-            setChange24h(((last - first) / first) * 100);
-          }
-        } else {
-          throw new Error("Invalid data format");
-        }
-      } catch (e) {
-        console.error(`Error processing chart data for ${symbol}:`, e);
-        setErr("Error processing chart data");
-      } finally {
-        if (alive) setLoading(false);
-      }
-    };
-
-    timeoutId = setTimeout(async () => {
-      if (!alive) return;
-      try {
-        const res = await fetch(apiEndpoint, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        processData(data);
-      } catch (e) {
-        console.log(`Error fetching chart data for ${symbol}:`, e.message);
-        setErr("Failed to fetch data");
-        setLoading(false);
-      }
-    }, 800);
-
-    return () => {
-      alive = false;
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [apiEndpoint, symbol]);
+      return {
+        candles: normalized,
+        price: currentPrice,
+        change24h: priceChange,
+        lastUpdated: new Date()
+      };
+    } catch (e) {
+      console.error(`Error processing chart data for ${symbol}:`, e);
+      return {
+        candles: [],
+        price: 0,
+        change24h: 0,
+        lastUpdated: null
+      };
+    }
+  }, [rawData, symbol]);
 
   // Prepare chart data
   const data = useMemo(() => {
@@ -259,14 +249,16 @@ const CryptoCard = ({
       </div>
 
       <div className="relative h-48">
-        {(loading || err) && (
+        {(isLoading || error) && (
           <div className="absolute inset-0 rounded-lg bg-white/80 dark:bg-background/80 backdrop-blur-sm flex items-center justify-center z-10">
-            {loading ? (
+            {isLoading ? (
               <div className="animate-pulse text-sm text-slate-500 dark:text-muted-foreground">
                 Loading Chart...
               </div>
             ) : (
-              <div className="text-sm text-red-500 text-center px-2">{err}</div>
+              <div className="text-sm text-red-500 text-center px-2">
+                {error?.message || "Failed to fetch data"}
+              </div>
             )}
           </div>
         )}

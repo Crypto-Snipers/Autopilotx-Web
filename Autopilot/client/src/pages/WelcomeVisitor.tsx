@@ -297,7 +297,7 @@ const StrategiesSection = () => {
                     style={{ filter: `drop-shadow(0 0 8px ${line.color})` }}
                     className="animate-pulse"
                   />
-                )
+                ),
               )}
             </g>
           ))}
@@ -317,7 +317,7 @@ const StrategiesSection = () => {
             key={item.id}
             className="relative rounded-2xl shadow-lg overflow-hidden border border-[#05b288]/50 w-full max-w-md sm:max-w-sm bg-[#162B32]/90 backdrop-blur-sm hover:scale-[1.03] transition-transform duration-300"
           >
-            {item.name === "Altcoin Strategy" && (
+            {item.name === "Ethereum Strategy" && (
               <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center bg-black/40 backdrop-blur-[8px] transition-all duration-500">
                 <img
                   src={Ethereum}
@@ -474,21 +474,42 @@ const Footer = () => {
     <footer className="bg-[#0A191E]/50 border-t border-slate-800 px-4 sm:px-8 py-12 relative z-10">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-8">
         <div>
-          <img src={icon} alt="AutopilotX" className="h-20 sm:h-28 w-auto mx-auto md:mx-0" />
-          <p className="text-slate-500 text-xs mt-2">&copy; {new Date().getFullYear()} AutopilotX - All rights reserved.</p>
+          <img
+            src={icon}
+            alt="AutopilotX"
+            className="h-20 sm:h-28 w-auto mx-auto md:mx-0"
+          />
+          <p className="text-slate-500 text-xs mt-2">
+            &copy; {new Date().getFullYear()} AutopilotX - All rights reserved.
+          </p>
         </div>
         <div>
           <h4 className="font-bold text-[#06a57f] mb-4">Follow Us</h4>
           <div className="flex items-start justify-center gap-8 text-slate-200">
-            <a href="https://www.youtube.com/@SatishKVideos" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a
+              href="https://youtube.com/@autopilotxofficial"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-2 hover:text-white transition-colors"
+            >
               <YoutubeIcon />
               <span className="text-xs">YouTube</span>
             </a>
-            <a href="https://www.instagram.com/autopilotx.in/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a
+              href="https://www.instagram.com/autopilotx.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-2 hover:text-white transition-colors"
+            >
               <InstagramIcon />
               <span className="text-xs">Instagram</span>
             </a>
-            <a href="https://web.telegram.org/k/#@autopilotx_in" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 hover:text-white transition-colors">
+            <a
+              href="https://web.telegram.org/k/#@autopilotx_in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-2 hover:text-white transition-colors"
+            >
               <Send />
               <span className="text-xs">Telegram</span>
             </a>

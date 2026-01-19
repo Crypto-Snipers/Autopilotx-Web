@@ -148,7 +148,7 @@ export default function Sidebar() {
     {
       name: "YouTube Channel",
       icon: <Youtube className="w-5 h-5 mr-2 text-[#06a57f]" />,
-      url: "https://www.youtube.com/@SatishKVideos",
+      url: "https://youtube.com/@autopilotxofficial",
     },
     {
       name: "Join Telegram",
