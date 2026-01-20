@@ -577,7 +577,7 @@ export default function AnalyticsDashboard() {
             sparklineColor: "#00ed64", // Green
         },
         {
-            title: "Total Approved Users",
+            title: "Total Active Users",
             value: totalActiveUsersLoading
                 ? spinner
                 : totalActiveUsersError
