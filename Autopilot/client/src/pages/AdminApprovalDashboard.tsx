@@ -34,41 +34,6 @@ interface DashboardMetrics {
     totalApproved: number
 }
 
-// ✅ Mock Users (for local testing)
-// const mockUsers: User[] = [
-//     {
-//         name: "Alice Johnson",
-//         email: "alice@example.com",
-//         broker_name: "CoinDCX",
-//         broker_id: "BRK-001",
-//         created_at: "2025-10-05T10:23:00Z",
-//         status: "Pending"
-//     },
-//     {
-//         name: "Bob Smith",
-//         email: "bob@example.com",
-//         broker_name: "Delta Exchange",
-//         broker_id: "BRK-002",
-//         created_at: "2025-09-29T09:15:00Z",
-//         status: "Approved"
-//     },
-//     {
-//         name: "Charlie Patel",
-//         email: "charlie@example.com",
-//         broker_name: "CoinDCX",
-//         broker_id: "BRK-003",
-//         created_at: "2025-10-01T12:00:00Z",
-//         status: "Pending"
-//     },
-//     {
-//         name: "Diana Kaur",
-//         email: "diana@example.com",
-//         broker_name: "CoinDCX",
-//         broker_id: "BRK-004",
-//         created_at: "2025-09-25T14:45:00Z",
-//         status: "Approved"
-//     },
-// ]
 
 // Show users by filtering it to Pending, Approved, or All
 const fetchUsers = async (status: string): Promise<User[]> => {
@@ -85,18 +50,6 @@ const fetchUsers = async (status: string): Promise<User[]> => {
         console.error("Failed to fetch users:", err);
         return [];
     }
-
-    // try {
-    //     const queryParam = status === "All" ? "" : `?status_filter=${encodeURIComponent(status)}`;
-    //     const res = await apiRequest<User[] | { users: User[] }>("GET", `/api/admin/users${queryParam}`);
-    //     if (Array.isArray(res)) return res;
-    //     if (res?.users && Array.isArray(res.users)) return res.users;
-    //     throw new Error("Unexpected response format");
-    // } catch (err) {
-    //     console.warn("⚠️ Using mock data for fetchUsers due to error:", err);
-    //     if (status === "All") return mockUsers;
-    //     return mockUsers.filter(u => u.status === status);
-    // }
 };
 
 // Fetch all users for metrics calculation
@@ -116,16 +69,6 @@ const fetchAllUsers = async (): Promise<User[]> => {
         console.error("Error fetching all users:", error);
         throw new Error("Failed to fetch all users");
     }
-
-    // ✅ Mock data fallback
-    // try {
-    //     const res = await apiRequest<{ success: boolean, count: number; users: User[] }>("GET", "/api/all-users");
-    //     if (!res.users || !Array.isArray(res.users)) throw new Error("Invalid response format");
-    //     return res.users;
-    // } catch (error) {
-    //     console.warn("⚠️ Using mock data for fetchAllUsers due to error:", error);
-    //     return mockUsers;
-    // }
 };
 
 // Approve users status
@@ -140,15 +83,6 @@ const approveUser = async (email: string) => {
     );
     console.log("Approve user response:", data);
     return data;
-
-    // ✅ Mock approve behavior
-    // try {
-    //     const data = await apiRequest("PUT", "/api/admin/update-user-status", { email, new_status: "approved" });
-    //     return data;
-    // } catch {
-    //     console.warn("⚠️ Using mock approveUser fallback");
-    //     return { success: true, email, new_status: "approved" };
-    // }
 };
 
 export default function AdminDashboard() {
@@ -308,14 +242,38 @@ export default function AdminDashboard() {
     })
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleString("en-US", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-        })
-    }
+        try {
+            // Handle different date formats from backend
+            let date: Date;
+            
+            // If it's already in ISO format or has 'Z', parse directly
+            if (dateString.includes('T') || dateString.includes('Z')) {
+                date = new Date(dateString);
+            } else {
+                // If it's in format like "2025-01-21 20:30", add timezone info
+                date = new Date(dateString + 'Z');
+            }
+            
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                return "Invalid Date";
+            }
+            
+            // Convert to Indian time with explicit timezone handling
+            return date.toLocaleString("en-IN", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+                timeZone: "Asia/Kolkata"
+            });
+        } catch (error) {
+            console.error("Date formatting error:", error, dateString);
+            return "Invalid Date";
+        }
+    };
 
     const getStatusBadgeVariant = (status: string) => {
         switch (status) {
