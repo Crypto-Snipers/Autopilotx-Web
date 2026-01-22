@@ -10,6 +10,17 @@ import { apiRequest } from "@/lib/queryClient";
 import DeployedStrategies from "@/components/DeployedStrategies";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch"
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { TrendingUp } from "lucide-react";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -594,51 +605,73 @@ export default function Home() {
                                     <div className="w-4 h-4 border-2 border-[#11a152] border-t-transparent rounded-full animate-spin"></div>
                                   </div>
                                 ) : (
-                                  <Switch
-                                    checked={runAllEnabled}
-                                    onCheckedChange={async (checked) => {
-                                      if (!checked) return;
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Switch
+                                        checked={runAllEnabled}
+                                        className="data-[state=checked]:bg-[#11a152]"
+                                        disabled={isLoadingDeactivate}
+                                      />
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Confirm Deactivation</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to deactivate all strategies?
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={async () => {
+                                            try {
+                                              setIsLoadingDeactivate(true);
 
-                                      try {
-                                        setIsLoadingDeactivate(true);
+                                              // Define the expected response type
+                                              type DeactivateAllResponse = { message: string };
 
-                                        // Define the expected response type
-                                        type DeactivateAllResponse = { message: string };
+                                              const response: DeactivateAllResponse = await apiRequest("GET",
+                                                `/api/strategy/deactivate-all?email=${encodeURIComponent(email || '')}`
+                                              );
 
-                                        const response: DeactivateAllResponse = await apiRequest("GET",
-                                          `/api/strategy/deactivate-all?email=${encodeURIComponent(email || '')}`
-                                        );
+                                              setRunAllEnabled(true);
 
-                                        setRunAllEnabled(true);
+                                              toast({
+                                                title: response?.message || 'Success',
+                                                description: response?.message || 'Strategies deactivated successfully',
+                                              });
 
-                                        toast({
-                                          title: response?.message || 'Success',
-                                          description: response?.message || 'Strategies deactivated successfully',
-                                        });
+                                              // Invalidate and refetch the deployed strategies
+                                              await queryClient.invalidateQueries({ queryKey: ['/deployed-strategies', email] });
 
-                                        // Invalidate and refetch the deployed strategies
-                                        await queryClient.invalidateQueries({ queryKey: ['/deployed-strategies', email] });
+                                              // Auto reset toggle after 1 second
+                                              setTimeout(() => {
+                                                setRunAllEnabled(false);
+                                              }, 1000);
 
-                                        // Auto reset toggle after 1 second
-                                        setTimeout(() => {
-                                          setRunAllEnabled(false);
-                                        }, 1000);
-
-                                      } catch (error: any) {
-                                        console.error('Error deactivating strategies:', error);
-                                        toast({
-                                          title: 'Error',
-                                          description: error.response?.data?.detail || 'Failed to deactivate strategies',
-                                          variant: 'destructive',
-                                        });
-                                        setRunAllEnabled(false);
-                                      } finally {
-                                        setIsLoadingDeactivate(false);
-                                      }
-                                    }}
-                                    className="data-[state=checked]:bg-[#11a152]"
-                                    disabled={isLoadingDeactivate}
-                                  />
+                                            } catch (error: any) {
+                                              console.error('Error deactivating strategies:', error);
+                                              toast({
+                                                title: 'Error',
+                                                description: error.response?.data?.detail || 'Failed to deactivate strategies',
+                                                variant: 'destructive',
+                                              });
+                                              setRunAllEnabled(false);
+                                            } finally {
+                                              setIsLoadingDeactivate(false);
+                                            }
+                                          }}
+                                          disabled={isLoadingDeactivate}
+                                        >
+                                          {isLoadingDeactivate ? (
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                          ) : (
+                                            'Deactivate All'
+                                          )}
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 )}
                                 <span className={`${runAllEnabled ? 'text-[#11a152] font-medium' : 'text-gray-600'}`}>on</span>
                               </div>

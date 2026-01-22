@@ -25,7 +25,7 @@ const useNotifications = (email: string | undefined) => {
     queryKey: ['notifications', email],
     enabled: !!email,
     queryFn: async () => {
-      const url = `/api/notifications?platform=WEB&user_type=ALL&user_email=${encodeURIComponent(email || '')}`;
+      const url = "/api/notifications";
       const data = await apiRequest("GET", url);
 
       if (!Array.isArray(data)) {
@@ -117,33 +117,6 @@ export default function Header() {
     }
   };
 
-  // const toggleNotifications = async () => {
-  //   setShowNotifications(!showNotifications);
-
-  //   if (!showNotifications) {
-  //     // Mark all unread notifications as read
-  //     const unread = notifications.filter(n => !n.read);
-
-  //     await Promise.all(
-  //       unread.map(async (n) => {
-  //         try {
-  //           const res = await fetch(`/api/notifications/${n.id}/read?user_email=${encodeURIComponent(user?.email || '')}`, {
-  //             method: "POST",
-  //           });
-  //           if (!res.ok) {
-  //             console.error(`Failed to mark notification ${n.id} as read`);
-  //           }
-  //         } catch (err) {
-  //           console.error("Error marking as read:", err);
-  //         }
-  //       })
-  //     );
-
-  //     // Update frontend state
-  //     setNotifications(notifications.map(n => ({ ...n, read: true })));
-  //   }
-  // };
-
 
   // Format time to Indian Standard Time (IST) - returns only time
   const formatToIST = (timeString: string) => {
@@ -192,6 +165,21 @@ export default function Header() {
             <span className="text-blue-600">i</span>
           </div>
         );
+    }
+  }
+
+  // Get the appropriate title color based on notification type
+  const getNotificationTitleColor = (type: NotificationType) => {
+    switch (type) {
+      case 'success':
+        return 'text-green-700 dark:text-green-400';
+      case 'warning':
+        return 'text-yellow-700 dark:text-yellow-400';
+      case 'error':
+        return 'text-red-700 dark:text-red-400';
+      case 'info':
+      default:
+        return 'text-blue-700 dark:text-blue-400';
     }
   }
 
@@ -307,13 +295,13 @@ export default function Header() {
                           <div className="flex items-start gap-2">
                             {getNotificationIcon(notification.type)}
                             <div className="flex-1">
-                              <h4 className={`font-medium ${!notification.read ? "font-bold" : "font-normal"}`}>
+                              <h4 className={`font-medium ${!notification.read ? "font-bold" : "font-normal"} ${getNotificationTitleColor(notification.type)}`}>
                                 {notification.title}</h4>
                               <p className="text-sm text-muted-foreground">{notification.message}</p>
                               <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
                                 <span>{format(new Date(), "PPP")}</span>
                                 <span>•</span>
-                                <span>{formatToIST(notification.time)}</span>
+                                <span>{notification.time}</span>
                               </div>
                             </div>
                           </div>
@@ -332,6 +320,7 @@ export default function Header() {
               </div>
             )}
           </div>
+
           <div className="relative">
             <button className="flex items-center space-x-2">
               {user?.identities?.[0]?.identity_data?.avatar_url ? (

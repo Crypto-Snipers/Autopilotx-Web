@@ -13,6 +13,7 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { apiRequest } from "@/lib/queryClient"
 import { useLocation } from "wouter"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface AdminUser {
   is_admin: boolean
@@ -23,9 +24,11 @@ export default function AdminNotificationPage() {
   const [notification, setNotification] = useState({
     title: "",
     message: "",
-    user_type: "ALL",
+    target_filter: "all",
+    user_email: "",
+    strategy_name: "",
     start_time: new Date(),
-    platform: "WEB",
+    platform: "both",
     notification_type: "info",
   })
 
@@ -33,8 +36,13 @@ export default function AdminNotificationPage() {
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(null)
   const [isAuthLoading, setIsAuthLoading] = useState(true)
   const [_, navigate] = useLocation()
-  const handleUserTypeChange = (value: string) => {
-    setNotification({ ...notification, user_type: value })
+  const handleTargetFilterChange = (value: string) => {
+    setNotification({ 
+      ...notification, 
+      target_filter: value,
+      user_email: value === "specific_user" ? notification.user_email : "",
+      strategy_name: value === "specific_strategy" ? notification.strategy_name : ""
+    })
   }
 
 
@@ -76,10 +84,14 @@ export default function AdminNotificationPage() {
 
   const handleSendNotification = async () => {
     const notificationData = {
-      ...notification,
-      created_by: "upadhyaymanisha13@gmail.com",
-      created_at: new Date().toISOString(),
-      last_updated_at: new Date().toISOString(),
+      title: notification.title,
+      message: notification.message,
+      target_filter: notification.target_filter,
+      user_email: notification.target_filter === "specific_user" ? notification.user_email : undefined,
+      strategy_name: notification.target_filter === "specific_strategy" ? notification.strategy_name : undefined,
+      start_time: notification.start_time.toISOString(),
+      platform: notification.platform,
+      notification_type: notification.notification_type,
     }
 
     try {
@@ -91,11 +103,23 @@ export default function AdminNotificationPage() {
         description: "Notification sent successfully!",
         className: "bg-green-100 border-green-500 text-green-800",
       });
+      
+      // Reset form
+      setNotification({
+        title: "",
+        message: "",
+        target_filter: "all",
+        user_email: "",
+        strategy_name: "",
+        start_time: new Date(),
+        platform: "both",
+        notification_type: "info",
+      })
     } catch (error: any) {
       console.error("Error while sending notification:", error.message);
       toast({
         title: "Error",
-        description: "Something went wrong",
+        description: error.message || "Something went wrong",
         variant: "destructive",
       });
     }
@@ -111,18 +135,16 @@ export default function AdminNotificationPage() {
         <div>
           <div className="container mx-auto p-6 space-y-6">
             <div className="mb-6 text-center">
-              <h1 className="text-2xl font-semibold text-start">Notification Dashboard</h1>
+              <h1 className="text-2xl font-semibold text-start">
+                Notification Dashboard
+              </h1>
             </div>
             <Card>
               <CardHeader>
-                <div className="flex justify-between">
-                  <CardTitle>Notification Details</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <UsersRound className="h-4 w-4 text-green-500" />
-                    <p className="text-sm text-gray-500">All the users will receive this notification</p>
-                  </div>
-                </div>
-                <CardDescription>Configure your notification settings</CardDescription>
+                <CardTitle>Notification Details</CardTitle>
+                <CardDescription>
+                  Configure your notification settings
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -130,7 +152,12 @@ export default function AdminNotificationPage() {
                   <Input
                     id="title"
                     value={notification.title}
-                    onChange={(e) => setNotification({ ...notification, title: e.target.value })}
+                    onChange={(e) =>
+                      setNotification({
+                        ...notification,
+                        title: e.target.value,
+                      })
+                    }
                     placeholder="Enter notification title"
                   />
                 </div>
@@ -140,11 +167,128 @@ export default function AdminNotificationPage() {
                   <Textarea
                     id="message"
                     value={notification.message}
-                    onChange={(e) => setNotification({ ...notification, message: e.target.value })}
+                    onChange={(e) =>
+                      setNotification({
+                        ...notification,
+                        message: e.target.value,
+                      })
+                    }
                     placeholder="Enter notification message"
                     className="min-h-[100px]"
                   />
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="notification_type">Notification Type</Label>
+                    <Select
+                      value={notification.notification_type}
+                      onValueChange={(value) =>
+                        setNotification({
+                          ...notification,
+                          notification_type: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="info">Info</SelectItem>
+                        <SelectItem value="warning">Warning</SelectItem>
+                        <SelectItem value="error">Error</SelectItem>
+                        <SelectItem value="success">Success</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="target_filter">Target Filter</Label>
+                    <Select
+                      value={notification.target_filter}
+                      onValueChange={handleTargetFilterChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select target filter" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Users</SelectItem>
+                        <SelectItem value="pending">Pending Users</SelectItem>
+                        <SelectItem value="approved">Approved Users</SelectItem>
+                        <SelectItem value="approved_broker">
+                          Approved Broker Users
+                        </SelectItem>
+                        <SelectItem value="pending_broker">
+                          Pending Broker Users
+                        </SelectItem>
+                        <SelectItem value="approved_broker_low_balance">
+                          Approved Broker Users with Low Balance
+                        </SelectItem>
+                        <SelectItem value="strategy_any">
+                          Users with Any Strategy
+                        </SelectItem>
+                        <SelectItem value="specific_strategy">
+                          Specific Strategy
+                        </SelectItem>
+                        <SelectItem value="specific_user">
+                          Specific User
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* <div className="space-y-2">
+                    <Label htmlFor="platform">Platform</Label>
+                    <Select
+                      value={notification.platform}
+                      onValueChange={(value) => setNotification({ ...notification, platform: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select platform" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="web">Web</SelectItem>
+                        <SelectItem value="mobile">Mobile</SelectItem>
+                        <SelectItem value="both">Both</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div> */}
+                </div>
+
+                {notification.target_filter === "specific_user" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="user_email">User Email</Label>
+                    <Input
+                      id="user_email"
+                      type="email"
+                      value={notification.user_email}
+                      onChange={(e) =>
+                        setNotification({
+                          ...notification,
+                          user_email: e.target.value,
+                        })
+                      }
+                      placeholder="Enter user email"
+                    />
+                  </div>
+                )}
+
+                {notification.target_filter === "specific_strategy" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="strategy_name">Strategy Name</Label>
+                    <Input
+                      id="strategy_name"
+                      value={notification.strategy_name}
+                      onChange={(e) =>
+                        setNotification({
+                          ...notification,
+                          strategy_name: e.target.value,
+                        })
+                      }
+                      placeholder="Enter strategy name"
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>Notification Post On</Label>
@@ -155,14 +299,20 @@ export default function AdminNotificationPage() {
                     </p>
                   </div>
                 </div>
-
               </CardContent>
             </Card>
 
             <div className="mt-6 flex justify-start">
               <Button
                 onClick={handleSendNotification}
-                disabled={!notification.title || !notification.message}
+                disabled={
+                  !notification.title ||
+                  !notification.message ||
+                  (notification.target_filter === "specific_user" &&
+                    !notification.user_email) ||
+                  (notification.target_filter === "specific_strategy" &&
+                    !notification.strategy_name)
+                }
                 className="min-w-32 cursor-pointer bg-[#1a785f] hover:bg-[#1e896d]"
               >
                 <Send className="h-4 w-4 mr-2" />
@@ -173,7 +323,7 @@ export default function AdminNotificationPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 
