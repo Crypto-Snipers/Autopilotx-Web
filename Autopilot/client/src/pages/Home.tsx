@@ -383,34 +383,26 @@ export default function Home() {
     }
   }, [futureWallet, isBalanceError, isLoadingBalance, brokerName]);
 
+
   const formatBalanceDisplay = () => {
-    if (isLoadingBalance) return 'Loading…';
+    if (isLoadingBalance) return "Loading…";
 
     // Determine which balance to show based on broker and available currencies
-    const showINR = currencies.includes('inr') && balances.inr > 0;
-    const showUSD = currencies.includes('usd') && balances.usd > 0;
+    const showINR = currencies.includes("inr") && balances.inr > 0;
+    const showUSD = currencies.includes("usd") && balances.usd > 0;
 
-    // Check if user email matches the special condition
-    const shouldMultiplyBalance = email === "archukushvaha1610@gmail.com";
-    const multiplier = shouldMultiplyBalance ? 5 : 1;
-
-    if (brokerName === 'coindcx') {
+    if (brokerName === "coindcx") {
       // For CoinDCX, show both if both are available and > 0
       if (showUSD && showINR) {
-        const usdAmount = balances.usd * multiplier;
-        const inrAmount = balances.inr * multiplier;
-        return `$${usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${inrAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${balances.usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${balances.inr.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       } else if (showINR) {
-        const inrAmount = balances.inr * multiplier;
-        return `₹${inrAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `₹${balances.inr.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       } else {
-        const usdAmount = balances.usd * multiplier;
-        return `$${usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${balances.usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
     } else {
       // For Delta Exchange, show USD only
-      const usdAmount = balances.usd * multiplier;
-      return `$${usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      return `$${balances.usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
   };
 
