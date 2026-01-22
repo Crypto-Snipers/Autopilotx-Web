@@ -7,7 +7,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Search, Users, UserCheck, Clock, Copy } from "lucide-react"
+import {
+  Loader2,
+  Search,
+  Users,
+  UserCheck,
+  Clock,
+  Copy,
+  ListFilter,
+  SlidersHorizontal,
+  ArrowDownWideNarrow,
+} from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import Lowheader from "@/components/Lowheader";
 import Sidebar from "@/components/Sidebar";
@@ -90,65 +100,66 @@ export default function AdminDashboard() {
     const { toast } = useToast()
     const queryClient = useQueryClient()
 
-    const [currentUser, setCurrentUser] = useState<AdminUser | null>(null)
-    const [isAuthLoading, setIsAuthLoading] = useState(true)
-    const [statusFilter, setStatusFilter] = useState<string>("Pending")
-    const [searchQuery, setSearchQuery] = useState("")
-    const [dateFilter, setDateFilter] = useState<string>("latest")
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null)
+  const [isAuthLoading, setIsAuthLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<string>("Pending")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [dateFilter, setDateFilter] = useState<string>("latest")
+  const [brokerFilter, setBrokerFilter] = useState<boolean>(false)
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
 
-    // Checks Admin access
-    useEffect(() => {
-        const checkAdminAccess = async () => {
-            try {
-                const email = sessionStorage.getItem('signupEmail') || '';
-                const res = await apiRequest<{ success: boolean; email: string; role: string; }>(
-                    "GET",
-                    `/api/get-role?email=${encodeURIComponent(email)}`
-                );
+  // Checks Admin access
+  useEffect(() => {
+    const checkAdminAccess = async () => {
+      try {
+        const email = sessionStorage.getItem('signupEmail') || '';
+        const res = await apiRequest<{ success: boolean; email: string; role: string; }>(
+          "GET",
+          `/api/get-role?email=${encodeURIComponent(email)}`
+        );
 
-                if (res?.role !== "superadmin" && res?.role !== "admin") {
-                    toast({
-                        title: "Access Denied",
-                        description: "You don't have permission to access the admin dashboard.",
-                        variant: "destructive",
-                    });
-                    navigate("/home");
-                    return;
-                }
+        if (res?.role !== "superadmin" && res?.role !== "admin") {
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access the admin dashboard.",
+            variant: "destructive",
+          });
+          navigate("/home");
+          return;
+        }
 
-                setCurrentUser({
-                    is_admin: res.role === "admin" || res.role === "superadmin",
-                    name: res.email, // or use res.name if available
-                });
-            } catch (err) {
-                console.error("Auth check failed:", err);
-                setCurrentUser({ is_admin: true, name: "Admin" }); // fallback, remove if not intended
-            } finally {
-                setIsAuthLoading(false);
-            }
-        };
-
-        checkAdminAccess();
-    }, [navigate, toast]);
-
-    // Function to handle copying Broker ID to clipboard
-    const handleCopy = (text: string) => {
-        navigator.clipboard.writeText(text)
-            .then(() => {
-                toast({
-                    title: "Copied!",
-                    description: (<>Broker ID <strong>{text}</strong> has been copied to clipboard</>),
-                });
-            })
-            .catch(() => {
-                toast({
-                    title: "Error",
-                    description: "Failed to copy Broker ID.",
-                    variant: "destructive",
-                });
-            });
+        setCurrentUser({
+          is_admin: res.role === "admin" || res.role === "superadmin",
+          name: res.email, // or use res.name if available
+        });
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        setCurrentUser({ is_admin: true, name: "Admin" }); // fallback, remove if not intended
+      } finally {
+        setIsAuthLoading(false);
+      }
     };
+
+    checkAdminAccess();
+  }, [navigate, toast]);
+
+  // Function to handle copying Broker ID to clipboard
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        toast({
+          title: "Copied!",
+          description: (<>Broker ID <strong>{text}</strong> has been copied to clipboard</>),
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Error",
+          description: "Failed to copy Broker ID.",
+          variant: "destructive",
+        });
+      });
+  };
 
     // Fetch All Users for Metrics
     const {
@@ -192,7 +203,7 @@ export default function AdminDashboard() {
     // Get filtered users for display
     const users: User[] = filteredUsersData || []
 
-    // Filtered Users based on search and date
+    // Filtered Users based on search, date, and broker filter
     useEffect(() => {
         const query = searchQuery.toLowerCase()
         let filtered = users
@@ -203,6 +214,14 @@ export default function AdminDashboard() {
                 [user.name, user.email, user.broker_name, user.broker_id].some((field) =>
                     field.toLowerCase().includes(query)
                 )
+            )
+        }
+        
+        // Apply broker filter - only show users with both broker_id and broker_name
+        if (brokerFilter) {
+            filtered = filtered.filter((user) => 
+                user.broker_id && user.broker_id.trim() !== '' && 
+                user.broker_name && user.broker_name.trim() !== ''
             )
         }
         
@@ -218,7 +237,7 @@ export default function AdminDashboard() {
         }
         
         setFilteredUsers(filtered)
-    }, [searchQuery, users, dateFilter])
+    }, [searchQuery, users, dateFilter, brokerFilter])
 
     // Approve Users Mutation
     const approveMutation = useMutation({
@@ -426,6 +445,8 @@ export default function AdminDashboard() {
                       <p className="text-muted-foreground">
                         {searchQuery
                           ? "Try adjusting your search criteria."
+                          : brokerFilter
+                          ? "No users found with both broker ID and broker name."
                           : "No users match the current filter."}
                       </p>
                     </div>
@@ -436,12 +457,23 @@ export default function AdminDashboard() {
                           <TableHead>Name</TableHead>
                           <TableHead>Email</TableHead>
                           <TableHead>Broker Name</TableHead>
-                          <TableHead>Broker ID</TableHead>
+                          <TableHead className="flex items-center gap-2">
+                            Broker ID
+                            <button
+                              onClick={() => setBrokerFilter(!brokerFilter)}
+                              className={`${brokerFilter ? 'text-blue-600' : 'text-muted-foreground'} hover:opacity-70 transition-opacity`}
+                              title={brokerFilter ? "Show all users" : "Show only users with broker details"}
+                            >
+                              <SlidersHorizontal className="h-4 w-4 cursor-pointer" />
+                            </button>
+                          </TableHead>
                           <TableHead>Registered On</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
+
+                      {/* User Data */}
                       <TableBody>
                         {filteredUsers.map((user) => (
                           <TableRow key={user.email}>
