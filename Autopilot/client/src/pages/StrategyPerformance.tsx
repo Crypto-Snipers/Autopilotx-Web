@@ -21,6 +21,7 @@ import NoPositionFound from "@/assets/undraw_no_open_positions_found.svg";
 
 interface StrategyPerformance {
   strategy_name: string;
+  current_status: string;
   total_trades: number;
   profit_trades: number;
   loss_trades: number;
@@ -198,169 +199,181 @@ export default function StrategyPerformance() {
           {data.strategies
             .filter((strategy) => strategy.strategy_name === "Bitron")
             .map((strategy) => (
-            <div
-              key={strategy.strategy_name}
-              className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border mb-6"
-            >
-              <h5 className="text-2xl font-semibold text-heading text-center mb-1">
-                {strategy.strategy_name}
-                <span className="bg-[#06a57f] text-white text-sm px-2 py-1 ml-2 rounded-full tracking-wide">
-                  {strategy.strategy_name == "Bitron" ? "BTC" : "ETH"}
-                </span>
-              </h5>
-              <div className="border-t-2 border-gray-200 dark:border-gray-700 my-4"></div>
-
-
-              {/* Date Filter */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div
+                key={strategy.strategy_name}
+                className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border mb-6"
+              >
                 <div>
-                  <label className="block text-sm font-medium text-body mb-2">
-                    <Calendar className="w-4 h-4 inline mr-1" />
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    max={new Date().toISOString().split("T")[0]}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#1e222d] text-heading focus:ring-2 focus:ring-primary-medium focus:border-transparent"
-                    placeholder="YYYY-MM-DD"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-body mb-2">
-                    <Calendar className="w-4 h-4 inline mr-1" />
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    max={new Date().toISOString().split("T")[0]}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#1e222d] text-heading focus:ring-2 focus:ring-primary-medium focus:border-transparent"
-                    placeholder="YYYY-MM-DD"
-                  />
-                </div>
-
-                <div className="flex items-end gap-2">
-                  <button
-                    onClick={handleFilter}
-                    disabled={!startDate && !endDate}
-                    className="flex-1 px-4 py-2 bg-[#06a57f] text-white rounded-lg hover:bg-[#06a57f]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  <div
+                    className={`${
+                      strategy.current_status
+                        ? "bg-green-200 text-green-700"
+                        : "bg-red-200 text-red-700"
+                    } py-1 w-14 text-center rounded-full uppercase shadow-md text-sm font-semibold border `}
                   >
-                    Apply Filter
-                  </button>
-                  {filterActive && (
+                    {strategy.current_status === "active" ? "Live" : "Inactive"}
+                  </div>
+
+                  <h5 className="text-2xl font-semibold text-heading text-center mb-1">
+                    {strategy.strategy_name}
+                    <span className="bg-[#06a57f] text-white text-sm px-2 py-1 ml-2 rounded-full tracking-wide">
+                      {strategy.strategy_name == "Bitron" ? "BTC" : "ETH"}
+                    </span>
+                  </h5>
+                </div>
+
+                <div className="border-t-2 border-gray-200 dark:border-gray-700 my-4"></div>
+
+                {/* Date Filter */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-body mb-2">
+                      <Calendar className="w-4 h-4 inline mr-1" />
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      max={new Date().toISOString().split("T")[0]}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#1e222d] text-heading focus:ring-2 focus:ring-primary-medium focus:border-transparent"
+                      placeholder="YYYY-MM-DD"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-body mb-2">
+                      <Calendar className="w-4 h-4 inline mr-1" />
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      max={new Date().toISOString().split("T")[0]}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#1e222d] text-heading focus:ring-2 focus:ring-primary-medium focus:border-transparent"
+                      placeholder="YYYY-MM-DD"
+                    />
+                  </div>
+
+                  <div className="flex items-end gap-2">
                     <button
-                      onClick={clearFilter}
-                      className="px-4 py-2 text-white border border-red-300 rounded-lg bg-red-600 hover:bg-red-600/80 transition-colors"
+                      onClick={handleFilter}
+                      disabled={!startDate && !endDate}
+                      className="flex-1 px-4 py-2 bg-[#06a57f] text-white rounded-lg hover:bg-[#06a57f]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                      Clear
+                      Apply Filter
                     </button>
-                  )}
+                    {filterActive && (
+                      <button
+                        onClick={clearFilter}
+                        className="px-4 py-2 text-white border border-red-300 rounded-lg bg-red-600 hover:bg-red-600/80 transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="border-t-2 border-gray-200 dark:border-gray-700 my-4"></div>
+                <div className="border-t-2 border-gray-200 dark:border-gray-700 my-4"></div>
 
-              <ul className="mb-6 space-y-3">
-                <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
-                  <a
-                    href="#"
-                    className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
-                  >
-                    <ChartColumnBig className="w-6 h-6" />
-                    <span className="flex-1 ms-3 whitespace-nowrap">
-                      Total Trades
-                    </span>
-                    <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
-                      {strategy.total_trades}
-                    </span>
-                  </a>
-                </li>
-                <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
-                  <a
-                    href="#"
-                    className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
-                  >
-                    <Smile className="w-6 h-6" />
-                    <span className="flex-1 ms-3 whitespace-nowrap">
-                      Winning Trades
-                    </span>
-                    <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
-                      {strategy.profit_trades}
-                    </span>
-                  </a>
-                </li>
-                <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
-                  <a
-                    href="#"
-                    className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
-                  >
-                    <Frown className="w-6 h-6" />
-                    <span className="flex-1 ms-3 whitespace-nowrap">
-                      Losing Trades
-                    </span>
-                    <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
-                      {strategy.loss_trades}
-                    </span>
-                  </a>
-                </li>
-                <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
-                  <a
-                    href="#"
-                    className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
-                  >
-                    <TrendingUp className="w-6 h-6" />
-                    <span className="flex-1 ms-3 whitespace-nowrap">
-                      Max Profit
-                    </span>
-                    <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
-                      {strategy.max_profit > 0 ? "+" : ""}
-                      {formatCurrency(strategy.max_profit)}
-                    </span>
-                  </a>
-                </li>
-                <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
-                  <a
-                    href="#"
-                    className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
-                  >
-                    <TrendingDown className="w-6 h-6" />
-                    <span className="flex-1 ms-3 whitespace-nowrap">
-                      Max Loss
-                    </span>
-                    <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
-                      {strategy.max_loss < 0 ? "-" : ""}
-                      {formatCurrency(strategy.max_loss)}
-                    </span>
-                  </a>
-                </li>
-                <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
-                  <a
-                    href="#"
-                    className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
-                  >
-                    <Wallet className="w-6 h-6" />
-                    <span className="flex-1 ms-3 whitespace-nowrap">
-                      Approx PnL
-                    </span>
-                    <span
-                      className={`bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5 ${
-                        strategy.approx_pnl > 0
-                          ? "text-[#06a57f]"
-                          : "text-red-600"
-                      }`}
+                <ul className="mb-6 space-y-3">
+                  <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
+                    <a
+                      href="#"
+                      className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
                     >
-                      {strategy.approx_pnl > 0 ? "+" : "-"}
-                      {formatCurrency(strategy.approx_pnl)}
-                    </span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          ))}
+                      <ChartColumnBig className="w-6 h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Total Trades
+                      </span>
+                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                        {strategy.total_trades}
+                      </span>
+                    </a>
+                  </li>
+                  <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
+                    <a
+                      href="#"
+                      className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
+                    >
+                      <Smile className="w-6 h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Winning Trades
+                      </span>
+                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                        {strategy.profit_trades}
+                      </span>
+                    </a>
+                  </li>
+                  <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
+                    <a
+                      href="#"
+                      className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
+                    >
+                      <Frown className="w-6 h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Losing Trades
+                      </span>
+                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                        {strategy.loss_trades}
+                      </span>
+                    </a>
+                  </li>
+                  <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
+                    <a
+                      href="#"
+                      className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
+                    >
+                      <TrendingUp className="w-6 h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Max Profit
+                      </span>
+                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                        {strategy.max_profit > 0 ? "+" : ""}
+                        {formatCurrency(strategy.max_profit)}
+                      </span>
+                    </a>
+                  </li>
+                  <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
+                    <a
+                      href="#"
+                      className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
+                    >
+                      <TrendingDown className="w-6 h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Max Loss
+                      </span>
+                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                        {strategy.max_loss < 0 ? "-" : ""}
+                        {formatCurrency(strategy.max_loss)}
+                      </span>
+                    </a>
+                  </li>
+                  <li className="bg-gray-100 dark:bg-[#1e222d] border border-gray-200 dark:border-[#2d3139] hover:bg-gray-200 dark:hover:bg-[#1e222d]/80 rounded-lg">
+                    <a
+                      href="#"
+                      className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
+                    >
+                      <Wallet className="w-6 h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Approx PnL
+                      </span>
+                      <span
+                        className={`bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5 ${
+                          strategy.approx_pnl > 0
+                            ? "text-[#06a57f]"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {strategy.approx_pnl > 0 ? "+" : "-"}
+                        {formatCurrency(strategy.approx_pnl)}
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            ))}
 
           <div className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border">
             <div>
