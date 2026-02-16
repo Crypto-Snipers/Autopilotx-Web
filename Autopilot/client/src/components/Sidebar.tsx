@@ -67,7 +67,9 @@ const useThemeDetector = () => {
   return theme;
 };
 
-export default function Sidebar() {
+// ... (imports remain same)
+
+export function SidebarContent() {
   const { user, signout } = useAuth();
   // Initialize role from localStorage to prevent flickering during page loads
   const [role, setRole] = useState<string>(() => {
@@ -168,8 +170,8 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-[14rem] fixed inset-y-0 bg-background text-foreground hidden md:flex flex-col z-10">
-      <div className="p-4">
+    <div className="flex flex-col h-full">
+      <div className="hidden md:block p-4">
         <img src={logo} className="h-20 ml-2" alt="AutoPilotX Logo" />
       </div>
       <div className="mt-6 px-4 text-medium text-foreground font-bold">Overview</div>
@@ -200,7 +202,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-auto">
+      <div className="mt-6 md:mt-auto">
         <div className="px-4 text-medium text-foreground font-bold mb-2">Join Us</div>
         <div className="bg-muted rounded-lg mx-2 p-4 space-y-3">
           {socialLinks.map((link) => (
@@ -234,6 +236,14 @@ export default function Sidebar() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+export default function Sidebar() {
+  return (
+    <aside className="w-[14rem] fixed inset-y-0 bg-background text-foreground hidden md:flex flex-col z-10">
+      <SidebarContent />
     </aside>
   );
 }

@@ -37,8 +37,8 @@ export default function AdminNotificationPage() {
   const [isAuthLoading, setIsAuthLoading] = useState(true)
   const [_, navigate] = useLocation()
   const handleTargetFilterChange = (value: string) => {
-    setNotification({ 
-      ...notification, 
+    setNotification({
+      ...notification,
       target_filter: value,
       user_email: value === "specific_user" ? notification.user_email : "",
       strategy_name: value === "specific_strategy" ? notification.strategy_name : ""
@@ -103,7 +103,7 @@ export default function AdminNotificationPage() {
         description: "Notification sent successfully!",
         className: "bg-green-100 border-green-500 text-green-800",
       });
-      
+
       // Reset form
       setNotification({
         title: "",
@@ -131,7 +131,7 @@ export default function AdminNotificationPage() {
 
       <div className="flex-1 md:ml-[14rem]">
         <Header />
-        <Lowheader />
+        <div className="hidden md:block"><Lowheader /></div>
         <div>
           <div className="container mx-auto p-6 space-y-6">
             <div className="mb-6 text-center">

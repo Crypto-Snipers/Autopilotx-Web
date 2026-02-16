@@ -10,7 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import DeployedStrategies from "@/components/DeployedStrategies";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch"
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { TrendingUp } from "lucide-react";
+import MobileHome from "@/components/mobileHome";
 
 import { useQueryClient } from "@tanstack/react-query";
 import CryptoMarketOverview from "@/components/CryptoMarketOverview";
@@ -394,7 +395,6 @@ export default function Home() {
     }
   }, [futureWallet, isBalanceError, isLoadingBalance, brokerName]);
 
-  {/* ORIGNAL CODE */}
   const formatBalanceDisplay = () => {
     if (isLoadingBalance) return "Loading…";
 
@@ -416,41 +416,6 @@ export default function Home() {
       return `$${balances.usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
   };
-
-
-  {/* TEMP CODE */}
-    //  const formatBalanceDisplay = () => {
-    //    if (isLoadingBalance) return "Loading…";
-
-    //    // Determine which balance to show based on broker and available currencies
-    //    const showINR = currencies.includes("inr") && balances.inr > 0;
-    //    const showUSD = currencies.includes("usd") && balances.usd > 0;
-
-    //    // Check if user email matches the special condition
-    //    const shouldMultiplyBalance = email === "archukushvaha1610@gmail.com";
-    //    const multiplier = shouldMultiplyBalance ? 5 : 1;
-
-    //    if (brokerName === "coindcx") {
-    //      // For CoinDCX, show both if both are available and > 0
-    //      if (showUSD && showINR) {
-    //        const usdAmount = balances.usd * multiplier;
-    //        const inrAmount = balances.inr * multiplier;
-    //        return `$${usdAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${inrAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    //      } else if (showINR) {
-    //        const inrAmount = balances.inr * multiplier;
-    //        return `₹${inrAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    //      } else {
-    //        const usdAmount = balances.usd * multiplier;
-    //        return `$${usdAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    //      }
-    //    } else {
-    //      // For Delta Exchange, show USD only
-    //      const usdAmount = balances.usd * multiplier;
-    //      return `$${usdAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    //    }
-    //  };
-
-  
 
   const getTotalBalanceForColor = () => {
     // Use USD as primary, but if only INR is available, use that
@@ -492,11 +457,36 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen bg-neutral-50 dark:bg-[#2d3139] text-foreground">
-      <Sidebar />
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
 
       <div className="flex-1 md:ml-[14rem]">
-        <Header />
-        <Lowheader />
+        <div className="hidden md:block"><Header /></div>
+        <div className="hidden md:block"><Lowheader /></div>
+
+
+        {/* MOBILE ONLY */}
+        <div className="md:hidden">
+          <MobileHome
+            userName={userName}
+            brokerIsActive={brokerIsActive}
+            brokerName={brokerName}
+            runAllEnabled={runAllEnabled}
+            isLoadingDeactivate={isLoadingDeactivate}
+            isManuallyRefreshing={isManuallyRefreshing}
+            formatBalanceDisplay={formatBalanceDisplay}
+            getTotalBalanceForColor={getTotalBalanceForColor}
+            handleRefreshBalance={handleRefreshBalance}
+            email={email}
+            apiRequest={apiRequest}
+            queryClient={queryClient}
+            toast={toast}
+            setRunAllEnabled={setRunAllEnabled}
+            setIsLoadingDeactivate={setIsLoadingDeactivate}
+          />
+        </div>
+
 
         <style>{`
           /* Light custom scrollbar for Home page */
@@ -507,21 +497,25 @@ export default function Home() {
           .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
         `}</style>
 
-        <main className="p-2 md:p-4">
-          <div className="flex justify-between w-full min-h-0">
+        <main className="hidden md:block p-2 md:p-4">
+          <div className="flex flex-col md:flex-row justify-between w-full min-h-0">
             {/* user connection here flex-col lg:flex-row gap-6 */}
-            <div ref={scrollRef} className="basis-[70%] flex flex-col min-h-0 max-h-[calc(100vh-140px)] overflow-y-auto snap-y snap-mandatory scroll-smooth pr-4 custom-scrollbar">
+            <div
+              ref={scrollRef}
+              className="basis-[70%] flex flex-col min-h-0 max-h-[calc(100vh-140px)] overflow-y-auto snap-y snap-mandatory scroll-smooth pr-4 custom-scrollbar"
+            >
               {brokerIsActive === "true" ? (
                 <div className="border-2 rounded-lg flex items-center justify-center">
                   <Card className="w-full max-w-5xl bg-white/80 dark:bg-background backdrop-blur-sm border-0 shadow-xl">
                     <CardContent className="p-0">
                       {/* Top Section */}
                       <div className="p-2 flex items-start justify-between mb-2">
+
                         <div>
-                          <h1 className="font-[500] text-[30px] leading-[38px] tracking-[0] font-poppins text-gray-900 dark:text-white mb-3">Hi, {userName ? userName : "User"}!</h1>
+                          <h1 className="font-[500] text-2xl md:text-[30px] md:leading-[38px] tracking-[0] font-poppins text-gray-900 dark:text-white mb-3">Hi, {userName ? userName : "User"}!</h1>
                           <p className="text-base text-gray-600 dark:text-gray-300">Hey, Trade Intelligently. Execute Instantly. Grow Confidently.</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left  md:text-right">
                           <div className="text-sm text-gray-500 dark:text-gray-300 mb-2">Total Value</div>
 
                           <div className="flex items-center">
@@ -565,6 +559,7 @@ export default function Home() {
 
                       {/* Bottom Section */}
                       <div className="py-2 px-8 flex items-center justify-between bg-[#DCE6FF] dark:bg-muted rounded-lg">
+
                         {/* Delta Section */}
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-3">
@@ -592,12 +587,13 @@ export default function Home() {
 
                         {/* Performance and Controls */}
                         <div className="flex items-center gap-8">
+
                           {/* Deactivate All */}
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 bg-[#06a57f] rounded-full flex items-center justify-center">
                               <TrendingUp className="w-6 h-6 text-white" />
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                               <div className="text-md font-semibold text-gray-900 dark:text-white">Deactivate All</div>
                               <div className="flex items-center gap-2">
                                 <span className={`${!runAllEnabled ? 'text-[#06a57f] font-medium' : 'text-[#06a57f]'}`}>off</span>
@@ -684,7 +680,7 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={handleRefreshBalance}
-                          className="group flex items-center gap-2 px-2 py-1 rounded-full bg-[#74d47742] text-[#06a57f] font-semibold hover:bg-[#06a57f]/80 hover:text-white transition-colors duration-300"
+                          className="group flex w-full md:w-auto items-center gap-2 px-2 py-2 md:py-1 rounded-full bg-[#74d47742] text-[#06a57f] font-semibold hover:bg-[#06a57f]/80 hover:text-white transition-colors duration-300"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -713,7 +709,7 @@ export default function Home() {
                 (user || userName) && <TradingGreetingCard userName={userName} brokerName={brokerName} />
               )}
 
-              <div className="py-8 w-full mx-auto m-2 p-2 flex flex-wrap">
+              <div className="hidden py-8 w-full mx-auto m-2 p-2 md:flex flex-wrap">
                 <CryptoMarketOverview />
               </div>
             </div>

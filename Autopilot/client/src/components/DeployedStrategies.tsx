@@ -35,7 +35,7 @@ const DeployedStrategies = () => {
   });
 
   return (
-    <div className="bg-background rounded-3xl p-6 w-full h-full max-w-md shadow-sm">
+    <div className="bg-background rounded-xl md:rounded-3xl p-6 w-full h-full max-w-md shadow-sm">
       <h2 className="text-[20px] leading-[30px] font-semibold text-gray-900 dark:text-foreground mb-4 flex justify-start font-poppins">Deployed Strategies</h2>
 
       {isLoadingStrategies ? (

@@ -23,80 +23,80 @@ import Header from "@/components/Header";
 import { apiRequest } from "@/lib/queryClient"
 
 interface User {
-    name: string
-    email: string
-    broker_name: string
-    broker_id: string
-    created_at: string
-    status: "Pending" | "Approved"
+  name: string
+  email: string
+  broker_name: string
+  broker_id: string
+  created_at: string
+  status: "Pending" | "Approved"
 }
 
 interface AdminUser {
-    is_admin: boolean
-    name: string
+  is_admin: boolean
+  name: string
 }
 
 interface DashboardMetrics {
-    pendingApprovals: number
-    totalUsers: number
-    totalApproved: number
+  pendingApprovals: number
+  totalUsers: number
+  totalApproved: number
 }
 
 
 // Show users by filtering it to Pending, Approved, or All
 const fetchUsers = async (status: string): Promise<User[]> => {
-    const queryParam = status === "All" ? "" : `?status_filter=${encodeURIComponent(status)}`;
+  const queryParam = status === "All" ? "" : `?status_filter=${encodeURIComponent(status)}`;
 
-    try {
-        const res = await apiRequest<User[] | { users: User[] }>("GET", `/api/admin/users${queryParam}`);
+  try {
+    const res = await apiRequest<User[] | { users: User[] }>("GET", `/api/admin/users${queryParam}`);
 
-        if (Array.isArray(res)) return res;
-        if (res?.users && Array.isArray(res.users)) return res.users;
+    if (Array.isArray(res)) return res;
+    if (res?.users && Array.isArray(res.users)) return res.users;
 
-        throw new Error("Unexpected response format");
-    } catch (err) {
-        console.error("Failed to fetch users:", err);
-        return [];
-    }
+    throw new Error("Unexpected response format");
+  } catch (err) {
+    console.error("Failed to fetch users:", err);
+    return [];
+  }
 };
 
 // Fetch all users for metrics calculation
 const fetchAllUsers = async (): Promise<User[]> => {
-    try {
-        const res = await apiRequest<{ success: boolean, count: number; users: User[] }>(
-            "GET",
-            "/api/all-users"
-        );
+  try {
+    const res = await apiRequest<{ success: boolean, count: number; users: User[] }>(
+      "GET",
+      "/api/all-users"
+    );
 
-        if (!res.users || !Array.isArray(res.users)) {
-            throw new Error("Invalid response format");
-        }
-
-        return res.users;
-    } catch (error) {
-        console.error("Error fetching all users:", error);
-        throw new Error("Failed to fetch all users");
+    if (!res.users || !Array.isArray(res.users)) {
+      throw new Error("Invalid response format");
     }
+
+    return res.users;
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    throw new Error("Failed to fetch all users");
+  }
 };
 
 // Approve users status
 const approveUser = async (email: string) => {
-    const data = await apiRequest(
-        "PUT",
-        "/api/admin/update-user-status",
-        {
-            email,
-            new_status: "approved"
-        }
-    );
-    console.log("Approve user response:", data);
-    return data;
+  const data = await apiRequest(
+    "PUT",
+    "/api/admin/update-user-status",
+    {
+      email,
+      new_status: "approved"
+    }
+  );
+  console.log("Approve user response:", data);
+  return data;
 };
 
 export default function AdminDashboard() {
-    const [_, navigate] = useLocation()
-    const { toast } = useToast()
-    const queryClient = useQueryClient()
+  const [_, navigate] = useLocation()
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(null)
   const [isAuthLoading, setIsAuthLoading] = useState(true)
@@ -159,381 +159,381 @@ export default function AdminDashboard() {
       });
   };
 
-    // Fetch All Users for Metrics
-    const {
-        data: allUsers,
-        isLoading: allUsersLoading,
-        error: allUsersError
-    } = useQuery({
-        queryKey: ["admin-all-users"],
-        queryFn: fetchAllUsers,
-        enabled: !!currentUser,
-    })
+  // Fetch All Users for Metrics
+  const {
+    data: allUsers,
+    isLoading: allUsersLoading,
+    error: allUsersError
+  } = useQuery({
+    queryKey: ["admin-all-users"],
+    queryFn: fetchAllUsers,
+    enabled: !!currentUser,
+  })
 
-    // Fetch Filtered Users for Display
-    const {
-        data: filteredUsersData,
-        isLoading: filteredUsersLoading,
-        error: filteredUsersError
-    } = useQuery({
-        queryKey: ["admin-filtered-users", statusFilter],
-        queryFn: () => fetchUsers(statusFilter),
-        enabled: !!currentUser,
-    })
+  // Fetch Filtered Users for Display
+  const {
+    data: filteredUsersData,
+    isLoading: filteredUsersLoading,
+    error: filteredUsersError
+  } = useQuery({
+    queryKey: ["admin-filtered-users", statusFilter],
+    queryFn: () => fetchUsers(statusFilter),
+    enabled: !!currentUser,
+  })
 
-    // Calculate metrics from all users
-    const metrics: DashboardMetrics = useMemo(() => {
-        if (!allUsers) {
-            return {
-                pendingApprovals: 0,
-                totalUsers: 0,
-                totalApproved: 0,
-            }
-        }
-
-        return {
-            totalUsers: allUsers.length,
-            pendingApprovals: allUsers.filter(user => user.status === "Pending").length,
-            totalApproved: allUsers.filter(user => user.status === "Approved").length,
-        }
-    }, [allUsers])
-
-    // Get filtered users for display
-    const users: User[] = filteredUsersData || []
-
-    // Filtered Users based on search, date, and broker filter
-    useEffect(() => {
-        const query = searchQuery.toLowerCase()
-        let filtered = users
-        
-        // Apply search filter
-        if (query.trim()) {
-            filtered = users.filter((user) =>
-                [user.name, user.email, user.broker_name, user.broker_id].some((field) =>
-                    field.toLowerCase().includes(query)
-                )
-            )
-        }
-        
-        // Apply broker filter - only show users with both broker_id and broker_name
-        if (brokerFilter) {
-            filtered = filtered.filter((user) => 
-                user.broker_id && user.broker_id.trim() !== '' && 
-                user.broker_name && user.broker_name.trim() !== ''
-            )
-        }
-        
-        // Apply date filter
-        if (dateFilter === "latest") {
-            filtered = [...filtered].sort((a, b) => 
-                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            )
-        } else if (dateFilter === "oldest") {
-            filtered = [...filtered].sort((a, b) => 
-                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-            )
-        }
-        
-        setFilteredUsers(filtered)
-    }, [searchQuery, users, dateFilter, brokerFilter])
-
-    // Approve Users Mutation
-    const approveMutation = useMutation({
-        mutationFn: approveUser,
-        onSuccess: (_, email) => {
-            toast({
-                title: "Success",
-                description: `User ${email} has been approved.`,
-            })
-            // Invalidate both queries to refresh data
-            queryClient.invalidateQueries({ queryKey: ["admin-all-users"] })
-            queryClient.invalidateQueries({ queryKey: ["admin-filtered-users"] })
-        },
-        onError: () => {
-            toast({
-                title: "Error",
-                description: "Failed to approve user. Please try again.",
-                variant: "destructive",
-            })
-        },
-    })
-
-    const formatDate = (dateString: string) => {
-        try {
-            // Handle different date formats from backend
-            let date: Date;
-            
-            // If it's already in ISO format or has 'Z', parse directly
-            if (dateString.includes('T') || dateString.includes('Z')) {
-                date = new Date(dateString);
-            } else {
-                // If it's in format like "2025-01-21 20:30", add timezone info
-                date = new Date(dateString + 'Z');
-            }
-            
-            // Check if date is valid
-            if (isNaN(date.getTime())) {
-                return "Invalid Date";
-            }
-            
-            // Convert to Indian time with explicit timezone handling
-            return date.toLocaleString("en-IN", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-                timeZone: "Asia/Kolkata"
-            });
-        } catch (error) {
-            console.error("Date formatting error:", error, dateString);
-            return "Invalid Date";
-        }
-    };
-
-    const getStatusBadgeVariant = (status: string) => {
-        switch (status) {
-            case "Pending":
-                return "secondary"
-            case "Approved":
-                return "default"
-            default:
-                return "outline"
-        }
+  // Calculate metrics from all users
+  const metrics: DashboardMetrics = useMemo(() => {
+    if (!allUsers) {
+      return {
+        pendingApprovals: 0,
+        totalUsers: 0,
+        totalApproved: 0,
+      }
     }
 
-    if (isAuthLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="flex items-center space-x-2">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                    <span>Checking permissions...</span>
-                </div>
-            </div>
+    return {
+      totalUsers: allUsers.length,
+      pendingApprovals: allUsers.filter(user => user.status === "Pending").length,
+      totalApproved: allUsers.filter(user => user.status === "Approved").length,
+    }
+  }, [allUsers])
+
+  // Get filtered users for display
+  const users: User[] = filteredUsersData || []
+
+  // Filtered Users based on search, date, and broker filter
+  useEffect(() => {
+    const query = searchQuery.toLowerCase()
+    let filtered = users
+
+    // Apply search filter
+    if (query.trim()) {
+      filtered = users.filter((user) =>
+        [user.name, user.email, user.broker_name, user.broker_id].some((field) =>
+          field.toLowerCase().includes(query)
         )
+      )
     }
 
-    if (!currentUser) return null
-
-    // Add error handling for debugging
-    if (allUsersError || filteredUsersError) {
-        console.error("Query error:", allUsersError || filteredUsersError)
+    // Apply broker filter - only show users with both broker_id and broker_name
+    if (brokerFilter) {
+      filtered = filtered.filter((user) =>
+        user.broker_id && user.broker_id.trim() !== '' &&
+        user.broker_name && user.broker_name.trim() !== ''
+      )
     }
 
-    const isLoading = allUsersLoading || filteredUsersLoading
+    // Apply date filter
+    if (dateFilter === "latest") {
+      filtered = [...filtered].sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    } else if (dateFilter === "oldest") {
+      filtered = [...filtered].sort((a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      )
+    }
 
+    setFilteredUsers(filtered)
+  }, [searchQuery, users, dateFilter, brokerFilter])
+
+  // Approve Users Mutation
+  const approveMutation = useMutation({
+    mutationFn: approveUser,
+    onSuccess: (_, email) => {
+      toast({
+        title: "Success",
+        description: `User ${email} has been approved.`,
+      })
+      // Invalidate both queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["admin-all-users"] })
+      queryClient.invalidateQueries({ queryKey: ["admin-filtered-users"] })
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to approve user. Please try again.",
+        variant: "destructive",
+      })
+    },
+  })
+
+  const formatDate = (dateString: string) => {
+    try {
+      // Handle different date formats from backend
+      let date: Date;
+
+      // If it's already in ISO format or has 'Z', parse directly
+      if (dateString.includes('T') || dateString.includes('Z')) {
+        date = new Date(dateString);
+      } else {
+        // If it's in format like "2025-01-21 20:30", add timezone info
+        date = new Date(dateString + 'Z');
+      }
+
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+
+      // Convert to Indian time with explicit timezone handling
+      return date.toLocaleString("en-IN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Kolkata"
+      });
+    } catch (error) {
+      console.error("Date formatting error:", error, dateString);
+      return "Invalid Date";
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Pending":
+        return "secondary"
+      case "Approved":
+        return "default"
+      default:
+        return "outline"
+    }
+  }
+
+  if (isAuthLoading) {
     return (
-      <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
-        <Sidebar />
-        <div className="flex-1 md:ml-[14rem] flex flex-col">
-          <Header />
-          <Lowheader />
-          <div className="container mx-auto p-6 space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-semibold text-foreground">
-                  Approval Dashboard
-                </h1>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
-              <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">
-                    Pending Approvals
-                  </CardTitle>
-                  <Clock className="h-4 w-4 text-white" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-white">
-                    {metrics.pendingApprovals}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">
-                    Total Users
-                  </CardTitle>
-                  <Users className="h-4 w-4 text-white" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-white">
-                    {metrics.totalUsers}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">
-                    Approved Users
-                  </CardTitle>
-                  <UserCheck className="h-4 w-4 text-white" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-white">
-                    {metrics.totalApproved}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Checking permissions...</span>
+        </div>
+      </div>
+    )
+  }
 
-            {/* Filters */}
-            <Card className="bg-card">
-              <CardHeader>
-                <CardTitle>User Management</CardTitle>
+  if (!currentUser) return null
+
+  // Add error handling for debugging
+  if (allUsersError || filteredUsersError) {
+    console.error("Query error:", allUsersError || filteredUsersError)
+  }
+
+  const isLoading = allUsersLoading || filteredUsersLoading
+
+  return (
+    <div className="flex flex-col md:flex-row min-h-screen bg-neutral-50 dark:bg-[#2d3139]">
+      <Sidebar />
+      <div className="flex-1 md:ml-[14rem] flex flex-col">
+        <Header />
+        <div className="hidden md:block"><Lowheader /></div>
+        <div className="container mx-auto px-2 md:px-6 py-6 space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">
+                Approval Dashboard
+              </h1>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+            <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">
+                  Pending Approvals
+                </CardTitle>
+                <Clock className="h-4 w-4 text-white" />
               </CardHeader>
               <CardContent>
-                {/* Table Header */}
-                <div className="sticky top-16 bg-card z-10 border-b">
-                  <div className="flex flex-col sm:flex-row gap-4 mb-6 pt-2">
-                    <div className="flex-1">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                          placeholder="Search by name, email, broker name, or broker ID..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
-                    <Select
-                      value={statusFilter}
-                      onValueChange={setStatusFilter}
-                    >
-                      <SelectTrigger className="w-full sm:w-48">
-                        <SelectValue placeholder="Filter by status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Pending">Pending</SelectItem>
-                        <SelectItem value="Approved">Approved</SelectItem>
-                        <SelectItem value="All">All</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={dateFilter} onValueChange={setDateFilter}>
-                      <SelectTrigger className="w-full sm:w-40">
-                        <SelectValue placeholder="Sort by date" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="latest">Latest First</SelectItem>
-                        <SelectItem value="oldest">Oldest First</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="text-2xl font-bold text-white">
+                  {metrics.pendingApprovals}
                 </div>
-
-                {/* Table Content*/}
-                <div className="border rounded-lg bg-neutral-50 dark:bg-card dark:border-border">
-                  {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <div className="flex items-center space-x-2 text-muted-foreground">
-                        <Loader2 className="h-6 w-6 animate-spin" />
-                        <span>Loading users...</span>
-                      </div>
-                    </div>
-                  ) : filteredUsers.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <Users className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium text-foreground mb-2">
-                        No users found
-                      </h3>
-                      <p className="text-muted-foreground">
-                        {searchQuery
-                          ? "Try adjusting your search criteria."
-                          : brokerFilter
-                          ? "No users found with both broker ID and broker name."
-                          : "No users match the current filter."}
-                      </p>
-                    </div>
-                  ) : (
-                    <Table>
-                      <TableHeader className="bg-muted">
-                        <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Broker Name</TableHead>
-                          <TableHead className="flex items-center gap-2">
-                            Broker ID
-                            <button
-                              onClick={() => setBrokerFilter(!brokerFilter)}
-                              className={`${brokerFilter ? 'text-blue-600' : 'text-muted-foreground'} hover:opacity-70 transition-opacity`}
-                              title={brokerFilter ? "Show all users" : "Show only users with broker details"}
-                            >
-                              <SlidersHorizontal className="h-4 w-4 cursor-pointer" />
-                            </button>
-                          </TableHead>
-                          <TableHead>Registered On</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-
-                      {/* User Data */}
-                      <TableBody>
-                        {filteredUsers.map((user) => (
-                          <TableRow key={user.email}>
-                            <TableCell className="font-medium">
-                              {user.name}
-                            </TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.broker_name}</TableCell>
-                            <TableCell className="flex items-center gap-2">
-                              {user.broker_id && (
-                                <>
-                                  {user.broker_id}
-                                  <button
-                                    onClick={() => handleCopy(user.broker_id)}
-                                    className="text-muted-foreground hover:text-foreground transition"
-                                    title="Copy Broker ID"
-                                  >
-                                    <Copy className="w-4 h-4" />
-                                  </button>
-                                </>
-                              )}
-                            </TableCell>
-                            <TableCell>{formatDate(user.created_at)}</TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={getStatusBadgeVariant(user.status)}
-                              >
-                                {user.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {user.status === "Pending" && (
-                                <Button
-                                  size="sm"
-                                  onClick={() =>
-                                    approveMutation.mutate(user.email)
-                                  }
-                                  disabled={
-                                    approveMutation.isPending &&
-                                    approveMutation.variables === user.email
-                                  }
-                                  className="bg-[#1a785f] hover:bg-[#05b288] text-primary-foreground font-semibold cursor-pointer"
-                                >
-                                  {approveMutation.isPending &&
-                                  approveMutation.variables === user.email ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    "Approve"
-                                  )}
-                                </Button>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  )}
+              </CardContent>
+            </Card>
+            <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">
+                  Total Users
+                </CardTitle>
+                <Users className="h-4 w-4 text-white" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {metrics.totalUsers}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#05b289] via-[#06a07c] to-[#047158] bg-opacity-20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">
+                  Approved Users
+                </CardTitle>
+                <UserCheck className="h-4 w-4 text-white" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">
+                  {metrics.totalApproved}
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* Filters */}
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle>User Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Table Header */}
+              <div className="md:sticky top-16 bg-card md:z-10 border-b">
+                <div className="flex flex-col sm:flex-row gap-4 mb-6 pt-2">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Input
+                        placeholder="Search by name, email, broker name, or broker ID..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={setStatusFilter}
+                  >
+                    <SelectTrigger className="w-full sm:w-48">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                      <SelectItem value="Approved">Approved</SelectItem>
+                      <SelectItem value="All">All</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={dateFilter} onValueChange={setDateFilter}>
+                    <SelectTrigger className="w-full sm:w-40">
+                      <SelectValue placeholder="Sort by date" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="latest">Latest First</SelectItem>
+                      <SelectItem value="oldest">Oldest First</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Table Content*/}
+              <div className="border rounded-lg bg-neutral-50 dark:bg-card dark:border-border">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="flex items-center space-x-2 text-muted-foreground">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                      <span>Loading users...</span>
+                    </div>
+                  </div>
+                ) : filteredUsers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium text-foreground mb-2">
+                      No users found
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {searchQuery
+                        ? "Try adjusting your search criteria."
+                        : brokerFilter
+                          ? "No users found with both broker ID and broker name."
+                          : "No users match the current filter."}
+                    </p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader className="bg-muted">
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Broker Name</TableHead>
+                        <TableHead className="flex items-center gap-2">
+                          Broker ID
+                          <button
+                            onClick={() => setBrokerFilter(!brokerFilter)}
+                            className={`${brokerFilter ? 'text-blue-600' : 'text-muted-foreground'} hover:opacity-70 transition-opacity`}
+                            title={brokerFilter ? "Show all users" : "Show only users with broker details"}
+                          >
+                            <SlidersHorizontal className="h-4 w-4 cursor-pointer" />
+                          </button>
+                        </TableHead>
+                        <TableHead>Registered On</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+
+                    {/* User Data */}
+                    <TableBody>
+                      {filteredUsers.map((user) => (
+                        <TableRow key={user.email}>
+                          <TableCell className="font-medium">
+                            {user.name}
+                          </TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user.broker_name}</TableCell>
+                          <TableCell className="flex items-center gap-2">
+                            {user.broker_id && (
+                              <>
+                                {user.broker_id}
+                                <button
+                                  onClick={() => handleCopy(user.broker_id)}
+                                  className="text-muted-foreground hover:text-foreground transition"
+                                  title="Copy Broker ID"
+                                >
+                                  <Copy className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                          </TableCell>
+                          <TableCell>{formatDate(user.created_at)}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={getStatusBadgeVariant(user.status)}
+                            >
+                              {user.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {user.status === "Pending" && (
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  approveMutation.mutate(user.email)
+                                }
+                                disabled={
+                                  approveMutation.isPending &&
+                                  approveMutation.variables === user.email
+                                }
+                                className="bg-[#1a785f] hover:bg-[#05b288] text-primary-foreground font-semibold cursor-pointer"
+                              >
+                                {approveMutation.isPending &&
+                                  approveMutation.variables === user.email ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  "Approve"
+                                )}
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    );
+    </div>
+  );
 }

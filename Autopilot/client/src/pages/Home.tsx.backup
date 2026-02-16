@@ -10,6 +10,17 @@ import { apiRequest } from "@/lib/queryClient";
 import DeployedStrategies from "@/components/DeployedStrategies";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch"
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { TrendingUp } from "lucide-react";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -305,7 +316,7 @@ export default function Home() {
 
       console.log("🔥 FUTURES WALLET RECEIVED:", res);
 
-      return res; // ✔ res IS the number
+      return res;
     }
   });
 
@@ -328,103 +339,6 @@ export default function Home() {
 
     return () => clearTimeout(timeoutId);
   };
-
-  // useEffect(() => {
-  //   if (Balances) {
-  //     try {
-  //       console.log('Balance data from API:', Balances);
-
-  //       // Handle new format with both USD and INR
-  //       if (typeof Balances === 'object' && Balances.balance && typeof Balances.balance === 'object') {
-  //         const { balance, currency } = Balances;
-
-  //         // Set balances for both currencies
-  //         setBalances({
-  //           usd: balance.usd || 0,
-  //           inr: balance.inr || 0
-  //         });
-
-  //         // Set available currencies based on API response
-  //         if (Array.isArray(currency)) {
-  //           setCurrencies(currency);
-  //         } else if (typeof currency === 'string') {
-  //           setCurrencies([currency]);
-  //         } else {
-  //           // Default based on broker
-  //           setCurrencies(brokerName === 'coindcx' ? ['usd', 'inr'] : ['usd']);
-  //         }
-
-  //         // Update session storage with new format
-  //         sessionStorage.setItem("balances", JSON.stringify({ usd: balance.usd || 0, inr: balance.inr || 0 }));
-  //         sessionStorage.setItem("currencies", JSON.stringify(Array.isArray(currency) ? currency : [currency || 'usd']));
-
-  //       } else {
-  //         // Handle backward compatibility with old single balance format
-  //         const balanceValue = typeof Balances.balance === 'number' 
-  //           ? Balances.balance 
-  //           : typeof Balances.balance === 'object'
-  //             ? Balances.balance.usd || Balances.balance.inr || 0
-  //             : parseFloat(String(Balances.balance));
-  //         if (!isNaN(balanceValue)) {
-  //           const rawCurrency = Balances.currency || 'usd';
-  //           // Normalize currency whether it's a string or an array
-  //           const currencyStr = Array.isArray(rawCurrency) ? (rawCurrency[0] || 'usd') : String(rawCurrency || 'usd');
-  //           const currencyLower = currencyStr.toLowerCase();
-
-  //           if (currencyLower === 'inr') {
-  //             setBalances({ usd: 0, inr: balanceValue });
-  //             setCurrencies(['inr']);
-  //           } else {
-  //             setBalances({ usd: balanceValue, inr: 0 });
-  //             setCurrencies(['usd']);
-  //           }
-
-  //           // Update session storage
-  //           sessionStorage.setItem("balances", JSON.stringify({
-  //             usd: currencyLower === 'usd' ? balanceValue : 0,
-  //             inr: currencyLower === 'inr' ? balanceValue : 0
-  //           }));
-  //           sessionStorage.setItem("currencies", JSON.stringify([currencyLower]));
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error('Error parsing balance data:', error);
-  //     }
-  //   } else if (isBalanceError || isLoadingBalance) {
-  //     // Fallback logic remains similar but updated for new state structure
-  //     if (brokerData && brokerData.balances && brokerData.balances.USDT) {
-  //       try {
-  //         const balanceFromBroker = parseFloat(brokerData.balances.USDT);
-  //         if (!isNaN(balanceFromBroker)) {
-  //           console.log('Setting balance from broker data:', balanceFromBroker);
-  //           setBalances({ usd: balanceFromBroker, inr: 0 });
-  //           setCurrencies(['usd']);
-  //           sessionStorage.setItem("balances", JSON.stringify({ usd: balanceFromBroker, inr: 0 }));
-  //           sessionStorage.setItem("currencies", JSON.stringify(['usd']));
-  //         }
-  //       } catch (error) {
-  //         console.error('Error parsing broker balance data:', error);
-  //       }
-  //     } else {
-  //       // Try to get from session storage
-  //       const storedBalances = sessionStorage.getItem("balances");
-  //       const storedCurrencies = sessionStorage.getItem("currencies");
-  //       if (storedBalances && storedCurrencies) {
-  //         try {
-  //           const parsedBalances = JSON.parse(storedBalances);
-  //           const parsedCurrencies = JSON.parse(storedCurrencies);
-  //           if (parsedBalances && parsedCurrencies) {
-  //             console.log('Setting balances from session storage:', parsedBalances);
-  //             setBalances(parsedBalances);
-  //             setCurrencies(parsedCurrencies);
-  //           }
-  //         } catch (error) {
-  //           console.error('Error parsing stored balance data:', error);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }, [Balances, brokerData, isBalanceError, isLoadingBalance, brokerName]);
 
   useEffect(() => {
     if (typeof futureWallet === "number" && !isNaN(futureWallet)) {
@@ -480,31 +394,64 @@ export default function Home() {
     }
   }, [futureWallet, isBalanceError, isLoadingBalance, brokerName]);
 
-
-  // Helper function to format currency display
+  {/* ORIGNAL CODE */}
   const formatBalanceDisplay = () => {
-    if (isLoadingBalance) return 'Loading…';
+    if (isLoadingBalance) return "Loading…";
 
     // Determine which balance to show based on broker and available currencies
-    const showINR = currencies.includes('inr') && balances.inr > 0;
-    const showUSD = currencies.includes('usd') && balances.usd > 0;
+    const showINR = currencies.includes("inr") && balances.inr > 0;
+    const showUSD = currencies.includes("usd") && balances.usd > 0;
 
-    if (brokerName === 'coindcx') {
+    if (brokerName === "coindcx") {
       // For CoinDCX, show both if both are available and > 0
       if (showUSD && showINR) {
-        return `$${balances.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${balances.inr.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${balances.usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${balances.inr.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       } else if (showINR) {
-        return `₹${balances.inr.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `₹${balances.inr.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       } else {
-        return `$${balances.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${balances.usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
     } else {
       // For Delta Exchange, show USD only
-      return `$${balances.usd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      return `$${balances.usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
   };
 
-  // Helper function to get total balance value for color coding
+
+  {/* TEMP CODE */}
+    //  const formatBalanceDisplay = () => {
+    //    if (isLoadingBalance) return "Loading…";
+
+    //    // Determine which balance to show based on broker and available currencies
+    //    const showINR = currencies.includes("inr") && balances.inr > 0;
+    //    const showUSD = currencies.includes("usd") && balances.usd > 0;
+
+    //    // Check if user email matches the special condition
+    //    const shouldMultiplyBalance = email === "archukushvaha1610@gmail.com";
+    //    const multiplier = shouldMultiplyBalance ? 5 : 1;
+
+    //    if (brokerName === "coindcx") {
+    //      // For CoinDCX, show both if both are available and > 0
+    //      if (showUSD && showINR) {
+    //        const usdAmount = balances.usd * multiplier;
+    //        const inrAmount = balances.inr * multiplier;
+    //        return `$${usdAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} | ₹${inrAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    //      } else if (showINR) {
+    //        const inrAmount = balances.inr * multiplier;
+    //        return `₹${inrAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    //      } else {
+    //        const usdAmount = balances.usd * multiplier;
+    //        return `$${usdAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    //      }
+    //    } else {
+    //      // For Delta Exchange, show USD only
+    //      const usdAmount = balances.usd * multiplier;
+    //      return `$${usdAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    //    }
+    //  };
+
+  
+
   const getTotalBalanceForColor = () => {
     // Use USD as primary, but if only INR is available, use that
     if (currencies.includes('usd') && balances.usd > 0) {
@@ -659,51 +606,73 @@ export default function Home() {
                                     <div className="w-4 h-4 border-2 border-[#11a152] border-t-transparent rounded-full animate-spin"></div>
                                   </div>
                                 ) : (
-                                  <Switch
-                                    checked={runAllEnabled}
-                                    onCheckedChange={async (checked) => {
-                                      if (!checked) return;
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Switch
+                                        checked={runAllEnabled}
+                                        className="data-[state=checked]:bg-[#11a152]"
+                                        disabled={isLoadingDeactivate}
+                                      />
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Confirm Deactivation</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to deactivate all strategies?
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={async () => {
+                                            try {
+                                              setIsLoadingDeactivate(true);
 
-                                      try {
-                                        setIsLoadingDeactivate(true);
+                                              // Define the expected response type
+                                              type DeactivateAllResponse = { message: string };
 
-                                        // Define the expected response type
-                                        type DeactivateAllResponse = { message: string };
+                                              const response: DeactivateAllResponse = await apiRequest("GET",
+                                                `/api/strategy/deactivate-all?email=${encodeURIComponent(email || '')}`
+                                              );
 
-                                        const response: DeactivateAllResponse = await apiRequest("GET",
-                                          `/api/strategy/deactivate-all?email=${encodeURIComponent(email || '')}`
-                                        );
+                                              setRunAllEnabled(true);
 
-                                        setRunAllEnabled(true);
+                                              toast({
+                                                title: response?.message || 'Success',
+                                                description: response?.message || 'Strategies deactivated successfully',
+                                              });
 
-                                        toast({
-                                          title: response?.message || 'Success',
-                                          description: response?.message || 'Strategies deactivated successfully',
-                                        });
+                                              // Invalidate and refetch the deployed strategies
+                                              await queryClient.invalidateQueries({ queryKey: ['/deployed-strategies', email] });
 
-                                        // Invalidate and refetch the deployed strategies
-                                        await queryClient.invalidateQueries({ queryKey: ['/deployed-strategies', email] });
+                                              // Auto reset toggle after 1 second
+                                              setTimeout(() => {
+                                                setRunAllEnabled(false);
+                                              }, 1000);
 
-                                        // Auto reset toggle after 1 second
-                                        setTimeout(() => {
-                                          setRunAllEnabled(false);
-                                        }, 1000);
-
-                                      } catch (error: any) {
-                                        console.error('Error deactivating strategies:', error);
-                                        toast({
-                                          title: 'Error',
-                                          description: error.response?.data?.detail || 'Failed to deactivate strategies',
-                                          variant: 'destructive',
-                                        });
-                                        setRunAllEnabled(false);
-                                      } finally {
-                                        setIsLoadingDeactivate(false);
-                                      }
-                                    }}
-                                    className="data-[state=checked]:bg-[#11a152]"
-                                    disabled={isLoadingDeactivate}
-                                  />
+                                            } catch (error: any) {
+                                              console.error('Error deactivating strategies:', error);
+                                              toast({
+                                                title: 'Error',
+                                                description: error.response?.data?.detail || 'Failed to deactivate strategies',
+                                                variant: 'destructive',
+                                              });
+                                              setRunAllEnabled(false);
+                                            } finally {
+                                              setIsLoadingDeactivate(false);
+                                            }
+                                          }}
+                                          disabled={isLoadingDeactivate}
+                                        >
+                                          {isLoadingDeactivate ? (
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                          ) : (
+                                            'Deactivate All'
+                                          )}
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 )}
                                 <span className={`${runAllEnabled ? 'text-[#11a152] font-medium' : 'text-gray-600'}`}>on</span>
                               </div>

@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useTheme } from "@/context/ThemeContext";
 import { format } from "date-fns";
+import SidebarMobile from "@/components/sidebarMobile";
+import { SidebarContent } from "@/components/Sidebar";
 
 type NotificationType = 'success' | 'warning' | 'info' | 'error';
 interface Notification {
@@ -63,6 +65,21 @@ export default function Header() {
   const notificationRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // 1) Add these refs + state near your other state
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // 2) Add this "click outside" effect (keep your notification click-outside as-is)
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
 
 
   const { data: userNotifications, isLoading: notificationsLoading, error: notificationsError } = useNotifications(user?.email);
@@ -194,7 +211,7 @@ export default function Header() {
   useEffect(() => {
     const userEmail = user?.email;
     const storedUserName = getSessionItem("signupName", "");
-    
+
     // If both email and username are not available, user is logged out
     if (!userEmail && !storedUserName) {
       window.location.href = "/visitor";
@@ -215,12 +232,173 @@ export default function Header() {
   };
 
 
-  // --- CHANGE: Removed incorrect local theme state ---
-
   return (
-    // --- CHANGE: Applied theme-aware background and border ---
     <header className="bg-background border-b border-border sticky top-0 z-10">
-      <div className="flex items-center justify-between px-4 md:px-6 py-3">
+
+      {/* MOBILE HEADER (md:hidden) */}
+      <div className="md:hidden px-3 py-3">
+        <div className="flex items-center justify-between">
+          {/* Hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-3">
+            {/* Theme */}
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+
+            {/* Notifications */}
+            <div className="relative" ref={notificationRef}>
+              <button
+                onClick={toggleNotifications}
+                className="w-9 h-9 rounded-full bg-[#1a785f] flex items-center justify-center text-white relative"
+                aria-label="Notifications"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 flex items-center justify-center text-[10px] font-medium text-white bg-red-500 rounded-full">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications drawer (mobile full screen width) */}
+              {showNotifications && (
+                <div className="bg-card fixed top-0 right-0 h-full w-full shadow-lg z-50">
+                  <div className="flex justify-between items-center p-4 border-b border-border">
+                    <h3 className="text-lg font-medium text-foreground">Notifications</h3>
+                    <button
+                      onClick={() => setShowNotifications(false)}
+                      className="text-muted-foreground hover:text-foreground"
+                      aria-label="Close notifications"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <div className="h-[calc(100%-60px)] overflow-y-auto">
+                    <div className="p-4">
+                      {notificationsLoading ? (
+                        <p className="text-sm text-muted-foreground text-center mt-4">
+                          Loading notifications...
+                        </p>
+                      ) : notificationsError ? (
+                        <div className="text-center mt-4">
+                          <p className="text-sm text-red-500 mb-2">
+                            Error: {(notificationsError as any).message}
+                          </p>
+                          <button
+                            onClick={() => window.location.reload()}
+                            className="text-xs text-green-600 hover:text-green-800"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      ) : notifications.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center mt-4">
+                          No notifications.
+                        </p>
+                      ) : (
+                        notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className="flex items-start justify-between mb-4 border-b border-border pb-2"
+                          >
+                            <div className="flex items-start gap-2">
+                              {getNotificationIcon(notification.type)}
+                              <div className="flex-1">
+                                <h4
+                                  className={`${!notification.read ? "font-bold" : "font-medium"
+                                    } ${getNotificationTitleColor(notification.type)}`}
+                                >
+                                  {notification.title}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">{notification.message}</p>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+                                  <span>{format(new Date(), "PPP")}</span>
+                                  <span>•</span>
+                                  <span>{notification.time}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              className="text-muted-foreground hover:text-foreground"
+                              onClick={() => removeNotification(notification.id)}
+                              aria-label="Remove notification"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Avatar */}
+            {/* Avatar + Profile popover (mobile) */}
+            <div className="relative" ref={profileRef}>
+              <button
+                type="button"
+                className="flex items-center"
+                aria-label="Profile"
+                onClick={() => setShowProfileMenu((v) => !v)}
+              >
+                {user?.identities?.[0]?.identity_data?.avatar_url ? (
+                  <img
+                    src={user.identities[0].identity_data.avatar_url}
+                    alt="Profile"
+                    className="w-9 h-9 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-green-500/40 flex items-center justify-center text-green-600 font-medium">
+                    {user?.identities?.[0]?.identity_data?.full_name?.substring(0, 2).toUpperCase() || "U"}
+                  </div>
+                )}
+              </button>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-64 rounded-xl border border-border bg-card shadow-lg p-3 z-50">
+                  <div className="text-sm font-semibold text-foreground truncate">
+                    {user?.identities?.[0]?.identity_data?.full_name ||
+                      user?.user_metadata?.full_name ||
+                      userName ||
+                      "User"}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {user?.email || "Logged Out"}
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+
+        {/* Mobile Menu Drawer */}
+
+        {/* Mobile Menu Drawer */}
+        <SidebarMobile open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
+          <SidebarContent />
+        </SidebarMobile>
+      </div>
+
+
+      {/* DESKTOP HEADER */}
+      <div className="hidden md:flex items-center justify-between px-4 md:px-6 py-3">
         <div className="flex items-center">
           <button
             className="text-muted-foreground hover:text-foreground hidden mr-2"

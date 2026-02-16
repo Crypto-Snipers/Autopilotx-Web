@@ -77,21 +77,21 @@ const Header = () => {
         </div>
 
         {/* Desktop Buttons */}
-        <div className="hidden sm:flex items-center gap-2">
-          <button onClick={() => window.location.href = "/signin"} className="text-slate-300 hover:text-white px-3 py-1.5 rounded-md text-sm">
+        <div className="flex items-center gap-2">
+          <button onClick={() => window.location.href = "/signin"} className="text-slate-300 hover:text-white px-2 md:px-3 py-1.5 rounded-md text-xs md:text-sm">
             Log in
           </button>
-          <button onClick={() => window.location.href = "/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-4 py-2 rounded-md text-sm">
+          <button onClick={() => window.location.href = "/signup"} className="bg-[#06a57f] hover:bg-[#05b289] text-white px-2 md:px-4 py-1.5 md:py-2 rounded-md text-xs md:text-sm">
             Sign up
           </button>
         </div>
 
         {/* Mobile Hamburger */}
-        <div className="sm:hidden">
+        {/* <div className="sm:hidden">
           <button onClick={() => setMenuOpen(!menuOpen)} className="text-slate-300">
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-        </div>
+        </div> */}
       </nav>
 
       {/* Mobile Menu */}
@@ -183,10 +183,10 @@ const HeroSection = () => (
       </div>
       <div className="absolute -left-16 -top-16 w-72 h-72 bg-[#06a57f]/10 blur-3xl rounded-full"></div>
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight">
+      <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight">
         Deploy Smart Strategies. <br className="hidden sm:block" /> Trade Automatically. <br className="hidden sm:block" /> Earn Profit.
       </h1>
-      <p className="text-base md:text-lg text-slate-400 max-w-md mx-auto md:mx-0">
+      <p className="text-sm md:text-lg text-slate-400 max-w-md mx-auto md:mx-0">
         Experience effortless crypto trading with ready-to-use strategies.
         Deploy them in a click, and watch your portfolio grow all on AutopilotX.
       </p>

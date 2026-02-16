@@ -135,7 +135,7 @@ export default function Positions() {
       <Sidebar />
       <div className="flex-1 md:ml-[14rem] flex flex-col">
         <Header />
-        <Lowheader />
+        <div className="hidden md:block"><Lowheader /></div>
 
         <main className="flex-1 overflow-y-auto p-4">
           <div className="mb-6">

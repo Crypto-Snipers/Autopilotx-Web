@@ -56,7 +56,7 @@ const fetchCryptoData = async (
 export default function Lowheader() {
   const { user } = useAuth();
 
-  useEffect(() => {}, [user]);
+  useEffect(() => { }, [user]);
 
   const {
     data: cryptoPrices = [],

@@ -46,14 +46,14 @@ const toHourTick = (d) => {
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // 0 should be 12
-  
+
   return `${hours}:${minutes} ${ampm}`;
 };
 
 // Format absolute time (e.g., "13 Jan 2026, 12:20 pm")
 const formatAbsoluteTime = (date) => {
   if (!date) return "Never";
-  
+
   const day = date.getDate();
   const month = date.toLocaleDateString('en-US', { month: 'short' });
   const year = date.getFullYear();
@@ -62,7 +62,7 @@ const formatAbsoluteTime = (date) => {
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // 0 should be 12
-  
+
   return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
 };
 
@@ -183,7 +183,7 @@ const CryptoCard = ({
             color: theme === 'dark' ? '#9ca3af' : '#000',
             maxTicksLimit: 6,
             font: { size: 11 },
-            callback: function(value, index) {
+            callback: function (value, index) {
               const label = this.getLabelForValue(value);
               const step = Math.ceil(this.getLabels().length / 6);
               return index % step === 0 ? label : '';
@@ -209,14 +209,14 @@ const CryptoCard = ({
   const bullish = change24h >= 0;
 
   return (
-    <div className="bg-neutral-50 dark:bg-muted border border-slate-200 dark:border-border rounded-xl shadow-md p-5 flex flex-col w-full hover:shadow-lg transition-shadow duration-300">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-baseline gap-2">
-          <h3 className="text-lg font-semibold text-slate-800 dark:text-foreground">{name}</h3>
-          <span className="text-sm text-slate-400 dark:text-muted-foreground">{symbol}</span>
+    <div className="bg-neutral-50 dark:bg-muted border border-slate-200 dark:border-border rounded-xl shadow-md p-4 sm:p-5 flex flex-col w-full hover:shadow-lg transition-shadow duration-300">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <h3 className="text-base sm:text-lg font-semibold text-slate-800 dark:text-foreground truncate">{name}</h3>
+          <span className="text-xs sm:text-sm text-slate-400 dark:text-muted-foreground shrink-0">{symbol}</span>
         </div>
         <span
-          className={`text-xs font-medium px-2 py-1 rounded-full border ${bullish
+          className={`self-start sm:self-auto text-xs font-medium px-2 py-1 rounded-full border ${bullish
             ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
             : "bg-green-500/10 text-black dark:text-white border-green-500/20"
             }`}
@@ -225,8 +225,8 @@ const CryptoCard = ({
         </span>
       </div>
 
-      <div className="mt-2 mb-3 flex items-center gap-3">
-        <div className="text-lg font-bold text-slate-900 dark:text-foreground">
+      <div className="mt-2 mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <div className="text-lg sm:text-xl font-bold text-slate-900 dark:text-foreground">
           ${formatNumber(price)}
         </div>
         <div
@@ -248,7 +248,7 @@ const CryptoCard = ({
         </div>
       </div>
 
-      <div className="relative h-48">
+      <div className="relative h-40 sm:h-48 md:h-56">
         {(isLoading || error) && (
           <div className="absolute inset-0 rounded-lg bg-white/80 dark:bg-background/80 backdrop-blur-sm flex items-center justify-center z-10">
             {isLoading ? (
@@ -265,9 +265,7 @@ const CryptoCard = ({
         <Line ref={chartRef} data={data} options={options} />
       </div>
 
-      <div className="mt-4 pt-4 border-b border-slate-100 dark:border-gray-200/20"></div>
-
-      <div className="mt-1 pt-1 border-t border-slate-100 dark:border-border text-xs text-slate-400 dark:text-muted-foreground">
+      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-border text-[11px] sm:text-xs text-slate-400 dark:text-muted-foreground">
         Last updated {formatAbsoluteTime(lastUpdated)}
       </div>
     </div>
@@ -281,11 +279,6 @@ export default function CryptoMarketOverview() {
   const now = Date.now();
   const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
 
-  // Format API URLs with 1-minute interval and time range
-  const getApiUrl = (pair) => {
-    return `  `; // 1440 minutes = 24 hours
-  };
-
   return (
     <div className="w-full font-sans p-4 bg-white dark:bg-background rounded-2xl border border-slate-200 dark:border-border shadow-lg">
       <div className="mb-6">
@@ -293,7 +286,6 @@ export default function CryptoMarketOverview() {
           Crypto Market Overview
         </h2>
         <p className="text-sm text-slate-500 dark:text-muted-foreground">
-          {/* Live price performance (1-minute candles, last 24 hours) */}
           Live price performance
         </p>
       </div>

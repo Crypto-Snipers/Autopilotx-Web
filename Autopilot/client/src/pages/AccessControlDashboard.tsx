@@ -254,8 +254,8 @@ export default function AdminDashboard() {
             <Sidebar />
             <div className="flex-1 md:ml-[14rem]">
                 <Header />
-                <Lowheader />
-                <div className="container mx-auto p-6 space-y-6">
+                <div className="hidden md:block"><Lowheader /></div>
+                <div className="container mx-auto p-4 md:p-6 space-y-6">
                     {/* Page Title */}
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-semibold">User Access Control</h1>
@@ -312,7 +312,7 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* User Table */}
-                            <div className="border rounded-lg">
+                            <div className="border rounded-lg overflow-x-auto">
                                 {isLoading ? (
                                     <div className="flex justify-center py-12">
                                         <Loader2 className="h-6 w-6 animate-spin mr-2" />

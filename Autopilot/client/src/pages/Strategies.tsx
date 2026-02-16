@@ -570,7 +570,7 @@ export default function Strategies() {
       <Sidebar />
       <div className="flex-1 md:ml-[14rem] flex flex-col">
         <Header />
-        <Lowheader />
+        <div className="hidden md:block"><Lowheader /></div>
 
         <main className="px-4 py-2 md:p-6">
           <div className="flex justify-between items-center">
@@ -610,11 +610,10 @@ export default function Strategies() {
               <Button
                 variant="strategy"
                 onClick={() => setViewType("all")}
-                className={`m-2 ${
-                  viewType === "all"
-                    ? "bg-black text-white"
-                    : "bg-gray-200 text-black"
-                }`}
+                className={`m-2 ${viewType === "all"
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-black"
+                  }`}
               >
                 {viewType === "all" && (
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -625,11 +624,10 @@ export default function Strategies() {
               <Button
                 variant="strategy"
                 onClick={() => setViewType("deployed")}
-                className={`m-2 ${
-                  viewType === "deployed"
-                    ? "bg-black text-white"
-                    : "bg-gray-200 text-black"
-                }`}
+                className={`m-2 ${viewType === "deployed"
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-black"
+                  }`}
               >
                 {viewType === "deployed" && (
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -739,11 +737,10 @@ export default function Strategies() {
                               ? "secondary"
                               : "secondary"
                           }
-                          className={`w-full text-sm font-medium py-2 px-4 rounded-md !bg-[#0e65f2] hover:!bg-[#0d5ce8] ${
-                            !deployedStrategyNames.includes(strategy.name)
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                          }`}
+                          className={`w-full text-sm font-medium py-2 px-4 rounded-md !bg-[#0e65f2] hover:!bg-[#0d5ce8] ${!deployedStrategyNames.includes(strategy.name)
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                            }`}
                           onClick={() => handleStrategyStatus(strategy)}
                           disabled={
                             !deployedStrategyNames.includes(strategy.name)

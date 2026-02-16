@@ -61,22 +61,22 @@ export default function StrategyPerformance() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Get user email from sessionStorage or auth context
       const userEmail = sessionStorage.getItem('signupEmail') || '';
-      
+
       if (!userEmail) {
         throw new Error('User email not found in session storage. Please log in again.');
       }
-      
+
       // Build query parameters
       const params = new URLSearchParams({ email: userEmail });
       if (start) params.append('startDate', start);
       if (end) params.append('endDate', end);
-      
+
       console.log('Fetching strategy performance for email:', userEmail, 'with dates:', { start, end });
       const result: ApiResponse = await apiRequest('GET', `/api/strategy-performance?${params.toString()}`);
-      
+
       setData(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch strategy performance');
@@ -184,14 +184,14 @@ export default function StrategyPerformance() {
       <Sidebar />
       <div className="flex-1 md:ml-[14rem] flex flex-col">
         <Header />
-        <Lowheader />
+        <div className="hidden md:block"><Lowheader /></div>
 
         <main className="flex-1 overflow-y-auto p-4">
           <div className="mb-6">
-            <h1 className={`text-2xl font-semibold dark:text-foreground`}>
+            <h1 className={`text-xl md:text-2xl font-semibold dark:text-foreground`}>
               Strategy Performance
             </h1>
-            <p className="text-body mt-2">
+            <p className="text-sm md:text-body mt-2">
               You can check your strategy's overall performance here.
             </p>
           </div>
@@ -205,18 +205,17 @@ export default function StrategyPerformance() {
               >
                 <div>
                   <div
-                    className={`${
-                      strategy.current_status
-                        ? "bg-green-200 text-green-700"
-                        : "bg-red-200 text-red-700"
-                    } py-1 w-14 text-center rounded-full uppercase shadow-md text-sm font-semibold border `}
+                    className={`${strategy.current_status
+                      ? "bg-green-200 text-green-700"
+                      : "bg-red-200 text-red-700"
+                      } py-1 w-14 text-center rounded-full uppercase shadow-md text-xs md:text-sm font-semibold border`}
                   >
                     {strategy.current_status === "active" ? "Live" : "Inactive"}
                   </div>
 
-                  <h5 className="text-2xl font-semibold text-heading text-center mb-1">
+                  <h5 className="text-xl md:text-2xl font-semibold text-heading text-center mb-1">
                     {strategy.strategy_name}
-                    <span className="bg-[#06a57f] text-white text-sm px-2 py-1 ml-2 rounded-full tracking-wide">
+                    <span className="bg-[#06a57f] text-white text-xs md:text-sm px-2 py-1 ml-2 rounded-full tracking-wide">
                       {strategy.strategy_name == "Bitron" ? "BTC" : "ETH"}
                     </span>
                   </h5>
@@ -227,7 +226,7 @@ export default function StrategyPerformance() {
                 {/* Date Filter */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-body mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-body mb-2">
                       <Calendar className="w-4 h-4 inline mr-1" />
                       Start Date
                     </label>
@@ -242,7 +241,7 @@ export default function StrategyPerformance() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-body mb-2">
+                    <label className="block text-xs md:text-sm font-medium text-body mb-2">
                       <Calendar className="w-4 h-4 inline mr-1" />
                       End Date
                     </label>
@@ -283,11 +282,11 @@ export default function StrategyPerformance() {
                       href="#"
                       className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
                     >
-                      <ChartColumnBig className="w-6 h-6" />
-                      <span className="flex-1 ms-3 whitespace-nowrap">
+                      <ChartColumnBig className="w-5 h-5 md:w-6 md:h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Total Trades
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
                         {strategy.total_trades}
                       </span>
                     </a>
@@ -297,11 +296,11 @@ export default function StrategyPerformance() {
                       href="#"
                       className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
                     >
-                      <Smile className="w-6 h-6" />
-                      <span className="flex-1 ms-3 whitespace-nowrap">
+                      <Smile className="w-5 h-5 md:w-6 md:h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Winning Trades
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
                         {strategy.profit_trades}
                       </span>
                     </a>
@@ -311,11 +310,11 @@ export default function StrategyPerformance() {
                       href="#"
                       className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
                     >
-                      <Frown className="w-6 h-6" />
-                      <span className="flex-1 ms-3 whitespace-nowrap">
+                      <Frown className="w-5 h-5 md:w-6 md:h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Losing Trades
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
                         {strategy.loss_trades}
                       </span>
                     </a>
@@ -325,8 +324,8 @@ export default function StrategyPerformance() {
                       href="#"
                       className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
                     >
-                      <TrendingUp className="w-6 h-6" />
-                      <span className="flex-1 ms-3 whitespace-nowrap">
+                      <TrendingUp className="w-5 h-5 md:w-6 md:h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Max Profit
                       </span>
                       <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
@@ -340,11 +339,11 @@ export default function StrategyPerformance() {
                       href="#"
                       className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
                     >
-                      <TrendingDown className="w-6 h-6" />
-                      <span className="flex-1 ms-3 whitespace-nowrap">
+                      <TrendingDown className="w-5 h-5 md:w-6 md:h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Max Loss
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
                         {strategy.max_loss < 0 ? "-" : ""}
                         {formatCurrency(strategy.max_loss)}
                       </span>
@@ -355,16 +354,15 @@ export default function StrategyPerformance() {
                       href="#"
                       className="flex items-center p-3 text-lg font-semibold text-heading rounded-base bg-neutral-secondary-medium hover:bg-neutral-tertiary-medium group"
                     >
-                      <Wallet className="w-6 h-6" />
-                      <span className="flex-1 ms-3 whitespace-nowrap">
+                      <Wallet className="w-5 h-5 md:w-6 md:h-6" />
+                      <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Approx PnL
                       </span>
                       <span
-                        className={`bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5 ${
-                          strategy.approx_pnl > 0
-                            ? "text-[#06a57f]"
-                            : "text-red-600"
-                        }`}
+                        className={`bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5 ${strategy.approx_pnl > 0
+                          ? "text-[#06a57f]"
+                          : "text-red-600"
+                          }`}
                       >
                         {strategy.approx_pnl > 0 ? "+" : "-"}
                         {formatCurrency(strategy.approx_pnl)}
@@ -377,8 +375,8 @@ export default function StrategyPerformance() {
 
           <div className="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-[#17181d] rounded-lg shadow-md border">
             <div>
-              <span className="inline-flex items-center text-sm text-body tracking-normal">
-                <HelpCircle className="w-4 h-4 me-1.5" />
+              <span className="inline-flex items-start md:items-center text-xs md:text-sm text-body tracking-normal">
+                <HelpCircle className="w-4 h-4 mr-1.5" />
                 This is not an exact PnL. To check your exact PnL click on the
                 link.
               </span>
@@ -386,7 +384,7 @@ export default function StrategyPerformance() {
                 href="https://coindcx.com/stats/futures/positions"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary-medium underline hover:text-blue-600 ml-2 text-sm"
+                className="text-primary-medium underline hover:text-blue-600 ml-2 text-xs md:text-sm"
               >
                 https://coindcx.com/stats/futures/positions
               </a>

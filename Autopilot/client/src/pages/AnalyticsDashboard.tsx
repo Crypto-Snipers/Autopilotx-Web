@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
-  TrendingUp,
-  Users,
-  Wallet,
-  BarChart3,
-  Activity,
-  Calendar as CalendarIcon,
-  SlidersHorizontal,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
+    TrendingUp,
+    Users,
+    Wallet,
+    BarChart3,
+    Activity,
+    Calendar as CalendarIcon,
+    SlidersHorizontal,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -313,19 +313,19 @@ export default function AnalyticsDashboard() {
         .sort((a, b) => {
             // Apply total volumes sorting if active
             if (sortOrder) {
-                return sortOrder === 'asc' 
+                return sortOrder === 'asc'
                     ? a.total_volumes - b.total_volumes
                     : b.total_volumes - a.total_volumes;
             }
             // Apply deployed funds sorting if active
             if (deployedFundsSortOrder) {
-                return deployedFundsSortOrder === 'asc' 
+                return deployedFundsSortOrder === 'asc'
                     ? a.deployed_funds - b.deployed_funds
                     : b.deployed_funds - a.deployed_funds;
             }
             // Apply total qty sorting if active
             if (totalQtySortOrder) {
-                return totalQtySortOrder === 'asc' 
+                return totalQtySortOrder === 'asc'
                     ? a.qty - b.qty
                     : b.qty - a.qty;
             }
@@ -716,21 +716,21 @@ export default function AnalyticsDashboard() {
             <Sidebar />
             <div className="flex-1 md:ml-[14rem] flex flex-col">
                 <Header />
-                <Lowheader />
+                <div className="hidden md:block"><Lowheader /></div>
                 {/* Main Content */}
-                <main className="container mx-auto p-6 space-y-6">
+                <main className="container mx-auto p-4 md:p-6 space-y-6">
                     <div>
                         {/* Welcome Section */}
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Analytics Dashboard</h2>
-                            <p className="text-gray-600 dark:text-gray-400">Monitor your platform's key performance metrics and trading strategies.</p>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">Monitor your platform's key performance metrics and trading strategies.</p>
                         </div>
 
                         {/* Date Range Picker */}
-                        <div className="flex items-center justify-end gap-2 mb-6">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-end gap-2 mb-6">
                             {/* start date */}
                             <div className="flex items-center gap-2">
-                                <span className="text-md text-gray-600 dark:text-gray-200">From</span>
+                                <span className="text-sm md:text-md text-gray-600 dark:text-gray-200">Start Date</span>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button variant="outline" className="w-60 justify-center text-center font-normal bg-card text-foreground hover:bg-muted hover:text-foreground">
@@ -760,7 +760,7 @@ export default function AnalyticsDashboard() {
 
                             {/* end date */}
                             <div className="flex items-center gap-2">
-                                <span className="text-md text-gray-600 dark:text-gray-200">To</span>
+                                <span className="text-sm md:text-md text-gray-600 dark:text-gray-200">End Date</span>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button
@@ -795,7 +795,7 @@ export default function AnalyticsDashboard() {
                                 </Popover>
                             </div>
 
-                            {/* clear filters */}
+                            {/* apply & clear filters */}
                             <Button
                                 onClick={() => {
                                     const endDateToUse = endDate || new Date();
@@ -810,14 +810,14 @@ export default function AnalyticsDashboard() {
                                     handleApplyDateRange();
                                 }}
                                 disabled={!startDate}
-                                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground text-sm font-medium px-4 py-2"
+                                className="bg-[#1a785f] hover:bg-[#1e896d] text-primary-foreground text-sm font-medium px-4 py-2 w-full md:w-auto"
                             >
                                 Apply
                             </Button>
                             <Button
                                 onClick={handleResetDateRange}
                                 disabled={!startDate && !endDate}
-                                className="text-sm font-medium px-4 py-2 bg-black/80 hover:bg-red-600 text-primary-foreground"
+                                className="text-sm font-medium px-4 py-2 bg-black/80 hover:bg-red-600 text-primary-foreground w-full md:w-auto"
                             >
                                 Clear
                             </Button>
