@@ -286,7 +286,7 @@ export default function StrategyPerformance() {
                       <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Total Trades
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-base font-normal px-1.5 py-0.5">
                         {strategy.total_trades}
                       </span>
                     </a>
@@ -300,7 +300,7 @@ export default function StrategyPerformance() {
                       <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Winning Trades
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-base font-normal px-1.5 py-0.5">
                         {strategy.profit_trades}
                       </span>
                     </a>
@@ -314,7 +314,7 @@ export default function StrategyPerformance() {
                       <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Losing Trades
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-base font-normal px-1.5 py-0.5">
                         {strategy.loss_trades}
                       </span>
                     </a>
@@ -328,7 +328,7 @@ export default function StrategyPerformance() {
                       <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Max Profit
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-base font-normal px-1.5 py-0.5">
                         {strategy.max_profit > 0 ? "+" : ""}
                         {formatCurrency(strategy.max_profit)}
                       </span>
@@ -343,7 +343,7 @@ export default function StrategyPerformance() {
                       <span className="flex-1 ms-3 whitespace-nowrap text-sm md:text-lg">
                         Max Loss
                       </span>
-                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5">
+                      <span className="bg-neutral-primary-soft text-heading text-sm md:text-base font-normal px-1.5 py-0.5">
                         {strategy.max_loss < 0 ? "-" : ""}
                         {formatCurrency(strategy.max_loss)}
                       </span>
@@ -359,7 +359,7 @@ export default function StrategyPerformance() {
                         Approx PnL
                       </span>
                       <span
-                        className={`bg-neutral-primary-soft text-heading text-sm md:text-md font-normal px-1.5 py-0.5 ${strategy.approx_pnl > 0
+                        className={`bg-neutral-primary-soft text-heading text-sm md:text-base font-normal px-1.5 py-0.5 ${strategy.approx_pnl > 0
                           ? "text-[#06a57f]"
                           : "text-red-600"
                           }`}
